@@ -141,3 +141,6 @@ iterator DList::end() {
 	// to calculate it everytime we call this func?
 }
 
+void DList::clear() {
+	mHead = nullptr;
+}
