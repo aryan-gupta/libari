@@ -39,6 +39,8 @@ public:
 		TYPE& operator*();
 		TYPE& operator->();
 		
+		Node* getNode();
+		
 	private:
 		struct Node* data;
 		
