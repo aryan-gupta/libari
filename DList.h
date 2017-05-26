@@ -104,8 +104,6 @@ DList::DList(const DList& other) {
 		current = new Node{prev, other[i], nullptr};
 		prev->next = current;
 	}
-	
-	current->next = nullptr;
 }
 
 DList(const size_t size, const TYPE& val = TYPE()) {
