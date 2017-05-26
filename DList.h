@@ -71,8 +71,8 @@ public:
 	
 	size_t size() const;
 	
-	const TYPE& operator[](const size_t idx) const;
-	TYPE& operator[](const size_t idx);
+	const TYPE& operator[](size_t idx) const;
+	TYPE& operator[](size_t idx);
 	
 private:
 	struct Node {
