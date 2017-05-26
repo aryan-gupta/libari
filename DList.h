@@ -79,6 +79,7 @@ private:
 	};
 	
 	Node* mHead;
+	Node* mTail;
 	size_t mSize;
 	
 };
@@ -88,6 +89,7 @@ private:
 
 DList::DList() {
 	mHead = nullptr;
+	mTail = nullptr;
 	mSize = 0;
 }
 
@@ -102,6 +104,8 @@ DList::DList(const DList& other) {
 		current = new Node{prev, other[i], nullptr};
 		prev->next = current;
 	}
+	
+	mTail = current;
 }
 
 DList::DList(const size_t size, const TYPE& val = TYPE()) {
@@ -115,6 +119,8 @@ DList::DList(const size_t size, const TYPE& val = TYPE()) {
 		current = new Node{prev, val, nullptr};
 		prev->next = current;
 	}
+	
+	mTail = current;
 }
 
 template <typename ITER>
@@ -129,6 +135,8 @@ DList::DList(const ITER& begin, const ITER& end) {
 		current = new Node{prev, *begin++, nullptr};
 		prev->next = current;
 	}
+	
+	mTail = current;
 }
 
 iterator DList::begin() {
