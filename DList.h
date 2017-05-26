@@ -237,3 +237,21 @@ size_t DList::size() {
 	return mSize;
 }
 
+const TYPE& operator[](size_t idx) const {
+	Node* current = mHead;
+	
+	while(idx --> 0)
+		current = current->next;
+	
+	return current->data;
+}
+
+TYPE& operator[](size_t idx) {
+	Node* current = mHead;
+	
+	while(idx --> 0)
+		current = current->next;
+	
+	return current->data;
+}
+
