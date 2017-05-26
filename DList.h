@@ -63,9 +63,13 @@ public:
 	void pop_back();
 	void pop_front();
 	
+	void insert(const size_t idx, const TYPE& val);
 	void remove(const TYPE& val);
 	
-	size_t size();
+	size_t size() const;
+	
+	const TYPE& operator[](const size_t idx) const;
+	TYPE& operator[](const size_t idx);
 	
 private:
 	struct Node {
@@ -77,4 +81,4 @@ private:
 	Node* mHead;
 	size_t mSize;
 	
-}
+};
