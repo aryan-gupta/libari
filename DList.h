@@ -92,12 +92,10 @@ DList::DList() {
 }
 
 DList::DList(const DList& other) {
-	Node* current = nullptr, prev = nullptr;
-	
 	if(other.size() > 0)
-		current = new Node{nullptr, other[0], nullptr};
+		mHead = new Node{nullptr, other[0], nullptr};
 	
-	mHead = current;
+	Node* current = mHead, prev = nullptr;
 	
 	for(size_t i = 1; i < other.size(); ++i) {
 		prev = current;
@@ -107,12 +105,10 @@ DList::DList(const DList& other) {
 }
 
 DList(const size_t size, const TYPE& val = TYPE()) {
-	Node* current = nullptr, prev = nullptr;
-	
 	if(size > 0)
-		current = new Node{nullptr, val, nullptr};
+		mHead = new Node{nullptr, val, nullptr};
 	
-	mHead = current;
+	Node* current = mHead, prev = nullptr;
 	
 	for(size_t i = 0; i < size; ++i) {
 		prev = current;
@@ -120,3 +116,4 @@ DList(const size_t size, const TYPE& val = TYPE()) {
 		prev->next = current;
 	}
 }
+
