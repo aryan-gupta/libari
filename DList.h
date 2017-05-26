@@ -188,3 +188,21 @@ void DList::pop_front() {
 	mSize--;
 }
 
+void DList::insert(size_t idx, const TYPE& val) {
+	Node* node = mHead;
+	
+	while(idx --> 0)
+		node = node->next;
+	
+	Node* newNext = node->next;
+	
+	node->next = new Node{node, val, newNext};
+	
+}
+
+void DList::insert(const DList::iterator it, const TYPE& val) {
+	Node* current = it.getNode();
+	Node* newNext = current->next;
+	
+	current->next = new Node{current, val, newNext};
+}
