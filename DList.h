@@ -47,7 +47,7 @@ public:
 	DList();
 	DList(const DList& other);
 	
-	DList(const size_t size, const TYPE& = TYPE());
+	DList(const size_t size, const TYPE& val = TYPE());
 	
 	template <typename ITER>
 	DList(const ITER& begin, const ITER& end);
@@ -108,3 +108,17 @@ DList::DList(const DList& other) {
 	current->next = nullptr;
 }
 
+DList(const size_t size, const TYPE& val = TYPE()) {
+	Node* current = nullptr, prev = nullptr;
+	
+	if(size > 0)
+		current = new Node{nullptr, val, nullptr};
+	
+	mHead = current;
+	
+	for(size_t i = 0; i < size; ++i) {
+		prev = current;
+		current = new Node{prev, val, nullptr};
+		prev->next = current;
+	}
+}
