@@ -117,3 +117,16 @@ DList(const size_t size, const TYPE& val = TYPE()) {
 	}
 }
 
+template <typename ITER>
+DList(const ITER& begin, const ITER& end) {
+	if(std::distance(start, end) > 0)
+		mHead = new Node{nullptr, *begin++, nullptr};
+	
+	Node* current = mHead, prev = nullptr;
+	
+	while(begin != end) {
+		prev = current;
+		current = new Node{prev, *begin++, nullptr};
+		prev->next = current;
+	}
+}
