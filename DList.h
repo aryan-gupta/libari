@@ -91,3 +91,20 @@ DList::DList() {
 	mSize = 0;
 }
 
+DList::DList(const DList& other) {
+	Node* current = nullptr, prev = nullptr;
+	
+	if(other.size() > 0)
+		current = new Node{nullptr, other[0], nullptr};
+	
+	mHead = current;
+	
+	for(size_t i = 1; i < other.size(); ++i) {
+		prev = current;
+		current = new Node{prev, other[i], nullptr};
+		prev->next = current;
+	}
+	
+	current->next = nullptr;
+}
+
