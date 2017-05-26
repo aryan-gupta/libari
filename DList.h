@@ -81,7 +81,7 @@ private:
 		Node* next;
 	};
 	
-	Node* mHead;
+	Node* mHead; /// @todo convert to iterators?
 	Node* mTail;
 	size_t mSize;
 	
@@ -96,7 +96,7 @@ DList::DList() {
 	mSize = 0;
 }
 
-DList::DList(const DList& other) {
+DList::DList(const DList& other) { /// @todo set mHead to null in each constructor
 	if(other.size() > 0)
 		mHead = new Node{nullptr, other[0], nullptr};
 	
