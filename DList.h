@@ -130,3 +130,14 @@ DList::DList(const ITER& begin, const ITER& end) {
 		prev->next = current;
 	}
 }
+
+iterator DList::begin() {
+	return iterator(mHead);
+}
+
+iterator DList::end() {
+	/// @todo this part
+	// maybe add tail member variable so we dont have 
+	// to calculate it everytime we call this func?
+}
+
