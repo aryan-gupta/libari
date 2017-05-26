@@ -161,3 +161,29 @@ void DList::clear() {
 	// mSize = 0; // Use this in final
 }
 
+void DList::push_back(const TYPE& val) {
+	mTail->next = new Node{mTail, val, nullptr};
+	mTail = mTail->next;
+	mSize++;
+}
+
+void DList::push_front(const TYPE& val) {
+	mHead->prev = new Node{nullptr, val, mHead};
+	mHead = mHead->prev;
+	mSize++;
+}
+
+void DList::pop_back() {
+	Node* rem = mTail;
+	mTail = mTail->prev;
+	delete rem;
+	mSize--;
+}
+
+void DList::pop_front() {
+	Node* rem = mHead;
+	mHead = mHead->next;
+	delete rem;
+	mSize--;
+}
+
