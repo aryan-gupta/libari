@@ -208,3 +208,21 @@ void DList::insert(const DList::iterator it, const TYPE& val) {
 	
 	current->next = new Node{current, val, newNext};
 }
+
+void DList::remove(const TYPE& val) {
+	Node* current = mHead, rem;
+	
+	while(current != nullptr) {
+		if(current->data == val) {
+			rem = current; /// @todo we can shorted this by a line
+			current->prev->next = current->next;
+			current->next->prev = current->prev;
+			
+			current = current->next;
+			
+			delete rem;
+		} else {
+			current = current->next;
+		}
+	}
+}
