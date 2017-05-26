@@ -150,5 +150,14 @@ iterator DList::end() {
 }
 
 void DList::clear() {
+	while(mHead != mTail) {
+		Node* rem = mHead;
+		mHead = mHead->next;
+		delete rem;
+		--mSize; // only here for testing
+		// will use below in final
+	}
 	mHead = nullptr;
+	// mSize = 0; // Use this in final
 }
+
