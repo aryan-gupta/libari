@@ -104,7 +104,7 @@ DList::DList(const DList& other) {
 	}
 }
 
-DList(const size_t size, const TYPE& val = TYPE()) {
+DList::DList(const size_t size, const TYPE& val = TYPE()) {
 	if(size > 0)
 		mHead = new Node{nullptr, val, nullptr};
 	
@@ -118,7 +118,7 @@ DList(const size_t size, const TYPE& val = TYPE()) {
 }
 
 template <typename ITER>
-DList(const ITER& begin, const ITER& end) {
+DList::DList(const ITER& begin, const ITER& end) {
 	if(std::distance(start, end) > 0)
 		mHead = new Node{nullptr, *begin++, nullptr};
 	
