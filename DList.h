@@ -232,3 +232,8 @@ void DList::remove(const TYPE& val) {
 		}
 	}
 }
+
+size_t DList::size() {
+	return mSize;
+}
+
