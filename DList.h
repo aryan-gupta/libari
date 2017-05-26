@@ -200,6 +200,8 @@ void DList::insert(size_t idx, const TYPE& val) {
 	
 	node->next = new Node{node, val, newNext};
 	
+	mSize++;
+	
 }
 
 void DList::insert(const DList::iterator it, const TYPE& val) {
@@ -207,6 +209,8 @@ void DList::insert(const DList::iterator it, const TYPE& val) {
 	Node* newNext = current->next;
 	
 	current->next = new Node{current, val, newNext};
+	
+	mSize++;
 }
 
 void DList::remove(const TYPE& val) {
@@ -221,6 +225,8 @@ void DList::remove(const TYPE& val) {
 			current = current->next;
 			
 			delete rem;
+			
+			mSize--;
 		} else {
 			current = current->next;
 		}
