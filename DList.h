@@ -64,6 +64,7 @@ public:
 	void pop_front();
 	
 	void insert(const size_t idx, const TYPE& val);
+	void insert(const DList::iterator it, const TYPE& val);
 	void remove(const TYPE& val);
 	
 	size_t size() const;
