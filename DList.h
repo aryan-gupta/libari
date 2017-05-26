@@ -82,3 +82,12 @@ private:
 	size_t mSize;
 	
 };
+
+
+// IMPLEMENTATION
+
+DList::DList() {
+	mHead = nullptr;
+	mSize = 0;
+}
+
