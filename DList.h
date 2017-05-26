@@ -214,7 +214,7 @@ void DList::insert(const DList::iterator it, const TYPE& val) {
 }
 
 void DList::remove(const TYPE& val) {
-	Node* current = mHead, rem;
+	Node* current = mHead, rem = nullptr;
 	
 	while(current != nullptr) {
 		if(current->data == val) {
