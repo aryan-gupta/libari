@@ -69,7 +69,7 @@ public:
 	void pop_front();
 	
 	void insert(size_t idx, const TYPE& val);
-	void insert(const DList::iterator it, const TYPE& val);
+	void insert(const DList<TYPE>::iterator it, const TYPE& val);
 	void remove(const TYPE& val);
 	
 	size_t size() const;
@@ -93,13 +93,16 @@ private:
 
 // IMPLEMENTATION
 
-DList::DList() {
+template <typename TYPE> 
+DList<TYPE>::DList() {
 	mHead = nullptr;
 	mTail = nullptr;
 	mSize = 0;
 }
 
-DList::DList(const DList& other) { /// @todo set mHead to null in each constructor
+
+template <typename TYPE> 
+DList<TYPE>::DList(const DList& other) { /// @todo set mHead to null in each constructor
 	if(other.size() > 0)
 		mHead = new Node{nullptr, other[0], nullptr};
 	
@@ -114,7 +117,9 @@ DList::DList(const DList& other) { /// @todo set mHead to null in each construct
 	mTail = current;
 }
 
-DList::DList(const size_t size, const TYPE& val = TYPE()) {
+
+template <typename TYPE> 
+DList<TYPE>::DList(const size_t size, const TYPE& val = TYPE()) {
 	if(size > 0)
 		mHead = new Node{nullptr, val, nullptr};
 	
@@ -129,8 +134,9 @@ DList::DList(const size_t size, const TYPE& val = TYPE()) {
 	mTail = current;
 }
 
-template <typename ITER>
-DList::DList(ITER& begin, ITER& end) {
+
+template <typename TYPE, typename ITER>
+DList<TYPE>::DList(ITER& begin, ITER& end) {
 	if(std::distance(start, end) > 0)
 		mHead = new Node{nullptr, *begin++, nullptr};
 	
@@ -145,17 +151,23 @@ DList::DList(ITER& begin, ITER& end) {
 	mTail = current;
 }
 
-iterator DList::begin() {
+
+template <typename TYPE> 
+iterator DList<TYPE>::begin() {
 	return iterator(mHead);
 }
 
-iterator DList::end() {
+
+template <typename TYPE> 
+iterator DList<TYPE>::end() {
 	/// @todo this part
 	// maybe add tail member variable so we dont have 
 	// to calculate it everytime we call this func?
 }
 
-void DList::clear() {
+
+template <typename TYPE> 
+void DList<TYPE>::clear() {
 	while(mHead != mTail) {
 		Node* rem = mHead;
 		mHead = mHead->next;
@@ -167,33 +179,43 @@ void DList::clear() {
 	// mSize = 0; // Use this in final
 }
 
-void DList::push_back(const TYPE& val) {
+
+template <typename TYPE> 
+void DList<TYPE>::push_back(const TYPE& val) {
 	mTail->next = new Node{mTail, val, nullptr};
 	mTail = mTail->next;
 	mSize++;
 }
 
-void DList::push_front(const TYPE& val) {
+
+template <typename TYPE> 
+void DList<TYPE>::push_front(const TYPE& val) {
 	mHead->prev = new Node{nullptr, val, mHead};
 	mHead = mHead->prev;
 	mSize++;
 }
 
-void DList::pop_back() {
+
+template <typename TYPE> 
+void DList<TYPE>::pop_back() {
 	Node* rem = mTail;
 	mTail = mTail->prev;
 	delete rem;
 	mSize--;
 }
 
-void DList::pop_front() {
+
+template <typename TYPE> 
+void DList<TYPE>::pop_front() {
 	Node* rem = mHead;
 	mHead = mHead->next;
 	delete rem;
 	mSize--;
 }
 
-void DList::insert(size_t idx, const TYPE& val) {
+
+template <typename TYPE> 
+void DList<TYPE>::insert(size_t idx, const TYPE& val) {
 	Node* node = mHead;
 	
 	while(idx --> 0)
@@ -207,7 +229,9 @@ void DList::insert(size_t idx, const TYPE& val) {
 	
 }
 
-void DList::insert(const DList::iterator it, const TYPE& val) {
+
+template <typename TYPE> 
+void DList<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& val) {
 	Node* current = it.getNode();
 	Node* newNext = current->next;
 	
@@ -216,7 +240,9 @@ void DList::insert(const DList::iterator it, const TYPE& val) {
 	mSize++;
 }
 
-void DList::remove(const TYPE& val) {
+
+template <typename TYPE> 
+void DList<TYPE>::remove(const TYPE& val) {
 	Node* current = mHead, rem = nullptr;
 	
 	while(current != nullptr) {
@@ -236,10 +262,14 @@ void DList::remove(const TYPE& val) {
 	}
 }
 
-size_t DList::size() {
+
+template <typename TYPE> 
+size_t DList<TYPE>::size() {
 	return mSize;
 }
 
+
+template <typename TYPE> 
 const TYPE& operator[](size_t idx) const {
 	Node* current = mHead;
 	
@@ -249,6 +279,8 @@ const TYPE& operator[](size_t idx) const {
 	return current->data;
 }
 
+
+template <typename TYPE> 
 TYPE& operator[](size_t idx) {
 	Node* current = mHead;
 	
@@ -260,51 +292,69 @@ TYPE& operator[](size_t idx) {
 
 // ITERATOR
 
-DList::iterator::iterator() {
+
+template <typename TYPE> 
+DList<TYPE>::iterator::iterator() {
 	data = nullptr;
 }
 
-DList::iterator::iterator(const Node* node) {
+
+template <typename TYPE> 
+DList<TYPE>::iterator::iterator(const Node* node) {
 	data = node;
 }
 
-DList::iterator::iterator(const DList::iterator& it) {
+
+template <typename TYPE> 
+DList<TYPE>::iterator::iterator(const DList<TYPE>::iterator& it) {
 	data = it.data;
 }
 
-DList::iterator& DList::iterator::operator++() {
+
+template <typename TYPE> 
+DList<TYPE>::iterator& DList<TYPE>::iterator::operator++() {
 	data = data->next;
 	
 	return *this;
 }
 
-DList::iterator& DList::iterator::operator--() {
+
+template <typename TYPE> 
+DList<TYPE>::iterator& DList<TYPE>::iterator::operator--() {
 	data = data->prev;
 	
 	return *this;
 }
 
-DList::iterator DList::iterator::operator++(int) {
-	DList::iterator orig(data);
+
+template <typename TYPE> 
+DList<TYPE>::iterator DList<TYPE>::iterator::operator++(int) {
+	DList<TYPE>::iterator orig(data);
 	
 	data = data->next;
 	
 	return orig;
 }
 
-DList::iterator DList::iterator::operator--(int) {
-	DList::iterator orig(data);
+
+template <typename TYPE> 
+DList<TYPE>::iterator DList<TYPE>::iterator::operator--(int) {
+	DList<TYPE>::iterator orig(data);
 	
 	data = data->prev;
 	
 	return orig;
 }
 
-DList::iterator& DList::iterator::operator=(const iterator& it) {
+
+template <typename TYPE> 
+DList<TYPE>::iterator& DList<TYPE>::iterator::operator=(const iterator& it) {
 	data = it.data;
 }
 
-DList::iterator& DList::iterator::operator-(int scale) {
+
+template <typename TYPE> 
+DList<TYPE>::iterator& DList<TYPE>::iterator::operator-(int scale) {
 	scale = abs(scale);
 	
 	while(scale --> 0)
@@ -313,7 +363,9 @@ DList::iterator& DList::iterator::operator-(int scale) {
 	return *this;
 }
 
-DList::iterator& DList::iterator::operator+(int scale) {
+
+template <typename TYPE> 
+DList<TYPE>::iterator& DList<TYPE>::iterator::operator+(int scale) {
 	scale = abs(scale);
 	
 	while(scale --> 0)
@@ -322,18 +374,26 @@ DList::iterator& DList::iterator::operator+(int scale) {
 	return *this;
 }
 
-bool DList::iterator::operator==(const iterator& it) {
+
+template <typename TYPE> 
+bool DList<TYPE>::iterator::operator==(const iterator& it) {
 	return data == it.data
 }
 
-TYPE& DList::iterator::operator*() {
+
+template <typename TYPE> 
+TYPE& DList<TYPE>::iterator::operator*() {
 	return data->data;
 }
 
-TYPE& DList::iterator::operator->() {
+
+template <typename TYPE> 
+TYPE& DList<TYPE>::iterator::operator->() {
 	return data->data;
 }
 
-Node* DList::iterator::getNode() {
+
+template <typename TYPE> 
+Node* DList<TYPE>::iterator::getNode() {
 	return data;
 }
