@@ -20,10 +20,16 @@
 template <typename TYPE>
 class DList {
 public:
+	struct Node {
+		Node* prev;
+		TYPE data;
+		Node* next;
+	};
+	
 	class iterator {
 	public:
 		iterator();
-		iterator(const struct Node* node);
+		iterator(const Node* node);
 		iterator(const iterator& it);
 	
 		iterator& operator++(); // preincrement
@@ -42,10 +48,10 @@ public:
 		TYPE& operator*();
 		TYPE& operator->();
 		
-		struct Node* getNode();
+		Node* getNode();
 		
 	private:
-		struct Node* data;
+		Node* data;
 		
 	};
 	
@@ -55,7 +61,7 @@ public:
 	DList(const size_t size, const TYPE& val = TYPE());
 	
 	template <typename ITER>
-	DList(ITER& begin, ITER& end);
+	DList(ITER&& begin, ITER&& end);
 	
 	iterator begin() const;
 	iterator end() const;
@@ -77,13 +83,7 @@ public:
 	const TYPE& operator[](size_t idx) const;
 	TYPE& operator[](size_t idx);
 	
-private:
-	struct Node {
-		Node* prev;
-		TYPE data;
-		Node* next;
-	};
-	
+private:	
 	Node* mHead; /// @todo convert to iterators?
 	Node* mTail;
 	size_t mSize;
@@ -106,7 +106,7 @@ DList<TYPE>::DList(const DList& other) { /// @todo set mHead to null in each con
 	if(other.size() > 0)
 		mHead = new Node{nullptr, other[0], nullptr};
 	
-	Node* current = mHead, prev = nullptr;
+	Node* current = mHead, *prev = nullptr;
 	
 	for(size_t i = 1; i < other.size(); ++i) {
 		prev = current;
@@ -119,11 +119,11 @@ DList<TYPE>::DList(const DList& other) { /// @todo set mHead to null in each con
 
 
 template <typename TYPE> 
-DList<TYPE>::DList(const size_t size, const TYPE& val = TYPE()) {
+DList<TYPE>::DList(const size_t size, const TYPE& val) {
 	if(size > 0)
 		mHead = new Node{nullptr, val, nullptr};
 	
-	Node* current = mHead, prev = nullptr;
+	Node* current = mHead, *prev = nullptr;
 	
 	for(size_t i = 0; i < size; ++i) {
 		prev = current;
@@ -134,13 +134,13 @@ DList<TYPE>::DList(const size_t size, const TYPE& val = TYPE()) {
 	mTail = current;
 }
 
-
-template <typename TYPE, typename ITER>
-DList<TYPE>::DList(ITER& begin, ITER& end) {
-	if(std::distance(start, end) > 0)
+template <typename TYPE>
+template <typename ITER>
+DList<TYPE>::DList(ITER&& begin, ITER&& end) {
+	if(std::distance(begin, end) > 0)
 		mHead = new Node{nullptr, *begin++, nullptr};
 	
-	Node* current = mHead, prev = nullptr;
+	Node* current = mHead, *prev = nullptr;
 	
 	while(begin != end) {
 		prev = current;
@@ -153,13 +153,13 @@ DList<TYPE>::DList(ITER& begin, ITER& end) {
 
 
 template <typename TYPE> 
-iterator DList<TYPE>::begin() {
+typename DList<TYPE>::iterator DList<TYPE>::begin() const {
 	return iterator(mHead);
 }
 
 
 template <typename TYPE> 
-iterator DList<TYPE>::end() {
+typename DList<TYPE>::iterator DList<TYPE>::end() const {
 	/// @todo this part
 	// maybe add tail member variable so we dont have 
 	// to calculate it everytime we call this func?
@@ -243,7 +243,7 @@ void DList<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& val) {
 
 template <typename TYPE> 
 void DList<TYPE>::remove(const TYPE& val) {
-	Node* current = mHead, rem = nullptr;
+	Node* current = mHead, *rem = nullptr;
 	
 	while(current != nullptr) {
 		if(current->data == val) {
@@ -264,13 +264,13 @@ void DList<TYPE>::remove(const TYPE& val) {
 
 
 template <typename TYPE> 
-size_t DList<TYPE>::size() {
+size_t DList<TYPE>::size() const {
 	return mSize;
 }
 
 
 template <typename TYPE> 
-const TYPE& operator[](size_t idx) const {
+const TYPE& DList<TYPE>::operator[](size_t idx) const {
 	Node* current = mHead;
 	
 	while(idx --> 0)
@@ -281,7 +281,7 @@ const TYPE& operator[](size_t idx) const {
 
 
 template <typename TYPE> 
-TYPE& operator[](size_t idx) {
+TYPE& DList<TYPE>::operator[](size_t idx) {
 	Node* current = mHead;
 	
 	while(idx --> 0)
@@ -312,7 +312,7 @@ DList<TYPE>::iterator::iterator(const DList<TYPE>::iterator& it) {
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator& DList<TYPE>::iterator::operator++() {
+typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator++() {
 	data = data->next;
 	
 	return *this;
@@ -320,7 +320,7 @@ DList<TYPE>::iterator& DList<TYPE>::iterator::operator++() {
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator& DList<TYPE>::iterator::operator--() {
+typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator--() {
 	data = data->prev;
 	
 	return *this;
@@ -328,7 +328,7 @@ DList<TYPE>::iterator& DList<TYPE>::iterator::operator--() {
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator DList<TYPE>::iterator::operator++(int) {
+typename DList<TYPE>::iterator DList<TYPE>::iterator::operator++(int) {
 	DList<TYPE>::iterator orig(data);
 	
 	data = data->next;
@@ -338,7 +338,7 @@ DList<TYPE>::iterator DList<TYPE>::iterator::operator++(int) {
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator DList<TYPE>::iterator::operator--(int) {
+typename DList<TYPE>::iterator DList<TYPE>::iterator::operator--(int) {
 	DList<TYPE>::iterator orig(data);
 	
 	data = data->prev;
@@ -348,13 +348,13 @@ DList<TYPE>::iterator DList<TYPE>::iterator::operator--(int) {
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator& DList<TYPE>::iterator::operator=(const iterator& it) {
+typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator=(const iterator& it) {
 	data = it.data;
 }
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator& DList<TYPE>::iterator::operator-(int scale) {
+typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator-(int scale) {
 	scale = abs(scale);
 	
 	while(scale --> 0)
@@ -365,7 +365,7 @@ DList<TYPE>::iterator& DList<TYPE>::iterator::operator-(int scale) {
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator& DList<TYPE>::iterator::operator+(int scale) {
+typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator+(int scale) {
 	scale = abs(scale);
 	
 	while(scale --> 0)
@@ -377,7 +377,7 @@ DList<TYPE>::iterator& DList<TYPE>::iterator::operator+(int scale) {
 
 template <typename TYPE> 
 bool DList<TYPE>::iterator::operator==(const iterator& it) {
-	return data == it.data
+	return data == it.data;
 }
 
 
@@ -394,6 +394,6 @@ TYPE& DList<TYPE>::iterator::operator->() {
 
 
 template <typename TYPE> 
-Node* DList<TYPE>::iterator::getNode() {
+typename DList<TYPE>::Node* DList<TYPE>::iterator::getNode() {
 	return data;
 }
