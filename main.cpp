@@ -17,6 +17,9 @@
 #include "info.h"
 
 #include <iostream>
+#include <vector>
+
+using namespace std;
 
 #include "DList.h"
 
@@ -24,6 +27,10 @@ int main(int argc, char* argv[]) {
 	vector<int> tmp = {0, 3, 1, 4, 2, 6, 7, 3, 7, 1, 9, 0, 6};
 	
 	DList<typename tmp::value_type> listTest(tmp.begin(), tmp.end());
+	
+	for(size_t i = 0; i < listTest.size(); ++i) {
+		cout << listTest[i] << " ";
+	}
 	
 	return 0;
 }
