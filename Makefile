@@ -28,9 +28,11 @@ CFLAGS = $(DEBUG) -Wall -std=c++11 -c
 LFLAGS = $(DEBUG) -Wall
 OBJS = $(BIN)/res.o $(BIN)/main.o
 
+TEST = DList.h
+
 # ============================ RECEPIES ========================================
 
-$(BIN)/main.o: main.cpp
+$(BIN)/main.o: main.cpp $(TEST)
 	$(CC) main.cpp -o $@ $(CFLAGS) $(L_SDLC)
 
 $(BIN)/%.o: %.cpp
