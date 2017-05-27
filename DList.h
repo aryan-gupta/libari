@@ -29,7 +29,6 @@ public:
 		iterator operator--(int);
 		
 		iterator& operator=(const iterator& it);
-		iterator& operator=(iterator&& it);
 		
 		iterator& operator-(const int scale);
 		iterator& operator+(const int scale);
