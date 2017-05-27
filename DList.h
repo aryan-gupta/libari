@@ -102,9 +102,14 @@ DList<TYPE>::DList() {
 
 
 template <typename TYPE> 
-DList<TYPE>::DList(const DList& other) { /// @todo set mHead to null in each constructor
-	if(other.size() > 0)
+DList<TYPE>::DList(const DList& other) {
+	mHead = nullptr;
+	mSize = 0;
+	
+	if(other.size() > 0) {
 		mHead = new Node{nullptr, other[0], nullptr};
+		mSize++;
+	}
 	
 	Node* current = mHead, *prev = nullptr;
 	
@@ -112,6 +117,8 @@ DList<TYPE>::DList(const DList& other) { /// @todo set mHead to null in each con
 		prev = current;
 		current = new Node{prev, other[i], nullptr};
 		prev->next = current;
+		
+		mSize++;
 	}
 	
 	mTail = current;
@@ -120,8 +127,13 @@ DList<TYPE>::DList(const DList& other) { /// @todo set mHead to null in each con
 
 template <typename TYPE> 
 DList<TYPE>::DList(const size_t size, const TYPE& val) {
-	if(size > 0)
+	mHead = nullptr;
+	mSize = 0; /// @todo make one statement later rather than incrementing everytime
+	
+	if(size > 0) {
 		mHead = new Node{nullptr, val, nullptr};
+		mSize++;
+	}
 	
 	Node* current = mHead, *prev = nullptr;
 	
@@ -129,6 +141,8 @@ DList<TYPE>::DList(const size_t size, const TYPE& val) {
 		prev = current;
 		current = new Node{prev, val, nullptr};
 		prev->next = current;
+		
+		mSize++;
 	}
 	
 	mTail = current;
@@ -137,8 +151,13 @@ DList<TYPE>::DList(const size_t size, const TYPE& val) {
 template <typename TYPE>
 template <typename ITER>
 DList<TYPE>::DList(ITER&& begin, ITER&& end) {
-	if(std::distance(begin, end) > 0)
+	mHead = nullptr;
+	mSize = 0;
+	
+	if(std::distance(begin, end) > 0) {
 		mHead = new Node{nullptr, *begin++, nullptr};
+		mSize++;
+	}
 	
 	Node* current = mHead, *prev = nullptr;
 	
@@ -146,6 +165,8 @@ DList<TYPE>::DList(ITER&& begin, ITER&& end) {
 		prev = current;
 		current = new Node{prev, *begin++, nullptr};
 		prev->next = current;
+		
+		mSize++;
 	}
 	
 	mTail = current;
