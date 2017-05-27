@@ -23,31 +23,52 @@ using namespace std;
 
 #include "DList.h"
 
+template<typename DS>
+void output(DS& p) {
+	for(size_t i = 0; i < p.size(); ++i)
+		cout << p[i] << " ";
+	cout << endl;
+	cout << "Size: " << p.size() << endl;
+} 
+
 int main(int argc, char* argv[]) {
-	vector<int> tmp = {0, 3, 1, 4, 2, 6};
+	vector<int> tmp = {0, 3, 1, 1, 2, 6};
 	
+	cout << endl << "Iterator Constructor Test" << endl;
 	DList<int> listTest(tmp.begin(), tmp.end());
 	
+	cout << endl << "Push Back Test" << endl;
 	listTest.push_back(5);
-	cout << listTest.size() << endl;
-	
+	output(listTest);
 	listTest.push_back(7);
-	cout << listTest.size() << endl;
+	output(listTest);
 	
-	listTest.push_front(2);
-	cout << listTest.size() << endl;
+	cout << endl << "Push Front Test" << endl;
+	listTest.push_front(1);
+	output(listTest);
 	
-	
-	for(size_t i = 0; i < listTest.size(); ++i)
-		cout << listTest[i] << " ";
-	cout << endl;
-	
+	cout << endl << "Pop Back Test" << endl;
 	listTest.pop_back();
-	cout << listTest.size() << endl;
+	output(listTest);
 	
-	for(size_t i = 0; i < listTest.size(); ++i)
-		cout << listTest[i] << " ";
-	cout << endl;
+	cout << endl << "Pop Front Test" << endl;
+	listTest.pop_front();
+	output(listTest);
+	
+	cout << endl << "Remove Test" << endl;
+	listTest.remove(5);
+	output(listTest);
+	
+	cout << endl << "Operator[] Test" << endl;
+	listTest[2] = 5;
+	listTest[0] = 1;
+	output(listTest);
+	
+	cout << endl << "Insert Test" << endl;
+	listTest.insert(0, 9);
+	//listTest.insert(3, 9);
+	output(listTest);
+	
 	
 	return 0;
 }
