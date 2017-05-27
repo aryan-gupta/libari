@@ -25,8 +25,8 @@ public:
 		iterator& operator++(); // preincrement
 		iterator& operator--();
 		
-		iterator& operator++(int); // postincrement
-		iterator& operator--(int);
+		iterator operator++(int); // postincrement
+		iterator operator--(int);
 		
 		iterator& operator=(const iterator& it);
 		iterator& operator=(iterator&& it);
