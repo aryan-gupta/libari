@@ -23,7 +23,7 @@ public:
 	class iterator {
 	public:
 		iterator();
-		iterator(const Node* node);
+		iterator(const struct Node* node);
 		iterator(const iterator& it);
 	
 		iterator& operator++(); // preincrement
@@ -42,7 +42,7 @@ public:
 		TYPE& operator*();
 		TYPE& operator->();
 		
-		Node* getNode();
+		struct Node* getNode();
 		
 	private:
 		struct Node* data;
