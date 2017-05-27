@@ -15,17 +15,15 @@
  * =============================================================================
  */
 #include "info.h"
-#define PRINT_LEGAL_TERR std::cout << '\n' << R_PROJNAME << " v" << R_PVERSION \
-		<< " by " << R_AUTHOR << '\n' << R_COPYRIGHT << '\n' << R_COMMENTS \
-		<< "\n\n\n" // Legal and Informational
-
 
 #include <iostream>
 
-#include ".\h\main.h"
+#include "DList.h"
 
 int main(int argc, char* argv[]) {
-	PRINT_LEGAL_TERR;
+	vector<int> tmp = {0, 3, 1, 4, 2, 6, 7, 3, 7, 1, 9, 0, 6};
+	
+	DList<typename tmp::value_type> listTest(tmp.begin(), tmp.end());
 	
 	return 0;
 }
