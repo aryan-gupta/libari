@@ -55,7 +55,7 @@ public:
 	DList(const size_t size, const TYPE& val = TYPE());
 	
 	template <typename ITER>
-	DList(const ITER& begin, const ITER& end);
+	DList(ITER& begin, ITER& end);
 	
 	iterator begin() const;
 	iterator end() const;
@@ -130,7 +130,7 @@ DList::DList(const size_t size, const TYPE& val = TYPE()) {
 }
 
 template <typename ITER>
-DList::DList(const ITER& begin, const ITER& end) {
+DList::DList(ITER& begin, ITER& end) {
 	if(std::distance(start, end) > 0)
 		mHead = new Node{nullptr, *begin++, nullptr};
 	
