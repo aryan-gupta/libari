@@ -22,6 +22,10 @@ class DList {
 public:
 	class iterator {
 	public:
+		iterator();
+		iterator(const Node* node);
+		iterator(const iterator& it);
+	
 		iterator& operator++(); // preincrement
 		iterator& operator--();
 		
@@ -254,6 +258,20 @@ TYPE& operator[](size_t idx) {
 	return current->data;
 }
 
+// ITERATOR
+
+DList::iterator::iterator() {
+	data = nullptr;
+}
+
+DList::iterator::iterator(const Node* node) {
+	data = node;
+}
+
+DList::iterator::iterator(const DList::iterator& it) {
+	data = it.data;
+}
+
 DList::iterator& DList::iterator::operator++() {
 	data = data->next;
 	
@@ -303,7 +321,6 @@ DList::iterator& DList::iterator::operator+(int scale) {
 
 	return *this;
 }
-
 
 bool DList::iterator::operator==(const iterator& it) {
 	return data == it.data
