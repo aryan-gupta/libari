@@ -29,7 +29,7 @@ public:
 		iterator operator--(int);
 		
 		iterator& operator=(const iterator& it);
-		
+
 		iterator& operator-(int scale);
 		iterator& operator+(int scale);
 		
@@ -254,3 +254,69 @@ TYPE& operator[](size_t idx) {
 	return current->data;
 }
 
+DList::iterator& DList::iterator::operator++() {
+	data = data->next;
+	
+	return *this;
+}
+
+DList::iterator& DList::iterator::operator--() {
+	data = data->prev;
+	
+	return *this;
+}
+
+DList::iterator DList::iterator::operator++(int) {
+	DList::iterator orig(data);
+	
+	data = data->next;
+	
+	return orig;
+}
+
+DList::iterator DList::iterator::operator--(int) {
+	DList::iterator orig(data);
+	
+	data = data->prev;
+	
+	return orig;
+}
+
+DList::iterator& DList::iterator::operator=(const iterator& it) {
+	data = it.data;
+}
+
+DList::iterator& DList::iterator::operator-(int scale) {
+	scale = abs(scale);
+	
+	while(scale --> 0)
+		data = data->prev;
+
+	return *this;
+}
+
+DList::iterator& DList::iterator::operator+(int scale) {
+	scale = abs(scale);
+	
+	while(scale --> 0)
+		data = data->next;
+
+	return *this;
+}
+
+
+bool DList::iterator::operator==(const iterator& it) {
+	return data == it.data
+}
+
+TYPE& DList::iterator::operator*() {
+	return data->data;
+}
+
+TYPE& DList::iterator::operator->() {
+	return data->data;
+}
+
+Node* DList::iterator::getNode() {
+	return data;
+}
