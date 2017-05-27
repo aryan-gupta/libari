@@ -30,8 +30,8 @@ public:
 		
 		iterator& operator=(const iterator& it);
 		
-		iterator& operator-(const int scale);
-		iterator& operator+(const int scale);
+		iterator& operator-(int scale);
+		iterator& operator+(int scale);
 		
 		bool operator==(const iterator& it);
 		
