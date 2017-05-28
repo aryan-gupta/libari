@@ -102,3 +102,12 @@ DArray<TYPE>::DArray(const DArray& other) {
 }
 
 
+template <typename TYPE>
+DArray<TYPE>::DArray(const size_t size, const TYPE& val) {
+	mCap = size * GROWTH_FACTOR;
+	mSize = size;
+	mArray = new TYPE[mCap];
+	
+	for(size_t i = 0; i < mSize; ++i)
+		mArray[i] = val;
+}
