@@ -17,6 +17,8 @@
 
 #pragma once
 
+static const double GROWTH_FACTOR = 2;
+
 template <typename TYPE>
 class DArray {
 public:
@@ -91,9 +93,9 @@ DArray<TYPE>::DArray() {
 
 template <typename TYPE>
 DArray<TYPE>::DArray(const DArray& other) {
-	mArray = new TYPE[other.size() * 2];
+	mCap = mSize * GROWTH_FACTOR;
 	mSize = other.size();
-	mCap = mSize * 2;
+	mArray = new TYPE[mCap];
 	
 	for(size_t i = 0; i < mSize; ++i)
 		mArray[i] = other.mArray[i];
