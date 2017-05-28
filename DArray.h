@@ -145,3 +145,19 @@ void DArray<TYPE>::clear() {
 }
 
 
+template <typename TYPE>
+void DArray<TYPE>::push_back(const TYPE& val) {
+	if(mSize == mCap) {
+		mCap = mSize * 2;
+		tmpArray = new TYPE[mCap];
+		
+		for(size_t i = 0; i < mSize; ++i)
+			tmpArray[i] = mArray[i];
+		
+		delete mArray;
+		mArray = tmpArray;
+	}
+	
+	mArray[mSize++] = val;
+}
+
