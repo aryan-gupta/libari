@@ -80,3 +80,11 @@ private:
 	
 };
 
+
+template<typename TYPE>
+DArray<TYPE>::DArray() {
+	mArray = new TYPE[5]; /// @todo research optimal sizes;
+	mSize = 0;
+	mCap = 5;
+}
+
