@@ -88,3 +88,15 @@ DArray<TYPE>::DArray() {
 	mCap = 5;
 }
 
+
+template <typename TYPE>
+DArray<TYPE>::DArray(const DArray& other) {
+	mArray = new TYPE[other.size() * 2];
+	mSize = other.size();
+	mCap = mSize * 2;
+	
+	for(size_t i = 0; i < mSize; ++i)
+		mArray[i] = other.mArray[i];
+}
+
+
