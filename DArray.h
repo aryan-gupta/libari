@@ -123,3 +123,14 @@ DArray<TYPE>::DArray(ITER&& begin, ITER&& end) { /// @todo const end param
 	for(size_t i = 0; i < mSize; ++i)
 		mArray[i] = *begin++;
 }
+
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator DArray<TYPE>::begin() const {
+	/// @todo This part after we define DArray<TYPE>::iterator
+}
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator DArray<TYPE>::end() const {
+	/// @todo This part after we define DArray<TYPE>::iterator
+}
