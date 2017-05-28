@@ -134,3 +134,14 @@ template <typename TYPE>
 typename DArray<TYPE>::iterator DArray<TYPE>::end() const {
 	/// @todo This part after we define DArray<TYPE>::iterator
 }
+
+template <typename TYPE>
+void DArray<TYPE>::clear() {
+	delete mArray;
+	
+	mSize = 0;
+	mCap = 5;
+	mArray = new TYPE[mCap];
+}
+
+
