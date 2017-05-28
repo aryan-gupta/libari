@@ -16,3 +16,67 @@
  */
 
 #pragma once
+
+template <typename TYPE>
+class DArray {
+public:
+	class iterator {
+	public:
+		iterator();
+		iterator(const Node* node);
+		iterator(const iterator& it);
+	
+		iterator& operator++(); // preincrement
+		iterator& operator--();
+		
+		iterator operator++(int); // postincrement
+		iterator operator--(int);
+		
+		iterator& operator=(const iterator& it);
+
+		iterator& operator-(int scale);
+		iterator& operator+(int scale);
+		
+		bool operator==(const iterator& it);
+		
+		TYPE& operator*();
+		TYPE& operator->();
+		
+		TYPE* raw();
+		
+	private:
+		TYPE* data;
+		
+	};
+	
+	DArray();
+	DArray(const DArray& other);
+	
+	DArray(const size_t size, const TYPE& val = TYPE());
+	
+	template <typename ITER>
+	DArray(ITER&& begin, ITER&& end);
+	
+	iterator begin() const;
+	iterator end() const;
+	
+	void clear();
+	
+	void push_back(const TYPE& val);
+	void pop_back();
+	
+	void insert(size_t idx, const TYPE& val);
+	void insert(const DList<TYPE>::iterator it, const TYPE& val);
+	
+	size_t size() const;
+	
+	const TYPE& operator[](size_t idx) const;
+	TYPE& operator[](size_t idx);
+	
+private:
+	TYPE* mArray;
+	size_t mSize;
+	size_t mCap;
+	
+};
+
