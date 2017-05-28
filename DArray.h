@@ -161,3 +161,10 @@ void DArray<TYPE>::push_back(const TYPE& val) {
 	mArray[mSize++] = val;
 }
 
+
+
+template <typename TYPE>
+void DArray<TYPE>::pop_back() {
+	/// @todo Maybe make it shrink if mSize is less than mCap/2 ?
+	mSize--;
+}
