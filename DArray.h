@@ -111,3 +111,15 @@ DArray<TYPE>::DArray(const size_t size, const TYPE& val) {
 	for(size_t i = 0; i < mSize; ++i)
 		mArray[i] = val;
 }
+
+
+template <typename TYPE>
+template <typename ITER>
+DArray<TYPE>::DArray(ITER&& begin, ITER&& end) { /// @todo const end param
+	mSize = std::distance(begin, end);
+	mCap = mSize * GROWTH_FACTOR;
+	mArray = new TYPE[mCap];
+	
+	for(size_t i = 0; i < mSize; ++i)
+		mArray[i] = *begin++;
+}
