@@ -197,66 +197,93 @@ void DList<TYPE>::clear() {
 		// will use below in final
 	}
 	mHead = nullptr;
+	mTail = nullptr;
 	// mSize = 0; // Use this in final
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::push_back(const TYPE& val) {
-	mTail->next = new Node{mTail, val, nullptr};
-	mTail = mTail->next;
+	if(mHead == nullptr && mTail == nullptr)
+		mHead = mTail = new Node{nullptr, val, nullptr};
+	else
+		mTail = mTail->next = new Node{mTail, val, nullptr};
+	
 	mSize++;
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::push_front(const TYPE& val) {
-	mHead->prev = new Node{nullptr, val, mHead};
-	mHead = mHead->prev;
+	if(mHead == nullptr && mTail == nullptr)
+		mHead = mTail = new Node{nullptr, val, nullptr};
+	else
+		mHead = mHead->prev = new Node{nullptr, val, mHead};
+	
 	mSize++;
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::pop_back() {
+	if(mSize == 0)
+		throw std::out_of_range("No elements to remove");
+	
 	Node* rem = mTail;
 	mTail = mTail->prev;
 	delete rem;
 	mSize--;
+	
+	if(mSize == 0)
+		mHead = nullptr;
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::pop_front() {
+	if(mSize == 0)
+		throw std::out_of_range("No elements to remove");
+	
 	Node* rem = mHead;
 	mHead = mHead->next;
 	delete rem;
 	mSize--;
+	
+	if(mSize == 0)
+		mTail = nullptr;
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::insert(size_t idx, const TYPE& val) {
-	Node* node = mHead;
+	if(idx > mSize)
+		throw std::out_of_range("Supplied index was out of range");
 	
-	while(idx --> 0)
-		node = node->next;
-	
-	Node* newNext = node->next;
-	
-	node->next = new Node{node, val, newNext};
-	
-	mSize++;
-	
+	if       (idx == 0) {
+		push_front(val);
+	} else if(idx == mSize) {
+		push_back(val);
+	} else {
+		Node* current = mHead;
+		
+		while(idx --> 0)
+			current = current->next;
+		
+		Node* newPrev = current->prev;
+		current->prev = new Node{newPrev, val, current};
+		newPrev->next = current->prev;
+		
+		mSize++;
+	}
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& val) {
 	Node* current = it.getNode();
-	Node* newNext = current->next;
+	Node* newPrev = current->prev;
 	
-	current->next = new Node{current, val, newNext};
+	current->prev = new Node{newPrev, val, current};
 	
 	mSize++;
 }
