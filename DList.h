@@ -232,8 +232,9 @@ void DList<TYPE>::pop_back() {
 	Node* rem = mTail;
 	mTail = mTail->prev;
 	delete rem;
-	mSize--;
+	mTail->next = nullptr;
 	
+	mSize--;
 	if(mSize == 0)
 		mHead = nullptr;
 }
@@ -247,8 +248,9 @@ void DList<TYPE>::pop_front() {
 	Node* rem = mHead;
 	mHead = mHead->next;
 	delete rem;
-	mSize--;
+	mHead->prev = nullptr;
 	
+	mSize--;
 	if(mSize == 0)
 		mTail = nullptr;
 }
