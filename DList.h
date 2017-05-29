@@ -197,6 +197,7 @@ void DList<TYPE>::clear() {
 		// will use below in final
 	}
 	mHead = nullptr;
+	mTail = nullptr;
 	// mSize = 0; // Use this in final
 }
 
