@@ -204,16 +204,22 @@ void DList<TYPE>::clear() {
 
 template <typename TYPE> 
 void DList<TYPE>::push_back(const TYPE& val) {
-	mTail->next = new Node{mTail, val, nullptr};
-	mTail = mTail->next;
+	if(mHead == nullptr && mTail == nullptr)
+		mHead = mTail = new Node{nullptr, val, nullptr};
+	else
+		mTail = mTail->next = new Node{mTail, val, nullptr};
+	
 	mSize++;
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::push_front(const TYPE& val) {
-	mHead->prev = new Node{nullptr, val, mHead};
-	mHead = mHead->prev;
+	if(mHead == nullptr && mTail == nullptr)
+		mHead = mTail = new Node{nullptr, val, nullptr};
+	else
+		mHead = mHead->prev = new Node{nullptr, val, mHead};
+	
 	mSize++;
 }
 
