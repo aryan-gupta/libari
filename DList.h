@@ -232,8 +232,9 @@ void DList<TYPE>::pop_back() {
 	Node* rem = mTail;
 	mTail = mTail->prev;
 	delete rem;
-	mSize--;
+	mTail->next = nullptr;
 	
+	mSize--;
 	if(mSize == 0)
 		mHead = nullptr;
 }
@@ -247,8 +248,9 @@ void DList<TYPE>::pop_front() {
 	Node* rem = mHead;
 	mHead = mHead->next;
 	delete rem;
-	mSize--;
+	mHead->prev = nullptr;
 	
+	mSize--;
 	if(mSize == 0)
 		mTail = nullptr;
 }
@@ -296,11 +298,19 @@ void DList<TYPE>::remove(const TYPE& val) {
 	while(current != nullptr) {
 		if(current->data == val) {
 			rem = current; /// @todo we can shorted this by a line
-			current->prev->next = current->next;
-			current->next->prev = current->prev;
+			
+			if       (rem == mTail) {
+				mTail = mTail->prev;
+				mTail->next = nullptr;
+			} else if(rem == mHead) {
+				mHead = mHead->next;
+				mHead->prev = nullptr;
+			} else {
+				current->prev->next = current->next;
+				current->next->prev = current->prev;
+			}
 			
 			current = current->next;
-			
 			delete rem;
 			
 			mSize--;
