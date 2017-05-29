@@ -226,19 +226,31 @@ void DList<TYPE>::push_front(const TYPE& val) {
 
 template <typename TYPE> 
 void DList<TYPE>::pop_back() {
+	if(mSize == 0)
+		throw std::out_of_range("No elements to remove");
+	
 	Node* rem = mTail;
 	mTail = mTail->prev;
 	delete rem;
 	mSize--;
+	
+	if(mSize == 0)
+		mHead = nullptr;
 }
 
 
 template <typename TYPE> 
 void DList<TYPE>::pop_front() {
+	if(mSize == 0)
+		throw std::out_of_range("No elements to remove");
+	
 	Node* rem = mHead;
 	mHead = mHead->next;
 	delete rem;
 	mSize--;
+	
+	if(mSize == 0)
+		mTail = nullptr;
 }
 
 
