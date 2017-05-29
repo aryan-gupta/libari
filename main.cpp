@@ -70,6 +70,9 @@ int main(int argc, char* argv[]) {
 	listTest.insert(listTest.size(), 9);
 	output(listTest);
 	
+	cout << endl << "Clear Test" << endl;
+	listTest.clear();
+	output(listTest);
 	
 	return 0;
 }
