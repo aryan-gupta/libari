@@ -66,7 +66,8 @@ int main(int argc, char* argv[]) {
 	
 	cout << endl << "Insert Test" << endl;
 	listTest.insert(0, 9);
-	//listTest.insert(3, 9);
+	listTest.insert(2, 9);
+	listTest.insert(listTest.size(), 9);
 	output(listTest);
 	
 	
