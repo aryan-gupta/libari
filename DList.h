@@ -234,7 +234,7 @@ void DList<TYPE>::pop_back() {
 	mTail->next = nullptr;
 	
 	mSize--;
-	if(mSize == 0)
+	if(mSize == 0) /// @todo Check mSize is 1 condition (do we need to change mTail to nullptr?)
 		mHead = nullptr;
 }
 
