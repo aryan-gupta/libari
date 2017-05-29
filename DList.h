@@ -237,17 +237,22 @@ void DList<TYPE>::pop_front() {
 
 template <typename TYPE> 
 void DList<TYPE>::insert(size_t idx, const TYPE& val) {
-	Node* node = mHead;
-	
-	while(idx --> 0)
-		node = node->next;
-	
-	Node* newNext = node->next;
-	
-	node->next = new Node{node, val, newNext};
-	
-	mSize++;
-	
+	if       (idx == 0) {
+		push_front(val);
+	} else if(idx == mSize) {
+		push_back(val);
+	} else {
+		Node* current = mHead;
+		
+		while(idx --> 0)
+			current = current->next;
+		
+		Node* newPrev = current->prev;
+		current->prev = new Node{newPrev, val, current};
+		newPrev->next = current->prev;
+		
+		mSize++;
+	}
 }
 
 
