@@ -237,6 +237,9 @@ void DList<TYPE>::pop_front() {
 
 template <typename TYPE> 
 void DList<TYPE>::insert(size_t idx, const TYPE& val) {
+	if(idx > mSize)
+		throw std::out_of_range("Supplied index was out of range");
+	
 	if       (idx == 0) {
 		push_front(val);
 	} else if(idx == mSize) {
@@ -259,9 +262,9 @@ void DList<TYPE>::insert(size_t idx, const TYPE& val) {
 template <typename TYPE> 
 void DList<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& val) {
 	Node* current = it.getNode();
-	Node* newNext = current->next;
+	Node* newPrev = current->prev;
 	
-	current->next = new Node{current, val, newNext};
+	current->prev = new Node{newPrev, val, current};
 	
 	mSize++;
 }
