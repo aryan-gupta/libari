@@ -162,9 +162,18 @@ void DArray<TYPE>::push_back(const TYPE& val) {
 }
 
 
-
 template <typename TYPE>
 void DArray<TYPE>::pop_back() {
 	/// @todo Maybe make it shrink if mSize is less than mCap/2 ?
 	mSize--;
+}
+
+
+template <typename TYPE>
+void DArray<TYPE>::insert(size_t idx, const TYPE& val) {
+	size_t last = mSize++;
+	while(last --> idx)
+		mArray[last + 1] = mArray[last];
+	
+	mArray[idx] = val;
 }
