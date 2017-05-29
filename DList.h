@@ -298,11 +298,19 @@ void DList<TYPE>::remove(const TYPE& val) {
 	while(current != nullptr) {
 		if(current->data == val) {
 			rem = current; /// @todo we can shorted this by a line
-			current->prev->next = current->next;
-			current->next->prev = current->prev;
+			
+			if       (rem == mTail) {
+				mTail = mTail->prev;
+				mTail->next = nullptr;
+			} else if(rem == mHead) {
+				mHead = mHead->next;
+				mHead->prev = nullptr;
+			} else {
+				current->prev->next = current->next;
+				current->next->prev = current->prev;
+			}
 			
 			current = current->next;
-			
 			delete rem;
 			
 			mSize--;
