@@ -200,3 +200,9 @@ void DArray<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& valz) {
 }
 
 
+template <typename TYPE>
+size_t DArray<TYPE>::size() {
+	return mSize;
+}
+
+
