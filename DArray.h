@@ -25,7 +25,7 @@ public:
 	class iterator {
 	public:
 		iterator();
-		iterator(const Node* node);
+		iterator(const TYPE* data);
 		iterator(const iterator& it);
 	
 		iterator& operator++(); // preincrement
@@ -47,7 +47,7 @@ public:
 		TYPE* raw();
 		
 	private:
-		TYPE* data;
+		TYPE* mData;
 		
 	};
 	
