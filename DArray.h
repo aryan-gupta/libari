@@ -206,3 +206,15 @@ size_t DArray<TYPE>::size() {
 }
 
 
+template <typename TYPE>
+const TYPE& DArray<TYPE>::operator[](size_t idx) const {
+	return mArray[idx];
+}
+
+
+template <typename TYPE>
+TYPE& DArray<TYPE>::operator[](size_t idx) {
+	return mArray[idx];
+}
+
+
