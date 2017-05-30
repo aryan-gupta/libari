@@ -275,3 +275,10 @@ typename DArray<TYPE>::iterator& DArray<TYPE>::operator-(int scale) {
 	mData -= scale
 	return *this;
 }
+
+template <typename TYPE>
+bool DArray<TYPE>::iterator::operator==(const iterator& it) {
+	return mData == it.mData;
+}
+
+
