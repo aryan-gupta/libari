@@ -258,3 +258,20 @@ template <typename TYPE>
 typename DArray<TYPE>::iterator DArray<TYPE>::operator--(int) {
 	return iterator(mData--);
 }
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator& DArray<TYPE>::operator=(const iterator& it) {
+	data = it.data;
+}
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator& DArray<TYPE>::operator+(int scale) {
+	mData += scale
+	return *this;
+}
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator& DArray<TYPE>::operator-(int scale) {
+	mData -= scale
+	return *this;
+}
