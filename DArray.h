@@ -218,3 +218,19 @@ TYPE& DArray<TYPE>::operator[](size_t idx) {
 }
 
 
+template <typename TYPE>
+DArray<TYPE>::iterator::iterator() {
+	mData = nullptr;
+}
+
+
+template <typename TYPE>
+DArray<TYPE>::iterator::iterator(const TYPE* data) {
+	mData = data;
+}
+
+
+template <typename TYPE>
+DArray<TYPE>::iterator::iterator(const iterator& it) {
+	mData = it.mData;
+}
