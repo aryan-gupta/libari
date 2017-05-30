@@ -290,3 +290,8 @@ template <typename TYPE>
 TYPE& DArray<TYPE>::iterator::operator->() {
 	return *mData;
 }
+
+template <typename TYPE>
+TYPE* DArray<TYPE>::iterator::raw() {
+	return mData;
+}
