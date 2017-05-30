@@ -234,3 +234,27 @@ template <typename TYPE>
 DArray<TYPE>::iterator::iterator(const iterator& it) {
 	mData = it.mData;
 }
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator& DArray<TYPE>::operator++() {
+	mData++;
+	
+	return *this;
+}
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator& DArray<TYPE>::operator--() {
+	mData--;
+	
+	return *this 
+}
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator DArray<TYPE>::operator++(int) {
+	return iterator(mData++);
+}
+
+template <typename TYPE>
+typename DArray<TYPE>::iterator DArray<TYPE>::operator--(int) {
+	return iterator(mData--);
+}
