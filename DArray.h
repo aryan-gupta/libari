@@ -281,4 +281,12 @@ bool DArray<TYPE>::iterator::operator==(const iterator& it) {
 	return mData == it.mData;
 }
 
+template <typename TYPE>
+TYPE& DArray<TYPE>::iterator::operator*() {
+	return *mData;
+}
 
+template <typename TYPE>
+TYPE& DArray<TYPE>::iterator::operator->() {
+	return *mData;
+}
