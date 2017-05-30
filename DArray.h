@@ -171,9 +171,26 @@ void DArray<TYPE>::pop_back() {
 
 template <typename TYPE>
 void DArray<TYPE>::insert(size_t idx, const TYPE& val) {
-	size_t last = mSize++;
-	while(last --> idx)
-		mArray[last + 1] = mArray[last];
+	if(mSize == mCap) {
+		mCap = mSize * 2;
+		tmpArray = new TYPE[mCap];
+		
+		size_t last = mSize++;
+		while(last --> idx)
+			tmpArray[last + 1] = mArray[last];
+		
+		while(last --> 0)
+			tmpArray[last] = mArray[last];
+		
+		delete mArray;
+		mArray = tmpArray;
+	} else {
+		size_t last = mSize++;
+		while(last --> idx)
+			mArray[last + 1] = mArray[last];
+	}
 	
 	mArray[idx] = val;
 }
+
+
