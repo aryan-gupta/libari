@@ -194,3 +194,9 @@ void DArray<TYPE>::insert(size_t idx, const TYPE& val) {
 }
 
 
+template <typename TYPE>
+void DArray<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& valz) {
+	
+}
+
+
