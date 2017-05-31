@@ -28,9 +28,11 @@ CFLAGS = $(DEBUG) -Wall -std=c++11 -c
 LFLAGS = $(DEBUG) -Wall
 OBJS = $(BIN)/res.o $(BIN)/main.o
 
+TEST = DList.h
+
 # ============================ RECEPIES ========================================
 
-$(BIN)/main.o: main.cpp main.h
+$(BIN)/main.o: main.cpp $(TEST)
 	$(CC) main.cpp -o $@ $(CFLAGS) $(L_SDLC)
 
 $(BIN)/%.o: %.cpp
@@ -40,8 +42,8 @@ $(BIN)/res.o: res.rc info.h
 	$(RES) res.rc  $@
 	
 # Link
-$(BINDIR)\main.exe: DEBUG = -g -DDEBUG
-$(BINDIR)\main.exe: $(OBJS)
+$(BIN)/main.exe: DEBUG = -g -DDEBUG
+$(BIN)/main.exe: $(OBJS)
 	$(CC) $^ -o $(BIN)/main.exe $(LFLAGS) $(L_SDLL)
 
 # ============================= PHONY RECEPIES =================================
