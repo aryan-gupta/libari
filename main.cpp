@@ -89,5 +89,19 @@ int main(int argc, char* argv[]) {
 	listTest.clear();
 	output(listTest);
 	
+	cout << endl << "Size Constructor" << endl;
+	DList<int> listTest2(6, 2);
+	output(listTest);
+	
+	listTest2.push_back(3);
+	listTest2.push_back(7);
+	listTest2.push_front(2);
+	
+	cout << endl << "Forward Iterator" << endl;
+	outputF(listTest.begin(), listTest.end());
+	
+	cout << endl << "Backwards Iterator" << endl;
+	outputB(listTest.begin(), listTest.end());
+	
 	return 0;
 }
