@@ -189,16 +189,15 @@ typename DList<TYPE>::iterator DList<TYPE>::end() const {
 
 template <typename TYPE> 
 void DList<TYPE>::clear() {
-	while(mHead != mTail) {
+	while(mHead != nullptr) {
 		Node* rem = mHead;
 		mHead = mHead->next;
 		delete rem;
-		--mSize; // only here for testing
-		// will use below in final
 	}
 	mHead = nullptr;
 	mTail = nullptr;
-	// mSize = 0; // Use this in final
+	
+	mSize = 0;
 }
 
 
@@ -235,7 +234,7 @@ void DList<TYPE>::pop_back() {
 	mTail->next = nullptr;
 	
 	mSize--;
-	if(mSize == 0)
+	if(mSize == 0) /// @todo Check mSize is 1 condition (do we need to change mTail to nullptr?)
 		mHead = nullptr;
 }
 
