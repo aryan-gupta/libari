@@ -31,6 +31,21 @@ void output(DS& p) {
 	cout << "Size: " << p.size() << endl;
 } 
 
+
+template <typename ITER>
+void outputB(const ITER& begin, ITER& end) {
+	while(end --> begin)
+		cout << *end << " ";
+	cout << endl;		
+}
+
+template <typename ITER>
+void outputF(ITER& begin, const ITER& end) {
+	for(; begin != end; ++begin)
+		cout << *begin << " ";
+	cout << endl;
+}
+
 int main(int argc, char* argv[]) {
 	vector<int> tmp = {0, 3, 1, 1, 2, 6};
 	
