@@ -95,13 +95,13 @@ int main(int argc, char* argv[]) {
 	
 	listTest2.push_back(3);
 	listTest2.push_back(7);
-	listTest2.push_front(2);
+	listTest2.push_front(5);
 	
 	cout << endl << "Forward Iterator" << endl;
-	outputF(listTest.begin(), listTest.end());
+	outputF(listTest2.begin(), listTest2.end());
 	
 	cout << endl << "Backwards Iterator" << endl;
-	outputB(listTest.begin(), listTest.end());
+	outputB(listTest2.begin(), listTest2.end());
 	
 	return 0;
 }
