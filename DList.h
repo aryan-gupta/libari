@@ -29,7 +29,7 @@ public:
 	class iterator {
 	public:
 		iterator();
-		iterator(const Node* node);
+		iterator(Node* const node);
 		iterator(const iterator& it);
 	
 		iterator& operator++(); // preincrement
@@ -356,7 +356,7 @@ DList<TYPE>::iterator::iterator() {
 
 
 template <typename TYPE> 
-DList<TYPE>::iterator::iterator(const Node* node) {
+DList<TYPE>::iterator::iterator(Node* const node) {
 	data = node;
 }
 
