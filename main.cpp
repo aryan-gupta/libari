@@ -33,14 +33,14 @@ void output(DS& p) {
 
 
 template <typename ITER>
-void outputB(const ITER& begin, ITER& end) {
-	while(end --> begin)
+void outputB(const ITER& begin, ITER&& end) {
+	while(end-- != begin) /// @todo use --> (goes to operator) need to code in iterators
 		cout << *end << " ";
 	cout << endl;		
 }
 
 template <typename ITER>
-void outputF(ITER& begin, const ITER& end) {
+void outputF(ITER&& begin, const ITER& end) {
 	for(; begin != end; ++begin)
 		cout << *begin << " ";
 	cout << endl;
