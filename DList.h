@@ -182,9 +182,7 @@ typename DList<TYPE>::iterator DList<TYPE>::begin() const {
 
 template <typename TYPE> 
 typename DList<TYPE>::iterator DList<TYPE>::end() const {
-	/// @todo this part
-	// maybe add tail member variable so we dont have 
-	// to calculate it everytime we call this func?
+	return iterator(mTail);
 }
 
 
