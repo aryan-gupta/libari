@@ -68,7 +68,7 @@ public:
 	void pop_back();
 	
 	void insert(size_t idx, const TYPE& val);
-	void insert(const DList<TYPE>::iterator it, const TYPE& val);
+	void insert(const DArray<TYPE>::iterator it, const TYPE& val);
 	
 	size_t size() const;
 	
@@ -195,7 +195,7 @@ void DArray<TYPE>::insert(size_t idx, const TYPE& val) {
 
 
 template <typename TYPE>
-void DArray<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& valz) {
+void DArray<TYPE>::insert(const DArray<TYPE>::iterator it, const TYPE& valz) {
 	
 }
 
