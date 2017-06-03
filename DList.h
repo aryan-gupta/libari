@@ -44,6 +44,7 @@ public:
 		iterator& operator+(int scale);
 		
 		bool operator==(const iterator& it);
+		bool operator!=(const iterator& it);
 		
 		TYPE& operator*();
 		TYPE& operator->();
@@ -435,6 +436,12 @@ typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator+(int scale) {
 template <typename TYPE> 
 bool DList<TYPE>::iterator::operator==(const iterator& it) {
 	return data == it.data;
+}
+
+
+template <typename TYPE> 
+bool DList<TYPE>::iterator::operator!=(const iterator& it) {
+	return !operator==(it);
 }
 
 
