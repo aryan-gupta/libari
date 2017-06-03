@@ -61,7 +61,7 @@ public:
 	
 	DList(const size_t size, const TYPE& val = TYPE());
 	
-	template <typename ITER>
+	template <typename ITER, typename = decltype(*ITER())>
 	DList(ITER&& begin, ITER&& end);
 	
 	iterator begin() const;
@@ -150,7 +150,7 @@ DList<TYPE>::DList(const size_t size, const TYPE& val) {
 }
 
 template <typename TYPE>
-template <typename ITER>
+template <typename ITER, typename>
 DList<TYPE>::DList(ITER&& begin, ITER&& end) {
 	mHead = nullptr;
 	mSize = 0;
