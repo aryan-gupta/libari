@@ -18,6 +18,7 @@
 #pragma once
 
 static const double GROWTH_FACTOR = 2;
+static const size_t INITIAL_CAP  = 5;
 
 template <typename TYPE>
 class DArray {
@@ -87,7 +88,7 @@ template<typename TYPE>
 DArray<TYPE>::DArray() {
 	mArray = new TYPE[5]; /// @todo research optimal sizes;
 	mSize = 0;
-	mCap = 5;
+	mCap = INITIAL_CAP;
 }
 
 
@@ -140,7 +141,7 @@ void DArray<TYPE>::clear() {
 	delete mArray;
 	
 	mSize = 0;
-	mCap = 5;
+	mCap = INITIAL_CAP;
 	mArray = new TYPE[mCap];
 }
 
