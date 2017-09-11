@@ -76,6 +76,9 @@ public:
 	const TYPE& operator[](size_t idx) const;
 	TYPE& operator[](size_t idx);
 	
+	TYPE& at(const size_t idx);
+	const at(const size_t idx) const;
+	
 private:
 	TYPE* mArray;
 	size_t mSize;
@@ -218,6 +221,23 @@ TYPE& DArray<TYPE>::operator[](size_t idx) {
 	return mArray[idx];
 }
 
+template <typename TYPE>
+TYPE& DArray<TYPE>::at(const size_t idx) {
+	if(idx >= mSize) {
+		throw std::out_of_range("The specified index: " + std::to_string(idx) + ", is out of range");
+	}
+	
+	return mArray[idx];
+}
+
+template <typename TYPE>
+const TYPE& DArray<TYPE>::at(const size_t idx) {
+	if(idx >= mSize) {
+		throw std::out_of_range("The specified index: " + std::to_string(idx) + ", is out of range");
+	}
+	
+	return mArray[idx];
+}
 
 template <typename TYPE>
 DArray<TYPE>::iterator::iterator() {
