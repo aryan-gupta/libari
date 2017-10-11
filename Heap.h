@@ -22,11 +22,17 @@ public:
 	// class Iterator {};
 	
 	Heap();
+	Heap(TFunc cmp);
 	Heap(const Heap& other);
+	Heap(const Heap& other, TFunc cmp);
 	Heap(Heap&& other);
+	Heap(Heap&& other, TFunc cmp);
 	
 	template <typename TIter>
 	Heap(TIter begin, TIter end);
+	
+	template <typename TIter>
+	Heap(TIter begin, TIter end, TFunc cmp);
 	
 	Heap& operator=(const Heap& other);
 	Heap& operator=(Heap&& other);
@@ -42,8 +48,10 @@ private:
 	
 	TCont::iterator getLeftChIt(TCont::iterator idx);
 	TCont::iterator getRightChIt(TCont::iterator idx);
+	TCont::iterator getParentIt(TCont::iterator idx);
 	
 	TCont mHeap;
+	TFunc mComp;
 	
 };
 
