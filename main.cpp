@@ -21,7 +21,8 @@
 
 using namespace std;
 
-#include "DList.h"
+// #include "DList.h"
+#include "Heap.h"
 
 template<typename DS>
 void output(DS& p) {
@@ -35,44 +36,18 @@ int main(int argc, char* argv[]) {
 	vector<int> tmp = {0, 3, 1, 1, 2, 6};
 	
 	cout << endl << "Iterator Constructor Test" << endl;
-	DList<int> listTest(tmp.begin(), tmp.end());
+	Heap<int, /* default */ , std::less<int> > test(tmp.begin(), tmp.end());
 	
-	cout << endl << "Push Back Test" << endl;
-	listTest.push_back(5);
-	output(listTest);
-	listTest.push_back(7);
-	output(listTest);
+	cout << "Push Test" << endl;
+	test.push(4);
+	test.push(8);
+	test.push(0);
 	
-	cout << endl << "Push Front Test" << endl;
-	listTest.push_front(1);
-	output(listTest);
-	
-	cout << endl << "Pop Back Test" << endl;
-	listTest.pop_back();
-	output(listTest);
-	
-	cout << endl << "Pop Front Test" << endl;
-	listTest.pop_front();
-	output(listTest);
-	
-	cout << endl << "Remove Test" << endl;
-	listTest.remove(5);
-	output(listTest);
-	
-	cout << endl << "Operator[] Test" << endl;
-	listTest[2] = 5;
-	listTest[0] = 1;
-	output(listTest);
-	
-	cout << endl << "Insert Test" << endl;
-	listTest.insert(0, 9);
-	listTest.insert(2, 9);
-	listTest.insert(listTest.size(), 9);
-	output(listTest);
-	
-	cout << endl << "Clear Test" << endl;
-	listTest.clear();
-	output(listTest);
+	cout << "Top, Pop ,and Empty Test" << endl;
+	while (!test.empty()) {
+		cout << test.top() << "     " << test.size() << endl;
+		test.pop();
+	}
 	
 	return 0;
 }
