@@ -15,6 +15,7 @@ namespace me {
 	}
 }
 
+
 // right now keep it as std::vector, when we finish DArray, we'll change that
 template <typename TType, typename TCont = std::vector<TType>, typename TFunc = me::greater<TType>>
 class Heap {
@@ -41,6 +42,7 @@ public:
 	const T& top() const;
 	void pop();
 	size_t size() const;
+	bool empty() const;
 	
 private:
 	void heapifyup(TCont::iterator idx);
@@ -164,6 +166,18 @@ void Heap<TType, TCont, TFunc>::pop() {
 template <typename TType, typename TCont, typename TFunc>
 size_t Heap<TType, TCont, TFunc>::size() const {
 	return mHeap.size();
+}
+
+
+template <typename TType, typename TCont, typename TFunc>
+bool Heap<TType, TCont, TFunc>::empty() const {
+	return mHeap.empty();
+}
+
+
+template <typename TType, typename TCont, typename TFunc>
+void Heap<TType, TCont, TFunc>::swap(Heap<TType, TCont, TFunc>& other) const {
+	mHeap.swap(other.mHeap);
 }
 
 
