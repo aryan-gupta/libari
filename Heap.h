@@ -25,9 +25,7 @@ public:
 	Heap();
 	Heap(TFunc cmp);
 	Heap(const Heap<TType, TCont, TFunc>& other);
-	Heap(const Heap<TType, TCont, TFunc>& other, TFunc cmp);
 	Heap(Heap<TType, TCont, TFunc>&& other);
-	Heap(Heap<TType, TCont, TFunc>&& other, TFunc cmp);
 	
 	template <typename TIter>
 	Heap(TIter begin, TIter end);
@@ -72,22 +70,12 @@ Heap<TType, TCont, TFunc>::Heap(TFunc cmp)
 
 template <typename TType, typename TCont, typename TFunc>
 Heap<TType, TCont, TFunc>::Heap(const Heap<TType, TCont, TFunc>& other) 
-: mHeap{other}, mComp{} { /* No Code */ }
-
-
-template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(const Heap<TType, TCont, TFunc>& other, TFunc cmp) 
-: mHeap{other}, mComp{cmp} { /* No Code */ }
+: mHeap{other.mHeap}, mComp{other.mComp} { /* No Code */ }
 
 
 template <typename TType, typename TCont, typename TFunc>
 Heap<TType, TCont, TFunc>::Heap(Heap<TType, TCont, TFunc>&& other)
-: mHeap{other} { /* No Code */ }
-
-
-template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(Heap<TType, TCont, TFunc>&& other, TFunc cmp)
-: mHeap{other}, mComp{cmp} { /* No Code */ }
+: mHeap{other.mHeap}, mComp{other.mComp} { /* No Code */ }
 
 
 template <typename TType, typename TCont, typename TFunc>
