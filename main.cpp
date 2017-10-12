@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 	vector<int> tmp = {0, 3, 1, 1, 2, 6};
 	
 	cout << endl << "Iterator Constructor Test" << endl;
-	Heap<int, /* default */ , std::less<int> > test(tmp.begin(), tmp.end());
+	Heap<int, vector<int>, me::less<int> > test(tmp.begin(), tmp.end());
 	
 	cout << "Push Test" << endl;
 	test.push(4);

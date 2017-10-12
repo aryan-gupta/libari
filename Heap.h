@@ -5,14 +5,14 @@ namespace me {
 		bool operator()(const T& a, const T& b) {
 			return a > b;
 		}
-	}
+	};
 	
 	template<typename T>
 	struct less {
 		bool operator()(const T& a, const T& b) {
 			return a < b;
 		}
-	}
+	};
 }
 
 
@@ -24,10 +24,10 @@ public:
 	
 	Heap();
 	Heap(TFunc cmp);
-	Heap(const Heap& other);
-	Heap(const Heap& other, TFunc cmp);
-	Heap(Heap&& other);
-	Heap(Heap&& other, TFunc cmp);
+	Heap(const Heap<TType, TCont, TFunc>& other);
+	Heap(const Heap<TType, TCont, TFunc>& other, TFunc cmp);
+	Heap(Heap<TType, TCont, TFunc>&& other);
+	Heap(Heap<TType, TCont, TFunc>&& other, TFunc cmp);
 	
 	template <typename TIter>
 	Heap(TIter begin, TIter end);
@@ -35,22 +35,23 @@ public:
 	template <typename TIter>
 	Heap(TIter begin, TIter end, TFunc cmp);
 	
-	Heap& operator=(const Heap& other);
-	Heap& operator=(Heap&& other);
+	Heap<TType, TCont, TFunc>& operator=(const Heap<TType, TCont, TFunc>& other);
+	Heap<TType, TCont, TFunc>& operator=(Heap<TType, TCont, TFunc>&& other);
 	
 	void push(TType element);
-	const T& top() const;
+	const TType& top() const;
 	void pop();
 	size_t size() const;
 	bool empty() const;
+	void swap(Heap<TType, TCont, TFunc>& other);
 	
 private:
-	void heapifyup(TCont::iterator idx);
-	void heapifydown(TCont::iterator idx);
+	void heapifyup(typename TCont::iterator idx);
+	void heapifydown(typename TCont::iterator idx);
 	
-	TCont::iterator getLeftChIt(TCont::iterator idx);
-	TCont::iterator getRightChIt(TCont::iterator idx);
-	TCont::iterator getParentIt(TCont::iterator idx);
+	typename TCont::iterator getLeftChIt(typename TCont::iterator idx);
+	typename TCont::iterator getRightChIt(typename TCont::iterator idx);
+	typename TCont::iterator getParentIt(typename TCont::iterator idx);
 	
 	TCont mHeap;
 	TFunc mComp;
@@ -70,22 +71,22 @@ Heap<TType, TCont, TFunc>::Heap(TFunc cmp)
 
 
 template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(const Heap& other) 
+Heap<TType, TCont, TFunc>::Heap(const Heap<TType, TCont, TFunc>& other) 
 : mHeap{other}, mComp{} { /* No Code */ }
 
 
 template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(const Heap& other, TFunc cmp) 
+Heap<TType, TCont, TFunc>::Heap(const Heap<TType, TCont, TFunc>& other, TFunc cmp) 
 : mHeap{other}, mComp{cmp} { /* No Code */ }
 
 
 template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(Heap&& other)
+Heap<TType, TCont, TFunc>::Heap(Heap<TType, TCont, TFunc>&& other)
 : mHeap{other} { /* No Code */ }
 
 
 template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(Heap&& other, TFunc cmp)
+Heap<TType, TCont, TFunc>::Heap(Heap<TType, TCont, TFunc>&& other, TFunc cmp)
 : mHeap{other}, mComp{cmp} { /* No Code */ }
 
 
@@ -117,7 +118,7 @@ Heap<TType, TCont, TFunc>::Heap(TIter begin, TIter end, TFunc cmp)
 
 template <typename TType, typename TCont, typename TFunc> // template parameter
 Heap<TType, TCont, TFunc>& // return type
-Heap<TType, TCont, TFunc>::operator=(const Heap& other) { // member function
+Heap<TType, TCont, TFunc>::operator=(const Heap<TType, TCont, TFunc>& other) { // member function
 	if (&other == this)
 		return *this;
 	
@@ -130,7 +131,7 @@ Heap<TType, TCont, TFunc>::operator=(const Heap& other) { // member function
 
 template <typename TType, typename TCont, typename TFunc> // template parameter
 Heap<TType, TCont, TFunc>& // return type
-Heap<TType, TCont, TFunc>::operator=(Heap&& other) { // member function
+Heap<TType, TCont, TFunc>::operator=(Heap<TType, TCont, TFunc>&& other) { // member function
 	if (&other == this)
 		return *this;
 	
@@ -149,7 +150,7 @@ void Heap<TType, TCont, TFunc>::push(TType element) {
 
 
 template <typename TType, typename TCont, typename TFunc>
-const T& Heap<TType, TCont, TFunc>::top() const {
+const TType& Heap<TType, TCont, TFunc>::top() const {
 	return mHeap.front(); // make sure that front is available
 	// for most containers
 }
@@ -176,19 +177,19 @@ bool Heap<TType, TCont, TFunc>::empty() const {
 
 
 template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::swap(Heap<TType, TCont, TFunc>& other) const {
+void Heap<TType, TCont, TFunc>::swap(Heap<TType, TCont, TFunc>& other) {
 	mHeap.swap(other.mHeap);
 }
 
 
 template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::heapifyup(TCont::iterator idx) {
+void Heap<TType, TCont, TFunc>::heapifyup(typename TCont::iterator idx) {
 	// I need to check for copies, some of these things could be turned
 	// into refeerences
 	auto end = mHeap.end();
 	auto pt = getParentIt(idx); 
 	
-	if (std::distance(idx, mHeap.end()) > 0 and mComp(idx, pt)) {
+	if (std::distance(idx, mHeap.end()) > 0 and mComp(*idx, *pt)) {
 		std::iter_swap(idx, pt);
 		heapifyup(pt);
 	}
@@ -196,16 +197,16 @@ void Heap<TType, TCont, TFunc>::heapifyup(TCont::iterator idx) {
 
 
 template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::heapifydown(TCont::iterator idx) {
+void Heap<TType, TCont, TFunc>::heapifydown(typename TCont::iterator idx) {
 	auto lc  = getLeftChIt(idx); 
 	auto rc  = getRightChIt(idx);
 	auto max = idx;
 	auto end = mHeap.end();
 	
-	if (std::distance(lc, end) > 0 and mComp(lc, max))
+	if (std::distance(lc, end) > 0 and mComp(*lc, *max))
 		max = lc;
 	
-	if (std::distance(rc, end) > 0 and mComp(rc, max))
+	if (std::distance(rc, end) > 0 and mComp(*rc, *max))
 		max = rc;
 	
 	if (idx != max) {
@@ -216,18 +217,18 @@ void Heap<TType, TCont, TFunc>::heapifydown(TCont::iterator idx) {
 
 
 template <typename TType, typename TCont, typename TFunc>
-typename TCont::iterator Heap<TType, TCont, TFunc>::getLeftChIt(TCont::iterator idx) {
+typename TCont::iterator Heap<TType, TCont, TFunc>::getLeftChIt(typename TCont::iterator idx) {
 	return std::next(mHeap.begin(), std::distance(mHeap.begin(), idx) * 2 + 1);
 }
 
 
 template <typename TType, typename TCont, typename TFunc>
-typename TCont::iterator Heap<TType, TCont, TFunc>::getRightChIt(TCont::iterator idx) {
+typename TCont::iterator Heap<TType, TCont, TFunc>::getRightChIt(typename TCont::iterator idx) {
 	return std::next(mHeap.begin(), std::distance(mHeap.begin(), idx) * 2 + 2);
 }
 
 
 template <typename TType, typename TCont, typename TFunc>
-typename TCont::iterator Heap<TType, TCont, TFunc>::getRightChIt(TCont::iterator idx) {
+typename TCont::iterator Heap<TType, TCont, TFunc>::getParentIt(typename TCont::iterator idx) {
 	return std::next(mHeap.begin(), (std::distance(mHeap.begin(), idx) - 1) / -2);
 }
