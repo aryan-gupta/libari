@@ -145,7 +145,7 @@ Heap<TType, TCont, TFunc>::operator=(Heap<TType, TCont, TFunc>&& other) { // mem
 template <typename TType, typename TCont, typename TFunc>
 void Heap<TType, TCont, TFunc>::push(TType element) {
 	mHeap.push_back(element);
-	heapifyup(mHeap.begin());
+	heapifyup(mHeap.end() - 1);
 }
 
 
@@ -186,10 +186,13 @@ template <typename TType, typename TCont, typename TFunc>
 void Heap<TType, TCont, TFunc>::heapifyup(typename TCont::iterator idx) {
 	// I need to check for copies, some of these things could be turned
 	// into refeerences
-	auto end = mHeap.end();
+	auto begin = mHeap.begin();
 	auto pt = getParentIt(idx); 
 	
-	if (std::distance(idx, mHeap.end()) > 0 and mComp(*idx, *pt)) {
+	// if (std::distance(idx, mHeap.end()) > 0 and mComp(*idx, *pt)) {
+	cout << std::distance(mHeap.begin(), idx) << endl;
+	//if (std::distance(begin, idx) >= 0 and mComp(*idx, *pt)) {
+	if (idx != begin and *idx < *pt) {
 		std::iter_swap(idx, pt);
 		heapifyup(pt);
 	}
@@ -203,10 +206,12 @@ void Heap<TType, TCont, TFunc>::heapifydown(typename TCont::iterator idx) {
 	auto max = idx;
 	auto end = mHeap.end();
 	
-	if (std::distance(lc, end) > 0 and mComp(*lc, *max))
+	//if (std::distance(lc, end) > 0 and mComp(*lc, *max))
+	if (std::distance(lc, end) > 0 and *lc < *max)
 		max = lc;
 	
-	if (std::distance(rc, end) > 0 and mComp(*rc, *max))
+	//if (std::distance(rc, end) > 0 and mComp(*rc, *max))
+	if (std::distance(rc, end) > 0 and *rc < *max)
 		max = rc;
 	
 	if (idx != max) {

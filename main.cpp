@@ -33,15 +33,21 @@ void output(DS& p) {
 } 
 
 int main(int argc, char* argv[]) {
-	vector<int> tmp = {0, 3, 1, 1, 2, 6};
+	vector<int> tmp = {};
 	
 	cout << endl << "Iterator Constructor Test" << endl;
-	Heap<int, vector<int>, me::less<int> > test(tmp.begin(), tmp.end());
+	Heap<int, vector<int>, me::greater<int> > test(tmp.begin(), tmp.end());
 	
 	cout << "Push Test" << endl;
 	test.push(4);
 	test.push(8);
 	test.push(0);
+	test.push(4);
+	test.push(2);
+	test.push(6);
+	test.push(9);
+	test.push(2);
+	test.push(1);
 	
 	cout << "Top, Pop ,and Empty Test" << endl;
 	while (!test.empty()) {
