@@ -95,10 +95,10 @@ template <typename TIter>
 Heap<TType, TCont, TFunc>::Heap(TIter begin, TIter end)
 : mHeap{begin, end} {
 	for (
-		auto b = mHeap.begin(), e = std::next(mHeap.begin(), mHeap.size() / 2);
+		auto b = mHeap.begin() - 1, e = std::next(mHeap.begin(), mHeap.size() / 2 - 1);
 		b != e; 
-		++b) { // make names better
-		heapifydown(b);
+		--e) { // use reverse iterators
+		heapifydown(e);
 	}
 }
 
@@ -108,10 +108,10 @@ template <typename TIter>
 Heap<TType, TCont, TFunc>::Heap(TIter begin, TIter end, TFunc cmp)
 : mHeap{begin, end}, mComp{cmp} {
 	for (
-		auto b = mHeap.begin(), e = std::next(mHeap.begin(), mHeap.size() / 2);
+		auto b = mHeap.begin() - 1, e = std::next(mHeap.begin(), mHeap.size() / 2 - 1);
 		b != e; 
-		++b) { // make names better
-		heapifydown(b);
+		--e) { // use reverse iterators
+		heapifydown(e);
 	}
 }
 
@@ -186,13 +186,10 @@ template <typename TType, typename TCont, typename TFunc>
 void Heap<TType, TCont, TFunc>::heapifyup(typename TCont::iterator idx) {
 	// I need to check for copies, some of these things could be turned
 	// into refeerences
-	auto begin = mHeap.begin();
+	auto begin = mHeap.begin(); // use reverse iterators
 	auto pt = getParentIt(idx); 
 	
-	// if (std::distance(idx, mHeap.end()) > 0 and mComp(*idx, *pt)) {
-	cout << std::distance(mHeap.begin(), idx) << endl;
-	//if (std::distance(begin, idx) >= 0 and mComp(*idx, *pt)) {
-	if (idx != begin and *idx < *pt) {
+	if (std::distance(begin, pt) >= 0 and mComp(*idx, *pt)) {
 		std::iter_swap(idx, pt);
 		heapifyup(pt);
 	}
@@ -206,12 +203,10 @@ void Heap<TType, TCont, TFunc>::heapifydown(typename TCont::iterator idx) {
 	auto max = idx;
 	auto end = mHeap.end();
 	
-	//if (std::distance(lc, end) > 0 and mComp(*lc, *max))
-	if (std::distance(lc, end) > 0 and *lc < *max)
+	if (std::distance(lc, end) > 0 and mComp(*lc, *max))
 		max = lc;
 	
-	//if (std::distance(rc, end) > 0 and mComp(*rc, *max))
-	if (std::distance(rc, end) > 0 and *rc < *max)
+	if (std::distance(rc, end) > 0 and mComp(*rc, *max))
 		max = rc;
 	
 	if (idx != max) {
@@ -235,5 +230,5 @@ typename TCont::iterator Heap<TType, TCont, TFunc>::getRightChIt(typename TCont:
 
 template <typename TType, typename TCont, typename TFunc>
 typename TCont::iterator Heap<TType, TCont, TFunc>::getParentIt(typename TCont::iterator idx) {
-	return std::next(mHeap.begin(), (std::distance(mHeap.begin(), idx) - 1) / -2);
+	return std::next(mHeap.begin(), (std::distance(mHeap.begin(), idx) - 1) / 2);
 }
