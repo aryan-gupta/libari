@@ -34,12 +34,14 @@ public:
 	Heap<TType, TCont, TFunc>& operator=(const Heap<TType, TCont, TFunc>& other);
 	Heap<TType, TCont, TFunc>& operator=(Heap<TType, TCont, TFunc>&& other);
 	
+	
 	void push(TType element);
 	const TType& top() const;
 	void pop();
 	size_t size() const;
 	bool empty() const;
 	void swap(Heap<TType, TCont, TFunc>& other);
+	void heapify();
 	
 	template <typename TMemb, typename... TArgs>
 	auto call_member(TMemb member, TArgs... args);
@@ -82,12 +84,7 @@ template <typename TType, typename TCont, typename TFunc>
 template <typename TIter>
 Heap<TType, TCont, TFunc>::Heap(TIter begin, TIter end)
 : mHeap{begin, end} {
-	for (
-		auto b = mHeap.begin() - 1, e = std::next(mHeap.begin(), mHeap.size() / 2 - 1);
-		b != e; 
-		--e) { // use reverse iterators
-		heapifydown(e);
-	}
+	heapify();
 }
 
 
@@ -95,12 +92,7 @@ template <typename TType, typename TCont, typename TFunc>
 template <typename TIter>
 Heap<TType, TCont, TFunc>::Heap(TIter begin, TIter end, TFunc cmp)
 : mHeap{begin, end}, mComp{cmp} {
-	for (
-		auto b = mHeap.begin() - 1, e = std::next(mHeap.begin(), mHeap.size() / 2 - 1);
-		b != e; 
-		--e) { // use reverse iterators
-		heapifydown(e);
-	}
+	heapify();
 }
 
 
@@ -127,6 +119,17 @@ Heap<TType, TCont, TFunc>::operator=(Heap<TType, TCont, TFunc>&& other) { // mem
 	mComp = other.mComp;
 	
 	return *this;
+}
+
+
+template <typename TType, typename TCont, typename TFunc>
+void Heap<TType, TCont, TFunc>::heapify() {
+	for (
+		auto b = mHeap.begin() - 1, e = std::next(mHeap.begin(), mHeap.size() / 2 - 1);
+		b != e; 
+		--e) { // use reverse iterators
+		heapifydown(e);
+	}
 }
 
 
