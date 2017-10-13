@@ -52,18 +52,20 @@ int main(int argc, char* argv[]) {
 	test.push(2);
 	test.push(1);
 	
-	cout << "Returning Front!!       \n";
-	cout << tmp2.call_member(&std::vector<int>::size) << endl;
+	cout << "Returning Size!!       " << tmp2.call_member(&std::vector<int>::size) << endl;
 	
-	using insert_func_t = void(std::vector<int>::*)(const int&);
-	test.call_member(static_cast<insert_func_t>(&std::vector<int>::push_back), 0);
+	using push_back_func_t = void(std::vector<int>::*)(const int&);
+	test.call_member(static_cast<push_back_func_t>(&std::vector<int>::push_back), 0);
+	test.heapify();
+	
+	// test.call_member([](auto& c){ c.insert(c.begin(), 0); });
 	
 	cout << "Top, Pop ,and Empty Test" << endl;
 	while (!test.empty()) {
 		cout << test.top() << "     " << test.size() << endl;
 		test.pop();
 	}
-
+	cout << endl << endl;
 	while (!tmp2.empty()) {
 		cout << tmp2.top() << "     " << tmp2.size() << endl;
 		tmp2.pop();
