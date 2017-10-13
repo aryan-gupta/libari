@@ -19,9 +19,7 @@ namespace me {
 // right now keep it as std::vector, when we finish DArray, we'll change that
 template <typename TType, typename TCont = std::vector<TType>, typename TFunc = me::greater<TType>>
 class Heap {
-public:
-	// class Iterator {};
-	
+public:	
 	Heap();
 	Heap(TFunc cmp);
 	Heap(const Heap<TType, TCont, TFunc>& other);
@@ -43,6 +41,9 @@ public:
 	bool empty() const;
 	void swap(Heap<TType, TCont, TFunc>& other);
 	
+	template <typename TMemb, typename... TArgs>
+	auto call_member(TMemb member, TArgs... args);
+	
 private:
 	void heapifyup(typename TCont::iterator idx);
 	void heapifydown(typename TCont::iterator idx);
@@ -55,7 +56,6 @@ private:
 	TFunc mComp;
 	
 };
-
 
 
 template <typename TType, typename TCont, typename TFunc>
@@ -167,6 +167,13 @@ bool Heap<TType, TCont, TFunc>::empty() const {
 template <typename TType, typename TCont, typename TFunc>
 void Heap<TType, TCont, TFunc>::swap(Heap<TType, TCont, TFunc>& other) {
 	mHeap.swap(other.mHeap);
+}
+
+
+template <typename TType, typename TCont, typename TFunc>
+template <typename TMemb, typename... TArgs>
+auto Heap<TType, TCont, TFunc>::call_member(TMemb member, TArgs... args) {
+	return (mHeap.*member)(std::forward<TArgs>(args)...);
 }
 
 

@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <vector>
+#include <functional>
 
 using namespace std;
 
@@ -33,10 +34,12 @@ void output(DS& p) {
 } 
 
 int main(int argc, char* argv[]) {
-	vector<int> tmp = {};
+	vector<int> tmp = {5, 2, 8, 6, 4, 7, 3, 6, 4, 5, 1, 0, 0, 0};
 	
 	cout << endl << "Iterator Constructor Test" << endl;
-	Heap<int, vector<int>, me::greater<int> > test(tmp.begin(), tmp.end());
+	Heap<int, vector<int>, std::function<bool(int, int)> > tmp2{tmp.begin(), tmp.end(), [](int a, int b) { return a < b; }};
+	
+	auto test = tmp2;
 	
 	cout << "Push Test" << endl;
 	test.push(4);
@@ -49,10 +52,21 @@ int main(int argc, char* argv[]) {
 	test.push(2);
 	test.push(1);
 	
+	cout << "Returning Front!!       \n";
+	cout << tmp2.call_member(&std::vector<int>::size) << endl;
+	
+	using insert_func_t = void(std::vector<int>::*)(const int&);
+	test.call_member(static_cast<insert_func_t>(&std::vector<int>::push_back), 0);
+	
 	cout << "Top, Pop ,and Empty Test" << endl;
 	while (!test.empty()) {
 		cout << test.top() << "     " << test.size() << endl;
 		test.pop();
+	}
+
+	while (!tmp2.empty()) {
+		cout << tmp2.top() << "     " << tmp2.size() << endl;
+		tmp2.pop();
 	}
 	
 	return 0;
