@@ -20,10 +20,10 @@
 #include <vector>
 #include <functional>
 
-using namespace std;
-
 // #include "DList.h"
 #include "Heap.h"
+
+using namespace std;
 
 template<typename DS>
 void output(DS& p) {
@@ -36,7 +36,25 @@ void output(DS& p) {
 int main(int argc, char* argv[]) {
 	vector<int> tmp = {5, 2, 8, 6, 4, 7, 3, 6, 4, 5, 1, 0, 0, 0};
 	
-	cout << endl << "Iterator Constructor Test" << endl;
+	cout << "std::initializer_list test" << endl;
+	Heap<int> tmp0 = {1, 3, 5, 1, 7, 2, 6, 3, 8, 9, 12, 5, 3};
+	while (!tmp0.empty()) {
+		cout << tmp0.top() << endl;
+		tmp0.pop();
+	}
+	
+	cout << "std::initializer_list and compare test" << endl;
+	Heap<int, std::vector<int>, bool (*) (int, int)> tmp1{
+		{1, 3, 5, 1, 7, 2, 6, 3, 8, 9, 12, 5, 3}, 
+		[](int a, int b) { return a < b; }
+	};
+	while (!tmp1.empty()) {
+		cout << tmp1.top() << endl;
+		tmp1.pop();
+	}
+	
+	
+	cout << "Iterator Constructor Test" << endl;
 	Heap<int, vector<int>, std::function<bool(int, int)> > tmp2{tmp.begin(), tmp.end(), [](int a, int b) { return a < b; }};
 	
 	auto test = tmp2;
