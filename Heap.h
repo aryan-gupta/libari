@@ -176,7 +176,7 @@ void Heap<TType, TCont, TFunc>::swap(Heap<TType, TCont, TFunc>& other) {
 template <typename TType, typename TCont, typename TFunc>
 template <typename TMemb, typename... TArgs>
 auto Heap<TType, TCont, TFunc>::call_member(TMemb member, TArgs... args) {
-	return (mHeap.*member)(std::forward<TArgs>(args)...);
+	return std::invoke(member, mHeap, std::forward<TArgs>(args)...);
 }
 
 
