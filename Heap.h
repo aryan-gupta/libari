@@ -34,6 +34,10 @@ namespace me {
 template <typename TType, typename TCont = std::vector<TType>, typename TPred = me::greater<TType>>
 class Heap {
 public:	
+	using container_type = TCont;
+	using value_type = TType;
+	using size_type = typename TCont::size_type;
+
 	Heap();
 	Heap(TPred cmp);
 	Heap(const Heap<TType, TCont, TPred>& other);
