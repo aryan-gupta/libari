@@ -17,22 +17,22 @@ namespace me {
 
 
 // right now keep it as std::vector, when we finish DArray, we'll change that
-template <typename TType, typename TCont = std::vector<TType>, typename TFunc = me::greater<TType>>
+template <typename TType, typename TCont = std::vector<TType>, typename TPred = me::greater<TType>>
 class Heap {
 public:	
 	Heap();
-	Heap(TFunc cmp);
-	Heap(const Heap<TType, TCont, TFunc>& other);
-	Heap(Heap<TType, TCont, TFunc>&& other);
+	Heap(TPred cmp);
+	Heap(const Heap<TType, TCont, TPred>& other);
+	Heap(Heap<TType, TCont, TPred>&& other);
 	
 	template <typename TIter>
 	Heap(TIter begin, TIter end);
 	
 	template <typename TIter>
-	Heap(TIter begin, TIter end, TFunc cmp);
+	Heap(TIter begin, TIter end, TPred cmp);
 	
-	Heap<TType, TCont, TFunc>& operator=(const Heap<TType, TCont, TFunc>& other);
-	Heap<TType, TCont, TFunc>& operator=(Heap<TType, TCont, TFunc>&& other);
+	Heap<TType, TCont, TPred>& operator=(const Heap<TType, TCont, TPred>& other);
+	Heap<TType, TCont, TPred>& operator=(Heap<TType, TCont, TPred>&& other);
 	
 	
 	void push(TType element);
@@ -40,7 +40,7 @@ public:
 	void pop();
 	size_t size() const;
 	bool empty() const;
-	void swap(Heap<TType, TCont, TFunc>& other);
+	void swap(Heap<TType, TCont, TPred>& other);
 	void heapify();
 	
 	template <typename TMemb, typename... TArgs>
@@ -55,50 +55,50 @@ private:
 	typename TCont::iterator getParentIt(typename TCont::iterator idx);
 	
 	TCont mHeap;
-	TFunc mComp;
+	TPred mComp;
 	
 };
 
 
-template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap()
+template <typename TType, typename TCont, typename TPred>
+Heap<TType, TCont, TPred>::Heap()
 : mComp{} { /* No Code */ }
 
 
-template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(TFunc cmp)
+template <typename TType, typename TCont, typename TPred>
+Heap<TType, TCont, TPred>::Heap(TPred cmp)
 : mComp{cmp} { /* No Code */ }
 
 
-template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(const Heap<TType, TCont, TFunc>& other) 
+template <typename TType, typename TCont, typename TPred>
+Heap<TType, TCont, TPred>::Heap(const Heap<TType, TCont, TPred>& other) 
 : mHeap{other.mHeap}, mComp{other.mComp} { /* No Code */ }
 
 
-template <typename TType, typename TCont, typename TFunc>
-Heap<TType, TCont, TFunc>::Heap(Heap<TType, TCont, TFunc>&& other)
+template <typename TType, typename TCont, typename TPred>
+Heap<TType, TCont, TPred>::Heap(Heap<TType, TCont, TPred>&& other)
 : mHeap{other.mHeap}, mComp{other.mComp} { /* No Code */ }
 
 
-template <typename TType, typename TCont, typename TFunc>
+template <typename TType, typename TCont, typename TPred>
 template <typename TIter>
-Heap<TType, TCont, TFunc>::Heap(TIter begin, TIter end)
+Heap<TType, TCont, TPred>::Heap(TIter begin, TIter end)
 : mHeap{begin, end} {
 	heapify();
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
+template <typename TType, typename TCont, typename TPred>
 template <typename TIter>
-Heap<TType, TCont, TFunc>::Heap(TIter begin, TIter end, TFunc cmp)
+Heap<TType, TCont, TPred>::Heap(TIter begin, TIter end, TPred cmp)
 : mHeap{begin, end}, mComp{cmp} {
 	heapify();
 }
 
 
-template <typename TType, typename TCont, typename TFunc> // template parameter
-Heap<TType, TCont, TFunc>& // return type
-Heap<TType, TCont, TFunc>::operator=(const Heap<TType, TCont, TFunc>& other) { // member function
+template <typename TType, typename TCont, typename TPred> // template parameter
+Heap<TType, TCont, TPred>& // return type
+Heap<TType, TCont, TPred>::operator=(const Heap<TType, TCont, TPred>& other) { // member function
 	if (&other == this)
 		return *this;
 	
@@ -109,9 +109,9 @@ Heap<TType, TCont, TFunc>::operator=(const Heap<TType, TCont, TFunc>& other) { /
 }
 
 
-template <typename TType, typename TCont, typename TFunc> // template parameter
-Heap<TType, TCont, TFunc>& // return type
-Heap<TType, TCont, TFunc>::operator=(Heap<TType, TCont, TFunc>&& other) { // member function
+template <typename TType, typename TCont, typename TPred> // template parameter
+Heap<TType, TCont, TPred>& // return type
+Heap<TType, TCont, TPred>::operator=(Heap<TType, TCont, TPred>&& other) { // member function
 	if (&other == this)
 		return *this;
 	
@@ -122,8 +122,8 @@ Heap<TType, TCont, TFunc>::operator=(Heap<TType, TCont, TFunc>&& other) { // mem
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::heapify() {
+template <typename TType, typename TCont, typename TPred>
+void Heap<TType, TCont, TPred>::heapify() {
 	for (
 		auto b = mHeap.begin() - 1, e = std::next(mHeap.begin(), mHeap.size() / 2 - 1);
 		b != e; 
@@ -133,55 +133,55 @@ void Heap<TType, TCont, TFunc>::heapify() {
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::push(TType element) {
+template <typename TType, typename TCont, typename TPred>
+void Heap<TType, TCont, TPred>::push(TType element) {
 	mHeap.push_back(element);
 	heapifyup(mHeap.end() - 1);
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-const TType& Heap<TType, TCont, TFunc>::top() const {
+template <typename TType, typename TCont, typename TPred>
+const TType& Heap<TType, TCont, TPred>::top() const {
 	return mHeap.front(); // make sure that front is available
 	// for most containers
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::pop() {
+template <typename TType, typename TCont, typename TPred>
+void Heap<TType, TCont, TPred>::pop() {
 	mHeap.front() = mHeap.back();
 	mHeap.pop_back(); // change this to erase an iterator
 	heapifydown(mHeap.begin());
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-size_t Heap<TType, TCont, TFunc>::size() const {
+template <typename TType, typename TCont, typename TPred>
+size_t Heap<TType, TCont, TPred>::size() const {
 	return mHeap.size();
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-bool Heap<TType, TCont, TFunc>::empty() const {
+template <typename TType, typename TCont, typename TPred>
+bool Heap<TType, TCont, TPred>::empty() const {
 	return mHeap.empty();
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::swap(Heap<TType, TCont, TFunc>& other) {
+template <typename TType, typename TCont, typename TPred>
+void Heap<TType, TCont, TPred>::swap(Heap<TType, TCont, TPred>& other) {
 	mHeap.swap(other.mHeap);
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
+template <typename TType, typename TCont, typename TPred>
 template <typename TMemb, typename... TArgs>
-auto Heap<TType, TCont, TFunc>::call_member(TMemb member, TArgs... args) {
+auto Heap<TType, TCont, TPred>::call_member(TMemb member, TArgs... args) {
 	return std::invoke(member, mHeap, std::forward<TArgs>(args)...);
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::heapifyup(typename TCont::iterator idx) {
+template <typename TType, typename TCont, typename TPred>
+void Heap<TType, TCont, TPred>::heapifyup(typename TCont::iterator idx) {
 	// I need to check for copies, some of these things could be turned
 	// into refeerences
 	auto begin = mHeap.begin(); // use reverse iterators
@@ -194,8 +194,8 @@ void Heap<TType, TCont, TFunc>::heapifyup(typename TCont::iterator idx) {
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-void Heap<TType, TCont, TFunc>::heapifydown(typename TCont::iterator idx) {
+template <typename TType, typename TCont, typename TPred>
+void Heap<TType, TCont, TPred>::heapifydown(typename TCont::iterator idx) {
 	auto lc  = getLeftChIt(idx); 
 	auto rc  = getRightChIt(idx);
 	auto max = idx;
@@ -214,19 +214,19 @@ void Heap<TType, TCont, TFunc>::heapifydown(typename TCont::iterator idx) {
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-typename TCont::iterator Heap<TType, TCont, TFunc>::getLeftChIt(typename TCont::iterator idx) {
+template <typename TType, typename TCont, typename TPred>
+typename TCont::iterator Heap<TType, TCont, TPred>::getLeftChIt(typename TCont::iterator idx) {
 	return std::next(mHeap.begin(), std::distance(mHeap.begin(), idx) * 2 + 1);
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-typename TCont::iterator Heap<TType, TCont, TFunc>::getRightChIt(typename TCont::iterator idx) {
+template <typename TType, typename TCont, typename TPred>
+typename TCont::iterator Heap<TType, TCont, TPred>::getRightChIt(typename TCont::iterator idx) {
 	return std::next(mHeap.begin(), std::distance(mHeap.begin(), idx) * 2 + 2);
 }
 
 
-template <typename TType, typename TCont, typename TFunc>
-typename TCont::iterator Heap<TType, TCont, TFunc>::getParentIt(typename TCont::iterator idx) {
+template <typename TType, typename TCont, typename TPred>
+typename TCont::iterator Heap<TType, TCont, TPred>::getParentIt(typename TCont::iterator idx) {
 	return std::next(mHeap.begin(), (std::distance(mHeap.begin(), idx) - 1) / 2);
 }
