@@ -59,6 +59,8 @@ int main(int argc, char* argv[]) {
 	test.heapify();
 	
 	test.call_member([](auto& c){ c.insert(c.begin(), 0); });
+	test.call_member([](auto& c, auto num){ c.insert(c.begin(), num); }, 0);
+	test.heapify();
 	
 	cout << "Top, Pop ,and Empty Test" << endl;
 	while (!test.empty()) {
