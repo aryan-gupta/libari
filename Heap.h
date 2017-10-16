@@ -15,6 +15,20 @@ namespace me {
 	};
 }
 
+/*
+	TCont must support these members
+	Most of these can be rewritten as iterators
+	
+	- TCont::begin
+	- TCont::end
+	- TCont::push_back
+	- TCont::front
+	- TCont::back
+	- TCont::pop_back
+	- TCont::size
+	- TCont::empty
+	- TCont::swap	
+*/
 
 // right now keep it as std::vector, when we finish DArray, we'll change that
 template <typename TType, typename TCont = std::vector<TType>, typename TPred = me::greater<TType>>
