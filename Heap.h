@@ -34,9 +34,12 @@ namespace me {
 template <typename TType, typename TCont = std::vector<TType>, typename TPred = me::greater<TType>>
 class Heap {
 public:	
-	using container_type = TCont;
-	using value_type = TType;
-	using size_type = typename TCont::size_type;
+	using container_type  = TCont;
+	using value_type      = TType;
+	using value_compare   = TPred;
+	using size_type       = typename TCont::size_type;
+	using reference       = typename TCont::reference;
+	using const_reference = typename TCont::const_reference;
 
 	Heap(TPred cmp);
 	Heap(TCont cont);
@@ -57,9 +60,9 @@ public:
 	
 	
 	void push(TType element);
-	const TType& top() const;
+	const_reference top() const;
 	void pop();
-	size_t size() const;
+	size_type size() const;
 	bool empty() const;
 	void swap(Heap<TType, TCont, TPred>& other);
 	void heapify();
@@ -89,8 +92,8 @@ private:
 	typename TCont::iterator getRightChIt(typename TCont::iterator idx);
 	typename TCont::iterator getParentIt(typename TCont::iterator idx);
 	
-	TCont mHeap;
-	TPred mComp;
+	container_type mHeap;
+	value_compare mComp;
 	
 };
 
@@ -199,7 +202,7 @@ void Heap<TType, TCont, TPred>::push(TType element) {
 
 
 template <typename TType, typename TCont, typename TPred>
-const TType& Heap<TType, TCont, TPred>::top() const {
+typename Heap<TType, TCont, TPred>::const_reference Heap<TType, TCont, TPred>::top() const {
 	return mHeap.front(); // make sure that front is available
 	// for most containers
 }
@@ -214,7 +217,7 @@ void Heap<TType, TCont, TPred>::pop() {
 
 
 template <typename TType, typename TCont, typename TPred>
-size_t Heap<TType, TCont, TPred>::size() const {
+typename Heap<TType, TCont, TPred>::size_type Heap<TType, TCont, TPred>::size() const {
 	return mHeap.size();
 }
 
