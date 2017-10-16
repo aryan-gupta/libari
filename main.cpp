@@ -43,9 +43,9 @@ int main(int argc, char* argv[]) {
 	test.push_back(7);
 	output(test);
 	
-	cout << endl << "Push Front Test" << endl;
-	test.push_front(1);
-	output(test);
+	// cout << endl << "Push Front Test" << endl;
+	// test.push_front(1);
+	// output(test);
 	
 	cout << endl << "Pop Back Test" << endl;
 	test.pop_back();
