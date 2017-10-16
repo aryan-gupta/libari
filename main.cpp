@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 	test.call_member(static_cast<push_back_func_t>(&std::vector<int>::push_back), 0);
 	test.heapify();
 	
-	// test.call_member([](auto& c){ c.insert(c.begin(), 0); });
+	test.call_member([](auto& c){ c.insert(c.begin(), 0); });
 	
 	cout << "Top, Pop ,and Empty Test" << endl;
 	while (!test.empty()) {

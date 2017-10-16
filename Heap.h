@@ -43,8 +43,22 @@ public:
 	void swap(Heap<TType, TCont, TPred>& other);
 	void heapify();
 	
-	template <typename TMemb, typename... TArgs>
-	auto call_member(TMemb member, TArgs... args);
+//#if __cplusplus >= 201703L // becaise I'm using g++ 6.4 to compile
+// https://stackoverflow.com/questions/38456127/what-is-the-value-of-cplusplus-for-c17
+#if __cplusplus >= 201500L
+
+	template <typename TFunc, typename... TArgs>
+	auto call_member(TFunc func, TArgs... args);
+	
+#else
+	
+	template <typename TRet, typename... TArgs>
+	auto call_member(TRet TCont::* member, TArgs... args);
+	
+	template <typename TLamb, typename... TArgs>
+	auto call_member(TLamb lambda, TArgs... args);
+
+#endif
 	
 private:
 	void heapifyup(typename TCont::iterator idx);
@@ -172,13 +186,31 @@ void Heap<TType, TCont, TPred>::swap(Heap<TType, TCont, TPred>& other) {
 	mHeap.swap(other.mHeap);
 }
 
+//#if __cplusplus >= 201703L
+#if __cplusplus >= 201500L
 
 template <typename TType, typename TCont, typename TPred>
-template <typename TMemb, typename... TArgs>
-auto Heap<TType, TCont, TPred>::call_member(TMemb member, TArgs... args) {
-	return std::invoke(member, mHeap, std::forward<TArgs>(args)...);
+template <typename TFunc, typename... TArgs>
+auto Heap<TType, TCont, TPred>::call_member(TFunc func, TArgs... args) {
+	return std::invoke(func, mHeap, std::forward<TArgs>(args)...);
 }
 
+#else
+
+template <typename TType, typename TCont, typename TPred>
+template <typename TRet, typename... TArgs>
+auto Heap<TType, TCont, TPred>::call_member(TRet TCont::* member, TArgs... args) {
+	return (mHeap.* member) (args...);
+}
+
+
+template <typename TType, typename TCont, typename TPred>
+template <typename TLamb, typename... TArgs>
+auto Heap<TType, TCont, TPred>::call_member(TLamb lambda, TArgs... args) {
+	return lambda(mHeap, args...);
+}
+
+#endif
 
 template <typename TType, typename TCont, typename TPred>
 void Heap<TType, TCont, TPred>::heapifyup(typename TCont::iterator idx) {
