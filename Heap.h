@@ -38,8 +38,11 @@ public:
 	using value_type = TType;
 	using size_type = typename TCont::size_type;
 
-	Heap();
 	Heap(TPred cmp);
+	Heap(TCont cont);
+	Heap(TCont cont, TPred cmp);
+	Heap(std::initializer_list<TType> lst);
+	Heap(std::initializer_list<TType> lst, TPred cmp);
 	Heap(const Heap<TType, TCont, TPred>& other);
 	Heap(Heap<TType, TCont, TPred>&& other);
 	
@@ -93,13 +96,36 @@ private:
 
 
 template <typename TType, typename TCont, typename TPred>
-Heap<TType, TCont, TPred>::Heap()
-: mComp{} { /* No Code */ }
+Heap<TType, TCont, TPred>::Heap(TPred cmp)
+: mHeap{}, mComp{cmp} { /* No Code */ }
 
 
 template <typename TType, typename TCont, typename TPred>
-Heap<TType, TCont, TPred>::Heap(TPred cmp)
-: mComp{cmp} { /* No Code */ }
+Heap<TType, TCont, TPred>::Heap(TCont cont)
+: mHeap{cont}, mComp{} {
+	heapify();
+}
+
+
+template <typename TType, typename TCont, typename TPred>
+Heap<TType, TCont, TPred>::Heap(TCont cont, TPred cmp)
+: mHeap{cont}, mComp{cmp} {
+	heapify();
+}
+
+
+template <typename TType, typename TCont, typename TPred>
+Heap<TType, TCont, TPred>::Heap(std::initializer_list<TType> lst)
+: mHeap{lst.begin(), lst.end()}, mComp{} {
+	heapify();
+}
+
+
+template <typename TType, typename TCont, typename TPred>
+Heap<TType, TCont, TPred>::Heap(std::initializer_list<TType> lst, TPred cmp)
+: mHeap{lst.begin(), lst.end()}, mComp{cmp} {
+	heapify();
+}
 
 
 template <typename TType, typename TCont, typename TPred>
