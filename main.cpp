@@ -19,9 +19,9 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
-
 #include "DArray.h"
+
+using namespace std;
 
 template<typename DS>
 void output(DS& p) {
@@ -36,6 +36,8 @@ int main(int argc, char* argv[]) {
 	
 	cout << endl << "Iterator Constructor Test" << endl;
 	DArray<int> test(tmp.begin(), tmp.end());
+	output(test);
+	
 	
 	cout << endl << "Push Back Test" << endl;
 	test.push_back(5);
@@ -51,13 +53,13 @@ int main(int argc, char* argv[]) {
 	test.pop_back();
 	output(test);
 	
-	cout << endl << "Pop Front Test" << endl;
-	test.pop_front();
-	output(test);
+	// cout << endl << "Pop Front Test" << endl;
+	// test.pop_front();
+	// output(test);
 	
-	cout << endl << "Remove Test" << endl;
-	test.remove(5);
-	output(test);
+	// cout << endl << "Remove Test" << endl;
+	// test.remove(5);
+	// output(test);
 	
 	cout << endl << "Operator[] Test" << endl;
 	test[2] = 5;
@@ -66,9 +68,20 @@ int main(int argc, char* argv[]) {
 	
 	cout << endl << "Insert Test" << endl;
 	test.insert(0, 9);
-	//test.insert(3, 9);
+	test.insert(3, 9);
 	output(test);
 	
+	cout << endl << "Expansion test" << endl;
+	cout << test.max_size() << endl;
+	for (int i = 0; i < 8; ++i) {
+		test.push_back(i);
+	}
+	cout << test.max_size() << endl;
+	output(test);
+	
+	cout << endl << "Clear test" << endl;
+	test.clear();
+	output(test);
 	
 	return 0;
 }
