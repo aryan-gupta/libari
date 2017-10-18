@@ -33,7 +33,7 @@ public:
 	using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
 	
 	using iterator               = ari::random_access_iterator<pointer>;
-	using const_iterator         = ari::random_access_iterator<const pointer>;
+	using const_iterator         = ari::random_access_iterator<const value_type*>;
 	// using reverse_iterator       = ari::reverse_iterator<pointer>;
 	// using const_reverse_iterator = ari::reverse_iterator<const pointer>;
 	
@@ -50,6 +50,8 @@ public:
 	
 	iterator begin() const;
 	iterator end() const;
+	const_iterator cbegin() const;
+	const_iterator cend() const;
 	
 	void clear();
 	size_type max_size() const;
@@ -125,6 +127,16 @@ typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::begin() const {
 template <typename TType, typename TAlloc>
 typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::end() const {
 	return iterator{mArray + mSize};
+}
+
+template <typename TType, typename TAlloc>
+typename DArray<TType, TAlloc>::const_iterator DArray<TType, TAlloc>::cbegin() const {
+	return const_iterator{mArray};
+}
+
+template <typename TType, typename TAlloc>
+typename DArray<TType, TAlloc>::const_iterator DArray<TType, TAlloc>::cend() const {
+	return const_iterator{mArray + mSize};
 }
 
 template <typename TType, typename TAlloc>
