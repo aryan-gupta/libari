@@ -49,6 +49,24 @@ public:
 	random_access_iterator(const random_access_iterator<TOther>& it) 
 		: mCurrent{static_cast<TIter>(it.mCurrent)} { /* No Code */ }
 	
+	/// Assignment operator
+	/// Copies the underlying data over
+	random_access_iterator& operator=(const random_access_iterator& it) {
+		mCurrent = it.mCurrent;
+	}
+	
+	/// @return if the underlyng data is less than the other
+	bool operator<(const random_access_iterator& it) const { return mCurrent < it.mCurrent; }
+	
+	/// @return if the underlying data is greater than the other
+	bool operator>(const random_access_iterator& it) const { return mCurrent > it.mCurrent; }
+	
+	/// @return if the underlyng data is less than or equal the other
+	bool operator<=(const random_access_iterator& it) const { return mCurrent <= it.mCurrent; }
+	
+	/// @return if the underlying data is greater than or equal the other
+	bool operator>=(const random_access_iterator& it) const { return mCurrent >= it.mCurrent; }
+	
 	/// @return a reference to the this, just incremented by one
 	random_access_iterator& operator++() { 
 		++mCurrent;
