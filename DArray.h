@@ -19,11 +19,11 @@
 
 #include <memory>
 
+#include "Iterator.h"
+
 template <typename TType, typename TAlloc = std::allocator<TType>>
 class DArray {
-public:
-	class iterator;
-	
+public:	
 	using value_type      = TType;
 	using allocator_type  = TAlloc;
 	using size_type       = size_t;
@@ -31,37 +31,12 @@ public:
 	using const_reference = const value_type&;	
 	using pointer         = typename std::allocator_traits<allocator_type>::pointer;
 	using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
-	using iterator        = iterator; // rest will be defined after we get a better
-	// basis for other types of iterators 
 	
-	class iterator {
-	public:
-		iterator();
-		iterator(const TType* data);
-		iterator(const iterator& it);
+	using iterator               = ari::random_access_iterator<pointer>;
+	using const_iterator         = ari::random_access_iterator<const pointer>;
+	// using reverse_iterator       = ari::reverse_iterator<pointer>;
+	// using const_reverse_iterator = ari::reverse_iterator<const pointer>;
 	
-		iterator& operator++(); // preincrement
-		iterator& operator--();
-		
-		iterator operator++(int); // postincrement
-		iterator operator--(int);
-		
-		iterator& operator=(const iterator& it);
-
-		iterator& operator-(int scale);
-		iterator& operator+(int scale);
-		
-		bool operator==(const iterator& it);
-		
-		TType& operator*();
-		TType& operator->();
-		
-		TType* raw();
-		
-	private:
-		TType* mData;
-		
-	};
 	
 	DArray();
 	DArray(const DArray<TType, TAlloc>& other);
@@ -144,12 +119,12 @@ DArray<TType, TAlloc>::~DArray() {
 
 template <typename TType, typename TAlloc>
 typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::begin() const {
-	return iterator(mArray);
+	return iterator{mArray};
 }
 
 template <typename TType, typename TAlloc>
 typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::end() const {
-	return iterator(mArray + mSize);
+	return iterator{mArray + mSize};
 }
 
 template <typename TType, typename TAlloc>
@@ -279,86 +254,4 @@ void DArray<TType, TAlloc>::erase(typename DArray<TType, TAlloc>::iterator it) {
 	}
 	
 	mSize--;
-}
-
-template <typename TType, typename TAlloc>
-DArray<TType, TAlloc>::iterator::iterator() {
-	mData = nullptr;
-}
-
-
-template <typename TType, typename TAlloc>
-DArray<TType, TAlloc>::iterator::iterator(const TType* data) {
-	mData = data;
-}
-
-
-template <typename TType, typename TAlloc>
-DArray<TType, TAlloc>::iterator::iterator(const iterator& it) {
-	mData = it.mData;
-}
-
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator&DArray<TType, TAlloc>::iterator::operator++() {
-	mData++;
-	
-	return *this;
-}
-
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator& DArray<TType, TAlloc>::iterator::operator--() {
-	mData--;
-	
-	return *this;
-}
-
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::iterator::operator++(int) {
-	return iterator(mData++);
-}
-
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::iterator::operator--(int) {
-	return iterator(mData--);
-}
-
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator& DArray<TType, TAlloc>::iterator::operator=(
-	const typename DArray<TType, TAlloc>::iterator& it
-) {
-	mData = it.mData;
-	
-	return *this;
-}
-
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator& DArray<TType, TAlloc>::iterator::operator+(int scale) {
-	mData += scale;
-	return *this;
-}
-
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator& DArray<TType, TAlloc>::iterator::operator-(int scale) {
-	mData -= scale;
-	return *this;
-}
-
-template <typename TType, typename TAlloc>
-bool DArray<TType, TAlloc>::iterator::operator==(const iterator& it) {
-	return mData == it.mData;
-}
-
-template <typename TType, typename TAlloc>
-TType& DArray<TType, TAlloc>::iterator::operator*() {
-	return *mData;
-}
-
-template <typename TType, typename TAlloc>
-TType& DArray<TType, TAlloc>::iterator::operator->() {
-	return *mData;
-}
-
-template <typename TType, typename TAlloc>
-TType* DArray<TType, TAlloc>::iterator::raw() {
-	return mData;
 }
