@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <vector>
+#include <functional>
 
 #include "DArray.h"
 
@@ -32,56 +33,62 @@ void output(DS& p) {
 } 
 
 int main(int argc, char* argv[]) {
-	vector<int> tmp = {0, 3, 1, 1, 2, 6};
+	vector<int> tmp = {5, 2, 8, 6, 4, 7, 3, 6, 4, 5, 1, 0, 0, 0};
 	
-	cout << endl << "Iterator Constructor Test" << endl;
-	DArray<int> test(tmp.begin(), tmp.end());
-	output(test);
-	
-	
-	cout << endl << "Push Back Test" << endl;
-	test.push_back(5);
-	output(test);
-	test.push_back(7);
-	output(test);
-	
-	// cout << endl << "Push Front Test" << endl;
-	// test.push_front(1);
-	// output(test);
-	
-	cout << endl << "Pop Back Test" << endl;
-	test.pop_back();
-	output(test);
-	
-	// cout << endl << "Pop Front Test" << endl;
-	// test.pop_front();
-	// output(test);
-	
-	// cout << endl << "Remove Test" << endl;
-	// test.remove(5);
-	// output(test);
-	
-	cout << endl << "Operator[] Test" << endl;
-	test[2] = 5;
-	test[0] = 1;
-	output(test);
-	
-	cout << endl << "Insert Test" << endl;
-	test.insert(0, 9);
-	test.insert(3, 9);
-	output(test);
-	
-	cout << endl << "Expansion test" << endl;
-	cout << test.max_size() << endl;
-	for (int i = 0; i < 8; ++i) {
-		test.push_back(i);
+	cout << "std::initializer_list test" << endl;
+	Heap<int> tmp0 = {1, 3, 5, 1, 7, 2, 6, 3, 8, 9, 12, 5, 3};
+	while (!tmp0.empty()) {
+		cout << tmp0.top() << endl;
+		tmp0.pop();
 	}
-	cout << test.max_size() << endl;
-	output(test);
 	
-	cout << endl << "Clear test" << endl;
-	test.clear();
-	output(test);
+	cout << "std::initializer_list and compare test" << endl;
+	Heap<int, std::vector<int>, bool (*) (int, int)> tmp1{
+		{1, 3, 5, 1, 7, 2, 6, 3, 8, 9, 12, 5, 3}, 
+		[](int a, int b) { return a < b; }
+	};
+	while (!tmp1.empty()) {
+		cout << tmp1.top() << endl;
+		tmp1.pop();
+	}
+	
+	
+	cout << "Iterator Constructor Test" << endl;
+	Heap<int, vector<int>, std::function<bool(int, int)> > tmp2{tmp.begin(), tmp.end(), [](int a, int b) { return a < b; }};
+	
+	auto test = tmp2;
+	
+	cout << "Push Test" << endl;
+	test.push(4);
+	test.push(8);
+	test.push(0);
+	test.push(4);
+	test.push(2);
+	test.push(6);
+	test.push(9);
+	test.push(2);
+	test.push(1);
+	
+	cout << "Returning Size!!       " << tmp2.call_member(&std::vector<int>::size) << endl;
+	
+	using push_back_func_t = void(std::vector<int>::*)(const int&);
+	test.call_member(static_cast<push_back_func_t>(&std::vector<int>::push_back), 0);
+	test.heapify();
+	
+	test.call_member([](auto& c){ c.insert(c.begin(), 0); });
+	test.call_member([](auto& c, auto num){ c.insert(c.begin(), num); }, 0);
+	test.heapify();
+	
+	cout << "Top, Pop ,and Empty Test" << endl;
+	while (!test.empty()) {
+		cout << test.top() << "     " << test.size() << endl;
+		test.pop();
+	}
+	cout << endl << endl;
+	while (!tmp2.empty()) {
+		cout << tmp2.top() << "     " << tmp2.size() << endl;
+		tmp2.pop();
+	}
 	
 	return 0;
 }
