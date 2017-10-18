@@ -49,6 +49,10 @@ int main(int argc, char* argv[]) {
 	// test.push_front(1);
 	// output(test);
 	
+	cout << endl << "Iterator Test" << endl;
+	for (auto i = test.begin(); i != test.end(); ++i)
+		cout << *i << endl;
+	
 	cout << endl << "Pop Back Test" << endl;
 	test.pop_back();
 	output(test);
