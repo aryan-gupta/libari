@@ -2,11 +2,13 @@
 #ifndef ARI_ITERATOR_BASE_H
 #define ARI_ITERATOR_BASE_H
 
+#include <cstddef>
+
 namespace ari {
 
 template <
 	typename TType,
-	typename TDist  = ptrdiff_t, 
+	typename TDist  = std::ptrdiff_t, 
 	typename TPoint = TType*, 
 	typename TRef   = TType&
 > struct iterator_base {
@@ -18,4 +20,4 @@ template <
 
 } // end namespace ari
 
-#endif
+#endif // ARI_ITERATOR_BASE_H defined
