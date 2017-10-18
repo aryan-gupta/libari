@@ -51,7 +51,16 @@ int main(int argc, char* argv[]) {
 	
 	cout << endl << "Iterator Test" << endl;
 	for (auto i = test.begin(); i != test.end(); ++i)
-		cout << *i << endl;
+		cout << *i << " ";
+	cout << endl;
+	
+
+	cout << endl << "Const Iterator Test" << endl;
+	for (auto i = test.cbegin(); i != test.cend(); ++i) {
+		cout << *i << " ";
+		// *i = 4; // error
+	}
+	cout << endl;
 	
 	cout << endl << "Pop Back Test" << endl;
 	test.pop_back();
