@@ -33,6 +33,10 @@ public:
 	/// Intializes \c mCurrent to \c 0 or \c nullptr if its a pointer
 	random_access_iterator() : mCurrent{} { /* No Code */ }
 	
+	/// Covert Constructor
+	/// This converts a iterator_type to this type
+	explicit random_access_iterator(const iterator_type& dat) : mCurrent{dat} { /* No Code */ }
+	
 	/// Copy constructor
 	/// Copies the underling data structure
 	/// There is no need for move constructor
