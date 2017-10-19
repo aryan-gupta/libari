@@ -1,4 +1,11 @@
 
+
+#ifndef ARI_REVERSE_ITERATOR_H
+#define ARI_REVERSE_ITERATOR_H
+
+#include <cstddef>
+#include <iterator>
+
 #include "iterator_base.hpp"
 
 namespace ari {
@@ -31,12 +38,12 @@ public:
 	
 	reverse_iterator() : mCurrent{} { /* No Code */ }
 	
-	explicit reverse_iterator(const iterator_type& dat) : mCurrent{--dat} { /* No Code */ }
+	explicit reverse_iterator(iterator_type dat) : mCurrent{--dat} { /* No Code */ }
 	
 	reverse_iterator(const reverse_iterator& it)
 		: mCurrent{it.mCurrent} { /* No Code */ }
 		
-	template <template TOther>
+	template <typename TOther>
 	reverse_iterator(const reverse_iterator<TOther>& it)
 		: mCurrent{static_cast<TIter>(it.mCurrent)} { /* No Code */ }
 		
@@ -86,85 +93,60 @@ protected:
 	
 /// @return if the underlyng data is less than the other
 template <typename TIter>
-bool operator<(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) const 
+bool operator<(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() < b.base(); }
 
 /// @return if the underlying data is greater than the other
 template <typename TIter>
-bool operator>(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) const 
+bool operator>(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() > b.base(); }
 
 /// @return if the underlyng data is less than or equal the other
 template <typename TIter>
-bool operator<=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) const 
+bool operator<=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() <= b.base(); }
 
 /// @return if the underlying data is greater than or equal the other
 template <typename TIter>
-bool operator>=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) const 
+bool operator>=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() >= b.base(); }
 
 /// @return reference to \c this
 /// This operator decrements mCurrent by the scale
 template <typename TIter>
-random_access_iterator<TIter> operator-(
-	const random_access_iterator<TIter>& it
-	typename random_access_iterator<TIter>::difference_type scale,
+reverse_iterator<TIter> operator-(
+	const reverse_iterator<TIter>& it,
+	typename reverse_iterator<TIter>::difference_type scale
 ) { return reverse_iterator<TIter>{it.base() - scale}; }
 
 /// @return reference to \c this
 // This operator increments mCurrent by the scale
 template <typename TIter>
-random_access_iterator<TIter> operator+(
-	const random_access_iterator<TIter>& it
-	typename random_access_iterator<TIter>::difference_type scale,
+reverse_iterator<TIter> operator+(
+	const reverse_iterator<TIter>& it,
+	typename reverse_iterator<TIter>::difference_type scale
 ) { return reverse_iterator<TIter>{it.base() + scale}; }
 
 template <typename TIter>
 reverse_iterator<TIter>& operator+=(
-	random_access_iterator<TIter>& it
-	typename random_access_iterator<TIter>::difference_type scale,
+	reverse_iterator<TIter>& it,
+	typename reverse_iterator<TIter>::difference_type scale
 ) { it = it + scale; return it; }
 
 template <typename TIter>
 reverse_iterator<TIter>& operator-=(
-	random_access_iterator<TIter>& it
-	typename random_access_iterator<TIter>::difference_type scale,
+	reverse_iterator<TIter>& it,
+	typename reverse_iterator<TIter>::difference_type scale
 ) { it = it - scale; return it; }
 
-/// @return if the underlyng data is less than the other
-template <typename TIter>
-bool operator<(
-	const random_access_iterator<TIter>& a
-	const random_access_iterator<TIter>& b
-) { return a.base() < b.base(); }
-
-/// @return if the underlying data is greater than the other
-template <typename TIter>
-bool operator>(
-	const random_access_iterator<TIter>& a
-	const random_access_iterator<TIter>& b
-) { return a.base() > b.base(); }
-
-/// @return if the underlyng data is less than or equal the other
-template <typename TIter>
-bool operator<=(
-	const random_access_iterator<TIter>& a
-	const random_access_iterator<TIter>& b
-) { return a.base() <= b.base(); }
-
-/// @return if the underlying data is greater than or equal the other
-template <typename TIter>
-bool operator>=(
-	const random_access_iterator<TIter>& a
-	const random_access_iterator<TIter>& b
-) { return a.base() >= b.base(); }	
 
 template <typename TIter>
-typename random_access_iterator<TIter>::difference_type operator-(
-	const random_access_iterator<TIter>& a
-	const random_access_iterator<TIter>& b
+typename reverse_iterator<TIter>::difference_type operator-(
+	const reverse_iterator<TIter>& a,
+	const reverse_iterator<TIter>& b
 ) { return a.base() - b.base(); }
 
 
 } // end namespace ari
+
+#endif // ARI_REVERSE_ITERATOR_H defined
