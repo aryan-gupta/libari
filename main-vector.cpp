@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "vector.hpp"
 
@@ -75,17 +76,13 @@ int main(int argc, char* argv[]) {
 	}
 	cout << endl;
 	
+	cout << endl << "Front, back test" << endl;
+	cout << "Front: " << test.front() << endl;
+	cout << "Back: " << test.back() << endl;
+	
 	cout << endl << "Pop Back Test" << endl;
 	test.pop_back();
 	output(test);
-	
-	// cout << endl << "Pop Front Test" << endl;
-	// test.pop_front();
-	// output(test);
-	
-	// cout << endl << "Remove Test" << endl;
-	// test.remove(5);
-	// output(test);
 	
 	cout << endl << "Operator[] Test" << endl;
 	test[2] = 5;
@@ -98,12 +95,31 @@ int main(int argc, char* argv[]) {
 	output(test);
 	
 	cout << endl << "Expansion test" << endl;
-	cout << test.max_size() << endl;
+	cout << test.capacity() << endl;
 	for (int i = 0; i < 8; ++i) {
 		test.push_back(i);
 	}
-	cout << test.max_size() << endl;
+	cout << test.capacity() << endl;
 	output(test);
+	
+	cout << endl << "Shrink To Fit Test" << endl;
+	test.shrink_to_fit();
+	cout << test.capacity() << endl;
+	output(test);
+	
+	cout << endl << "Insert and Expansion after STF test" << endl;
+	test.insert(1, 4);
+	test.insert(test.begin(), 4);
+	test.insert(test.end(), 10);
+	test.insert(test.begin() + 3, 10);
+	test.insert(test.begin() + 3, 10);
+	test.insert(test.begin() + 3, 10);
+	cout << test.capacity() << endl;
+	output(test);
+	
+	cout << endl << "Data Test" << endl;
+	std::for_each(test.data(), test.data() + test.size(), [](auto i){ cout << i << " ";});
+	cout << endl;
 	
 	cout << endl << "Clear test" << endl;
 	test.clear();
