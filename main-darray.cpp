@@ -61,6 +61,19 @@ int main(int argc, char* argv[]) {
 		// *i = 4; // error
 	}
 	cout << endl;
+
+	cout << endl << "Reverse Iterator Test" << endl;
+	for (auto i = test.rbegin(); i != test.rend(); ++i) {
+		cout << *i << " ";
+	}
+	cout << endl;
+
+	cout << endl << "Const Reverse Iterator Test" << endl;
+	for (auto i = test.crbegin(); i != test.crend(); ++i) {
+		cout << *i << " ";
+		// *i = 4; // error
+	}
+	cout << endl;
 	
 	cout << endl << "Pop Back Test" << endl;
 	test.pop_back();
