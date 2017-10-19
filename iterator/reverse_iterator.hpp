@@ -38,7 +38,7 @@ public:
 	
 	reverse_iterator() : mCurrent{} { /* No Code */ }
 	
-	explicit reverse_iterator(const iterator_type& dat) : mCurrent{--dat} { /* No Code */ }
+	explicit reverse_iterator(iterator_type dat) : mCurrent{--dat} { /* No Code */ }
 	
 	reverse_iterator(const reverse_iterator& it)
 		: mCurrent{it.mCurrent} { /* No Code */ }
