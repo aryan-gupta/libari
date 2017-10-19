@@ -33,9 +33,9 @@ public:
 	using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
 	
 	using iterator               = ari::random_access_iterator<pointer>;
-	using const_iterator         = ari::random_access_iterator<const value_type*>;
-	// using reverse_iterator       = ari::reverse_iterator<pointer>;
-	// using const_reverse_iterator = ari::reverse_iterator<const pointer>;
+	using const_iterator         = ari::random_access_iterator<const_pointer>;
+	using reverse_iterator       = ari::reverse_iterator<pointer>;
+	using const_reverse_iterator = ari::reverse_iterator<const_pointer>;
 	
 	
 	DArray();
@@ -52,6 +52,10 @@ public:
 	iterator end() const;
 	const_iterator cbegin() const;
 	const_iterator cend() const;
+	reverse_iterator rbegin() const;
+	reverse_iterator rend() const;
+	const_reverse_iterator crbegin() const;
+	const_reverse_iterator crend() const;
 	
 	void clear();
 	size_type max_size() const;
@@ -137,6 +141,30 @@ typename DArray<TType, TAlloc>::const_iterator DArray<TType, TAlloc>::cbegin() c
 template <typename TType, typename TAlloc>
 typename DArray<TType, TAlloc>::const_iterator DArray<TType, TAlloc>::cend() const {
 	return const_iterator{mArray + mSize};
+}
+
+
+template <typename TType, typename TAlloc>
+typename DArray<TType, TAlloc>::reverse_iterator DArray<TType, TAlloc>::rbegin() const {
+	return reverse_iterator{mArray + mSize};
+}
+
+
+template <typename TType, typename TAlloc>
+typename DArray<TType, TAlloc>::reverse_iterator DArray<TType, TAlloc>::rend() const {
+	return reverse_iterator{mArray};
+}
+
+
+template <typename TType, typename TAlloc>
+typename DArray<TType, TAlloc>::const_reverse_iterator DArray<TType, TAlloc>::crbegin() const {
+	return const_reverse_iterator{mArray + mSize};
+}
+
+
+template <typename TType, typename TAlloc>
+typename DArray<TType, TAlloc>::const_reverse_iterator DArray<TType, TAlloc>::crend() const {
+	return const_reverse_iterator{mArray};
 }
 
 template <typename TType, typename TAlloc>
