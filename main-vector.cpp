@@ -19,7 +19,7 @@
 #include <iostream>
 #include <vector>
 
-#include "DArray.h"
+#include "vector.hpp"
 
 using namespace std;
 
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
 	vector<int> tmp = {0, 3, 1, 1, 2, 6};
 	
 	cout << endl << "Iterator Constructor Test" << endl;
-	DArray<int> test(tmp.begin(), tmp.end());
+	ari::vector<int> test(tmp.begin(), tmp.end());
 	output(test);
 	
 	

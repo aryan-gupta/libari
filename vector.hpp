@@ -15,14 +15,17 @@
  * =============================================================================
  */
 
-#pragma once
+#ifndef ARI_VECTOR_H
+#define ARI_VECTOR_H
 
 #include <memory>
 
 #include "Iterator.h"
 
+namespace ari {
+
 template <typename TType, typename TAlloc = std::allocator<TType>>
-class DArray {
+class vector {
 public:	
 	using value_type      = TType;
 	using allocator_type  = TAlloc;
@@ -38,15 +41,15 @@ public:
 	using const_reverse_iterator = ari::reverse_iterator<const_pointer>;
 	
 	
-	DArray();
-	DArray(const DArray<TType, TAlloc>& other);
+	vector();
+	vector(const vector<TType, TAlloc>& other);
 	
-	DArray(const size_type size, const_reference val = TType());
+	vector(const size_type size, const_reference val = TType());
 	
 	template <typename TIter>
-	DArray(TIter&& begin, TIter&& end);
+	vector(TIter&& begin, TIter&& end);
 	
-	~DArray();
+	~vector();
 	
 	iterator begin() const;
 	iterator end() const;
@@ -90,19 +93,19 @@ private:
 
 
 template<typename TType, typename TAlloc>
-DArray<TType, TAlloc>::DArray() 
+vector<TType, TAlloc>::vector() 
 : mSize{0}, mCap{INITIAL_CAP}, mAlloc{}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
 
 
 template <typename TType, typename TAlloc>
-DArray<TType, TAlloc>::DArray(const DArray& other)
+vector<TType, TAlloc>::vector(const vector& other)
 : mSize{other.mSize}, mCap{other.mCap}, mAlloc{other.mAlloc}, mArray{mAlloc.allocate(mCap)} {
 	std::copy(other.begin(), other.end(), mArray);
 }
 
 
 template <typename TType, typename TAlloc>
-DArray<TType, TAlloc>::DArray(const size_type size, const TType& val) 
+vector<TType, TAlloc>::vector(const size_type size, const TType& val) 
 : mSize{size}, mCap{size * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)} {
 	std::fill(mArray, mArray + mSize, val);
 }
@@ -110,7 +113,7 @@ DArray<TType, TAlloc>::DArray(const size_type size, const TType& val)
 
 template <typename TType, typename TAlloc>
 template <typename TIter>
-DArray<TType, TAlloc>::DArray(TIter&& begin, TIter&& end)
+vector<TType, TAlloc>::vector(TIter&& begin, TIter&& end)
 : mSize{static_cast<size_type>(std::distance(begin, end))}, /// @todo const end param
   mCap{static_cast<size_type>(mSize * GROWTH_FACTOR)}, mAlloc{}, mArray{mAlloc.allocate(mCap)} {
 	std::copy(begin, end, mArray);
@@ -118,57 +121,61 @@ DArray<TType, TAlloc>::DArray(TIter&& begin, TIter&& end)
 
 
 template <typename TType, typename TAlloc>
-DArray<TType, TAlloc>::~DArray() {
+vector<TType, TAlloc>::~vector() {
 	mAlloc.deallocate(mArray, mCap);
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::begin() const {
+typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::begin() const {
 	return iterator{mArray};
 }
 
+
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::iterator DArray<TType, TAlloc>::end() const {
+typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::end() const {
 	return iterator{mArray + mSize};
 }
 
+
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::const_iterator DArray<TType, TAlloc>::cbegin() const {
+typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cbegin() const {
 	return const_iterator{mArray};
 }
 
+
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::const_iterator DArray<TType, TAlloc>::cend() const {
+typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cend() const {
 	return const_iterator{mArray + mSize};
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::reverse_iterator DArray<TType, TAlloc>::rbegin() const {
+typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rbegin() const {
 	return reverse_iterator{mArray + mSize};
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::reverse_iterator DArray<TType, TAlloc>::rend() const {
+typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rend() const {
 	return reverse_iterator{mArray};
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::const_reverse_iterator DArray<TType, TAlloc>::crbegin() const {
+typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crbegin() const {
 	return const_reverse_iterator{mArray + mSize};
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::const_reverse_iterator DArray<TType, TAlloc>::crend() const {
+typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crend() const {
 	return const_reverse_iterator{mArray};
 }
 
+
 template <typename TType, typename TAlloc>
-void DArray<TType, TAlloc>::clear() {
+void vector<TType, TAlloc>::clear() {
 	mAlloc.deallocate(mArray, mCap);
 	
 	mSize = 0;
@@ -178,13 +185,13 @@ void DArray<TType, TAlloc>::clear() {
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::size_type DArray<TType, TAlloc>::max_size() const {
+typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::max_size() const {
 	return mCap;
 }
 
 
 template <typename TType, typename TAlloc>
-void DArray<TType, TAlloc>::push_back(typename DArray<TType, TAlloc>::const_reference val) {
+void vector<TType, TAlloc>::push_back(typename vector<TType, TAlloc>::const_reference val) {
 	if(mSize == mCap) {
 		size_type newCap = mSize * 2;
 		pointer newArray = mAlloc.allocate(newCap);
@@ -202,15 +209,15 @@ void DArray<TType, TAlloc>::push_back(typename DArray<TType, TAlloc>::const_refe
 
 
 template <typename TType, typename TAlloc>
-void DArray<TType, TAlloc>::pop_back() {
+void vector<TType, TAlloc>::pop_back() {
 	mSize--;
 }
 
 
 template <typename TType, typename TAlloc>
-void DArray<TType, TAlloc>::insert(
-	typename DArray<TType, TAlloc>::size_type idx,
-	typename DArray<TType, TAlloc>::const_reference val
+void vector<TType, TAlloc>::insert(
+	typename vector<TType, TAlloc>::size_type idx,
+	typename vector<TType, TAlloc>::const_reference val
 ) {
 	if(mSize == mCap) {
 		size_type newCap = mSize * 2;
@@ -237,46 +244,37 @@ void DArray<TType, TAlloc>::insert(
 
 
 template <typename TType, typename TAlloc>
-void DArray<TType, TAlloc>::insert(
-	const typename DArray<TType, TAlloc>::iterator& it,
-	typename DArray<TType, TAlloc>::const_reference val
+void vector<TType, TAlloc>::insert(
+	const typename vector<TType, TAlloc>::iterator& it,
+	typename vector<TType, TAlloc>::const_reference val
 ) {
 	/* Need to Code */
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::size_type DArray<TType, TAlloc>::size() const {
+typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::size() const {
 	return mSize;
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::const_reference 
-DArray<TType, TAlloc>::operator[](typename DArray<TType, TAlloc>::size_type idx) const {
+typename vector<TType, TAlloc>::const_reference 
+vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) const {
 	return mArray[idx];
 }
 
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::reference
-DArray<TType, TAlloc>::operator[](typename DArray<TType, TAlloc>::size_type idx) {
+typename vector<TType, TAlloc>::reference
+vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) {
 	return mArray[idx];
 }
 
-template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::const_reference
-DArray<TType, TAlloc>::at(const typename DArray<TType, TAlloc>::size_type idx) const {
-	if(idx >= mSize) {
-		throw std::out_of_range("The specified index: " + std::to_string(idx) + ", is out of range");
-	}
-	
-	return mArray[idx];
-}
 
 template <typename TType, typename TAlloc>
-typename DArray<TType, TAlloc>::reference
-DArray<TType, TAlloc>::at(const typename DArray<TType, TAlloc>::size_type idx) {
+typename vector<TType, TAlloc>::const_reference
+vector<TType, TAlloc>::at(const typename vector<TType, TAlloc>::size_type idx) const {
 	if(idx >= mSize) {
 		throw std::out_of_range("The specified index: " + std::to_string(idx) + ", is out of range");
 	}
@@ -286,7 +284,18 @@ DArray<TType, TAlloc>::at(const typename DArray<TType, TAlloc>::size_type idx) {
 
 
 template <typename TType, typename TAlloc>
-void DArray<TType, TAlloc>::erase(typename DArray<TType, TAlloc>::iterator it) {
+typename vector<TType, TAlloc>::reference
+vector<TType, TAlloc>::at(const typename vector<TType, TAlloc>::size_type idx) {
+	if(idx >= mSize) {
+		throw std::out_of_range("The specified index: " + std::to_string(idx) + ", is out of range");
+	}
+	
+	return mArray[idx];
+}
+
+
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::erase(typename vector<TType, TAlloc>::iterator it) {
 	// go from the start to the end 
 	// and move everything back
 	while(++it != end) {
@@ -295,3 +304,7 @@ void DArray<TType, TAlloc>::erase(typename DArray<TType, TAlloc>::iterator it) {
 	
 	mSize--;
 }
+
+} // end namespace ari
+
+#endif // ARI_VECTOR_H defined
