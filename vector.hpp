@@ -421,20 +421,16 @@ void vector<TType, TAlloc>::move_up(typename vector<TType, TAlloc>::size_type id
 		size_type newCap = mSize * 2;
 		pointer newArray = mAlloc.allocate(newCap);
 		
-		size_type last = mSize++;
-		while(last --> idx)
-			newArray[last + 1] = mArray[last];
-		
-		while(last --> 0)
-			newArray[last] = mArray[last];
+		std::move(mArray, mArray + idx, newArray);
+		std::move(mArray + idx, mArray + mSize, newArray + idx + 1);
 		
 		mAlloc.deallocate(mArray, mCap);
 		mArray = newArray;
 		mCap = newCap;
+		++mSize;
 	} else {
-		size_type last = mSize++;
-		while(last --> idx)
-			mArray[last + 1] = mArray[last];
+		std::move_backward(mArray + idx, mArray + mSize, mArray + mSize + 1);
+		++mSize;
 	}
 }
 
