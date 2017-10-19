@@ -45,7 +45,7 @@ public:
 	
 	/// Copy constructor
 	/// This attempts to copy another iterator if it can be converted
-	template<typename TOther>
+	template <typename TOther>
 	random_access_iterator(const random_access_iterator<TOther>& it) 
 		: mCurrent{static_cast<TIter>(it.mCurrent)} { /* No Code */ }
 	
