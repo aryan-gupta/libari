@@ -60,8 +60,21 @@ public:
 	const_reverse_iterator crbegin() const;
 	const_reverse_iterator crend() const;
 	
-	void clear();
+	reference front();
+	const_reference front() const;
+	reference back();
+	const_reference back() const;
+	
+	pointer data();
+	const_pointer data() const;
+	
+	bool empty() const;
+	size_type size() const;
 	size_type max_size() const;
+	void reserve(size_type sz);
+	size_type capacity() const;
+	void shrink_to_fit();
+	void clear();
 	
 	void push_back(const_reference val);
 	void pop_back();
@@ -69,7 +82,11 @@ public:
 	void insert(size_type idx, const_reference val);
 	void insert(const iterator& it, const_reference val);
 	
-	size_type size() const;
+	template <typename TIter, typename... TArgs>
+	void emplace(const TIter& it, TArgs&&... args);
+	
+	template <typename... TArgs>
+	void emplace_back(TArgs&&... args);
 	
 	const_reference operator[](const size_type idx) const;
 	reference operator[](const size_type idx);
@@ -81,6 +98,10 @@ public:
 	//void erase(const iterator& begin, const iterator& end);
 	
 private:	
+	void expand_to(size_type sz);
+	/// Moves [idx, mSize] forward by one, leaving a gap at idx and increasing mSize by one
+	void move_up(size_type idx);
+	
 	static constexpr double GROWTH_FACTOR  = 2;
 	static constexpr size_type INITIAL_CAP = 5;
 
@@ -175,6 +196,89 @@ typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::cr
 
 
 template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::front() {
+	return *mArray;
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::front() const {
+	return *mArray;
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::back() {
+	return *(mArray + mSize - 1);
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::back() const {
+	return *(mArray + mSize - 1);
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::pointer vector<TType, TAlloc>::data() {
+	return mArray;
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::const_pointer vector<TType, TAlloc>::data() const {
+	return mArray;
+}
+
+
+template <typename TType, typename TAlloc>
+bool vector<TType, TAlloc>::empty() const {
+	return mSize == 0;
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::size() const {
+	return mSize;
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::max_size() const {
+	return 0; //std::numeric_limits<size_type>::max();
+}
+
+
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::reserve(typename vector<TType, TAlloc>::size_type sz) {
+	if (mSize >= sz) // just a pre check
+		return;
+	
+	pointer tmpArray = mAlloc.allocate(sz);
+	std::move(mArray, mArray + mSize, tmpArray);
+	mAlloc.deallocate(mArray, mCap);
+	mArray = tmpArray;
+	mCap = sz;
+}
+
+
+template <typename TType, typename TAlloc>
+typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::capacity() const {
+	return mCap;
+}
+
+
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::shrink_to_fit() {
+	pointer tmpArray = mAlloc.allocate(mSize);
+	std::move(mArray, mArray + mSize, tmpArray);
+	mAlloc.deallocate(mArray, mCap);
+	mArray = tmpArray;
+	mCap = mSize;
+}
+
+
+template <typename TType, typename TAlloc>
 void vector<TType, TAlloc>::clear() {
 	mAlloc.deallocate(mArray, mCap);
 	
@@ -185,14 +289,8 @@ void vector<TType, TAlloc>::clear() {
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::max_size() const {
-	return mCap;
-}
-
-
-template <typename TType, typename TAlloc>
 void vector<TType, TAlloc>::push_back(typename vector<TType, TAlloc>::const_reference val) {
-	if(mSize == mCap) {
+	if(mSize == mCap) { // USE EXPAND TO
 		size_type newCap = mSize * 2;
 		pointer newArray = mAlloc.allocate(newCap);
 		
@@ -219,26 +317,7 @@ void vector<TType, TAlloc>::insert(
 	typename vector<TType, TAlloc>::size_type idx,
 	typename vector<TType, TAlloc>::const_reference val
 ) {
-	if(mSize == mCap) {
-		size_type newCap = mSize * 2;
-		pointer newArray = mAlloc.allocate(newCap);
-		
-		size_type last = mSize++;
-		while(last --> idx)
-			newArray[last + 1] = mArray[last];
-		
-		while(last --> 0)
-			newArray[last] = mArray[last];
-		
-		mAlloc.deallocate(mArray, mCap);
-		mArray = newArray;
-		mCap = newCap;
-	} else {
-		size_type last = mSize++;
-		while(last --> idx)
-			mArray[last + 1] = mArray[last];
-	}
-	
+	move_up(idx);
 	mArray[idx] = val;
 }
 
@@ -248,13 +327,23 @@ void vector<TType, TAlloc>::insert(
 	const typename vector<TType, TAlloc>::iterator& it,
 	typename vector<TType, TAlloc>::const_reference val
 ) {
-	/* Need to Code */
+	move_up(it.base() - mArray);
+	*it = val;
 }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::size() const {
-	return mSize;
+template <typename TIter, typename... TArgs>
+void vector<TType, TAlloc>::emplace(const TIter& it, TArgs&&... args) {
+	move_up(it.base() - mArray);
+	*it = value_type{std::forward<TArgs>(args)...};
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename... TArgs>
+void vector<TType, TAlloc>::emplace_back(TArgs&&... args) {
+	mArray[mSize++] = value_type{std::forward<TArgs>(args)...};
 }
 
 
@@ -304,6 +393,51 @@ void vector<TType, TAlloc>::erase(typename vector<TType, TAlloc>::iterator it) {
 	
 	mSize--;
 }
+
+
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::expand_to(typename vector<TType, TAlloc>::size_type sz) {
+	pointer tmpArray = mAlloc.allocate(sz);
+	
+	// if the first expression of the ?: operator runs then we are expanding the array
+	// if second expression runs then we are contracting the array. In the second case
+	// data WILL be lost. 
+	std::move(
+		mArray, 
+		(sz > mSize ? mArray + mSize : mArray + sz), // we want to copy the smaller value
+		tmpArray
+	);
+	
+	mAlloc.deallocate(mArray, mCap);
+	
+	mArray = tmpArray;
+	mCap = sz;
+}
+
+
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::move_up(typename vector<TType, TAlloc>::size_type idx) {
+	if(mSize == mCap) {
+		size_type newCap = mSize * 2;
+		pointer newArray = mAlloc.allocate(newCap);
+		
+		size_type last = mSize++;
+		while(last --> idx)
+			newArray[last + 1] = mArray[last];
+		
+		while(last --> 0)
+			newArray[last] = mArray[last];
+		
+		mAlloc.deallocate(mArray, mCap);
+		mArray = newArray;
+		mCap = newCap;
+	} else {
+		size_type last = mSize++;
+		while(last --> idx)
+			mArray[last + 1] = mArray[last];
+	}
+}
+
 
 } // end namespace ari
 
