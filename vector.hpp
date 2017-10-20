@@ -187,125 +187,105 @@ vector<TType, TAlloc>::vector(std::initializer_list<value_type>&& init)
   mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
 	{ std::move(init.begin(), init.end(), mArray); }
 
-	
-	//////// HERE ////////
 
 template <typename TType, typename TAlloc>
-vector<TType, TAlloc>::vector(const size_type size, const TType& val) 
-: mSize{size}, mCap{size * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)} {
-	std::fill(mArray, mArray + mSize, val);
-}
+vector<TType, TAlloc>::vector(std::initializer_list<value_type>&& init)
+: mSize{static_cast<size_type>(std::distance(init.begin(), init.end()))},
+  mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
+	{ std::copy(init.begin(), init.end(), mArray); }
 
 
 template <typename TType, typename TAlloc>
 template <typename TIter>
 vector<TType, TAlloc>::vector(TIter&& begin, TIter&& end)
 : mSize{static_cast<size_type>(std::distance(begin, end))}, /// @todo const end param
-  mCap{static_cast<size_type>(mSize * GROWTH_FACTOR)}, mAlloc{}, mArray{mAlloc.allocate(mCap)} {
-	std::copy(begin, end, mArray);
-}
+  mCap{static_cast<size_type>(mSize * GROWTH_FACTOR)}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
+	{ std::copy(begin, end, mArray); }
 
 
 template <typename TType, typename TAlloc>
-vector<TType, TAlloc>::~vector() {
-	mAlloc.deallocate(mArray, mCap);
-}
+vector<TType, TAlloc>::~vector()
+	{ mAlloc.deallocate(mArray, mCap); }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::begin() const {
-	return iterator{mArray};
-}
+typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::begin() const
+	{ return iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::end() const {
-	return iterator{mArray + mSize};
-}
+typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::end() const
+	{ return iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cbegin() const {
-	return const_iterator{mArray};
-}
+typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cbegin() const
+	{ return const_iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cend() const {
-	return const_iterator{mArray + mSize};
-}
+typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cend() const
+	{ return const_iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rbegin() const {
-	return reverse_iterator{mArray + mSize};
-}
+typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rbegin() const
+	{ return reverse_iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rend() const {
-	return reverse_iterator{mArray};
-}
+typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rend() const
+	{ return reverse_iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crbegin() const {
-	return const_reverse_iterator{mArray + mSize};
-}
+typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crbegin() const 
+	{ return const_reverse_iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crend() const {
-	return const_reverse_iterator{mArray};
-}
+typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crend() const
+	{ return const_reverse_iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::front() {
-	return *mArray;
-}
+typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::front()
+	{ return *mArray; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::front() const {
-	return *mArray;
-}
+typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::front() const
+	{ return *mArray; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::back() {
-	return *(mArray + mSize - 1);
-}
+typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::back() 
+	{ return *(mArray + mSize - 1); }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::back() const {
-	return *(mArray + mSize - 1);
-}
+typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::back() const
+	{ return *(mArray + mSize - 1); }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::pointer vector<TType, TAlloc>::data() {
-	return mArray;
-}
+typename vector<TType, TAlloc>::pointer vector<TType, TAlloc>::data()
+	{ return mArray; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_pointer vector<TType, TAlloc>::data() const {
-	return mArray;
-}
+typename vector<TType, TAlloc>::const_pointer vector<TType, TAlloc>::data() const
+	{ return mArray; }
 
 
 template <typename TType, typename TAlloc>
-bool vector<TType, TAlloc>::empty() const {
-	return mSize == 0;
-}
+bool vector<TType, TAlloc>::empty() const
+	{ return mSize == 0; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::size() const {
-	return mSize;
-}
+typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::size() const
+	{ return mSize; }
 
 
 template <typename TType, typename TAlloc>
@@ -328,9 +308,8 @@ void vector<TType, TAlloc>::reserve(typename vector<TType, TAlloc>::size_type sz
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::capacity() const {
-	return mCap;
-}
+typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::capacity() const
+	{ return mCap; }
 
 
 template <typename TType, typename TAlloc>
@@ -372,9 +351,8 @@ void vector<TType, TAlloc>::push_back(typename vector<TType, TAlloc>::const_refe
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::pop_back() {
-	mSize--;
-}
+void vector<TType, TAlloc>::pop_back() 
+	{ mSize--; }
 
 
 template <typename TType, typename TAlloc>
@@ -414,16 +392,14 @@ void vector<TType, TAlloc>::emplace_back(TArgs&&... args) {
 
 template <typename TType, typename TAlloc>
 typename vector<TType, TAlloc>::const_reference 
-vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) const {
-	return mArray[idx];
-}
+vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) const
+	{ return mArray[idx]; }
 
 
 template <typename TType, typename TAlloc>
 typename vector<TType, TAlloc>::reference
-vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) {
-	return mArray[idx];
-}
+vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) 
+	{ return mArray[idx]; }
 
 
 template <typename TType, typename TAlloc>
