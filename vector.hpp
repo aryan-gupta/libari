@@ -15,8 +15,8 @@
  * =============================================================================
  */
 
-#ifndef ARI_VECTOR_H
-#define ARI_VECTOR_H
+#ifndef ARI_VECTOR_HPP
+#define ARI_VECTOR_HPP
 
 #include <memory>
 
@@ -42,14 +42,21 @@ public:
 	
 	
 	vector();
-	vector(const vector<TType, TAlloc>& other);
-	
-	vector(const size_type size, const_reference val = TType());
-	
-	template <typename TIter>
-	vector(TIter&& begin, TIter&& end);
+	explicit vector(const allocator_type& alloc);
+	vector(const size_type size, const_reference val = value_type{}, const allocator_type& alloc = allocator_type{});
+	vector(const vector& other);
+	vector(vector&& other);
+	vector(vector&& other, const allocator_type& alloc);
+	vector(std::initializer_list<value_type>&& init)
+	vector(const std::initializer_list<value_type>& init)
+	template <typename TIter> vector(TIter&& begin, TIter&& end);
 	
 	~vector();
+	
+	void assign(size_type count, const_reference val);
+	template <typename TIter> void assign(TIter begin, const TIter& end);
+	void assign(std::initializer_list<value_type>&& it);
+	void assign(const std::initializer_list<value_type>& it);
 	
 	iterator begin() const;
 	iterator end() const;
@@ -72,21 +79,32 @@ public:
 	size_type size() const;
 	size_type max_size() const;
 	void reserve(size_type sz);
+	void reserve(size_type sz, const_reference value);
 	size_type capacity() const;
 	void shrink_to_fit();
 	void clear();
 	
 	void push_back(const_reference val);
+	void push_back(value_type&& val);
 	void pop_back();
 	
-	void insert(size_type idx, const_reference val);
-	void insert(const iterator& it, const_reference val);
+	void insert(size_type idx, const_reference val); // maybe should remove this soon
+	iterator insert(const const_iterator& it, const_reference val);
+	reverse_iterator insert(const const_reverse_iterator& it, const_reference val);
+	iterator insert(const const_iterator& it, value_type&& val);
+	reverse_iterator insert(const const_reverse_iterator& it, value_type&& val);
+	iterator insert(const const_iterator& it, size_type num, const_reference val);
+	reverse_iterator insert(const const_reverse_iterator& it, size_type num, const_reference val);
+	template <typename TIter> iterator insert(const const_iterator& it, const TIter& begin, const TIter& end);
+	template <typename TIter> reverse_iterator insert(const const_reverse_iterator& it, const TIter& begin, const TIter& end);
+	iterator insert(const const_iterator& it, std::initializer_list<value_type>&& lst);
+	iterator insert(const const_iterator& it, const std::initializer_list<value_type>& lst);
+	reverse_iterator insert(const const_reverse_iterator& it, std::initializer_list<value_type>&& lst);
+	reverse_iterator insert(const const_reverse_iterator& it, const std::initializer_list<value_type>& lst);
 	
-	template <typename TIter, typename... TArgs>
-	void emplace(const TIter& it, TArgs&&... args);
-	
-	template <typename... TArgs>
-	void emplace_back(TArgs&&... args);
+	template <typename... TArgs> iterator emplace(const const_iterator& it, TArgs&&... args);
+	template <typename... TArgs> reverse_iterator emplace(const const_reverse_iterator& it, TArgs&&... args);
+	template <typename... TArgs> reference emplace_back(TArgs&&... args);
 	
 	const_reference operator[](const size_type idx) const;
 	reference operator[](const size_type idx);
@@ -94,13 +112,18 @@ public:
 	const_reference at(const size_type idx) const;
 	reference at(const size_type idx);
 	
-	void erase(iterator it);
-	//void erase(const iterator& begin, const iterator& end);
+	iterator erase(const const_iterator& it);
+	reverse_iterator erase(const const_reverse_iterator& it);
+	iterator erase(const const_iterator& begin, const const_iterator& end);
+	reverse_iterator erase(const const_reverse_iterator& begin, const const_reverse_iterator& end);
 	
 private:	
 	void expand_to(size_type sz);
 	/// Moves [idx, mSize] forward by one, leaving a gap at idx and increasing mSize by one
 	void move_up(size_type idx);
+	
+	void erase(const pointer pt);
+	void erase(const pointer begin, const pointer end);
 	
 	static constexpr double GROWTH_FACTOR  = 2;
 	static constexpr size_type INITIAL_CAP = 5;
@@ -118,12 +141,54 @@ vector<TType, TAlloc>::vector()
 : mSize{0}, mCap{INITIAL_CAP}, mAlloc{}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
 
 
+template<typename TType, typename TAlloc>
+vector<TType, TAlloc>::vector(const typename vector<TType, TAlloc>::allocator_type& alloc) 
+: mSize{0}, mCap{INITIAL_CAP}, mAlloc{alloc}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
+
+
+template<typename TType, typename TAlloc>
+vector<TType, TAlloc>::vector(
+	const typename vector<TType, TAlloc>::size_type size, 
+	typename vector<TType, TAlloc>::const_reference val, 
+	const typename vector<TType, TAlloc>::allocator_type& alloc
+) : mSize{size}, mCap{mSize * GROWTH_FACTOR}, mAlloc{alloc}, mArray{mAlloc.allocate(mCap)}
+	{ std::fill(mArray, mArray + mSize, val); }
+
+
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(const vector& other)
-: mSize{other.mSize}, mCap{other.mCap}, mAlloc{other.mAlloc}, mArray{mAlloc.allocate(mCap)} {
-	std::copy(other.begin(), other.end(), mArray);
+: mSize{other.mSize}, mCap{other.mCap}, mAlloc{other.mAlloc}, mArray{mAlloc.allocate(mCap)}
+	{ std::copy(other.begin(), other.end(), mArray); }
+
+
+template <typename TType, typename TAlloc>
+vector<TType, TAlloc>::vector(vector&& other)
+: mSize{other.mSize}, mCap{other.mCap}, mAlloc{other.mAlloc}, mArray{other.mArray} {
+	// need to do more reaserch on whether allocators can be moved
+	other.mArray = pointer{}; // or should I change it to allocate INITIAL_CAP?
+	other.mSize = size_type{};
+	other.mCap = INITIAL_CAP;
 }
 
+
+template <typename TType, typename TAlloc>
+vector<TType, TAlloc>::vector(vector&& other, const allocator_type& alloc)
+: mSize{other.mSize}, mCap{other.mCap}, mAlloc{alloc}, mArray{other.mArray} {
+	// need to do more reaserch on whether allocators can be moved
+	other.mArray = pointer{}; // or should I change it to allocate INITIAL_CAP?
+	other.mSize = size_type{};
+	other.mCap = INITIAL_CAP;
+}
+
+
+template <typename TType, typename TAlloc>
+vector<TType, TAlloc>::vector(std::initializer_list<value_type>&& init)
+: mSize{static_cast<size_type>(std::distance(init.begin(), init.end()))},
+  mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
+	{ std::move(init.begin(), init.end(), mArray); }
+
+	
+	//////// HERE ////////
 
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(const size_type size, const TType& val) 
@@ -291,7 +356,7 @@ void vector<TType, TAlloc>::clear() {
 template <typename TType, typename TAlloc>
 void vector<TType, TAlloc>::push_back(typename vector<TType, TAlloc>::const_reference val) {
 	if(mSize == mCap) { // USE EXPAND TO
-		size_type newCap = mSize * 2;
+		size_type newCap = mSize * GROWTH_FACTOR;
 		pointer newArray = mAlloc.allocate(newCap);
 		
 		std::copy(mArray, mArray + mSize, newArray);
@@ -418,7 +483,7 @@ void vector<TType, TAlloc>::expand_to(typename vector<TType, TAlloc>::size_type 
 template <typename TType, typename TAlloc>
 void vector<TType, TAlloc>::move_up(typename vector<TType, TAlloc>::size_type idx) {
 	if(mSize == mCap) {
-		size_type newCap = mSize * 2;
+		size_type newCap = mSize * GROWTH_FACTOR;
 		pointer newArray = mAlloc.allocate(newCap);
 		
 		std::move(mArray, mArray + idx, newArray);
@@ -437,4 +502,4 @@ void vector<TType, TAlloc>::move_up(typename vector<TType, TAlloc>::size_type id
 
 } // end namespace ari
 
-#endif // ARI_VECTOR_H defined
+#endif // ARI_VECTOR_HPP defined
