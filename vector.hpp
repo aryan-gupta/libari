@@ -47,16 +47,14 @@ public:
 	vector(const vector& other);
 	vector(vector&& other);
 	vector(vector&& other, const allocator_type& alloc);
-	vector(std::initializer_list<value_type>&& init)
-	vector(const std::initializer_list<value_type>& init)
+	vector(std::initializer_list<value_type> init);
 	template <typename TIter> vector(TIter&& begin, TIter&& end);
 	
 	~vector();
 	
 	void assign(size_type count, const_reference val);
 	template <typename TIter> void assign(TIter begin, const TIter& end);
-	void assign(std::initializer_list<value_type>&& it);
-	void assign(const std::initializer_list<value_type>& it);
+	void assign(std::initializer_list<value_type>& init);
 	
 	iterator begin() const;
 	iterator end() const;
@@ -97,10 +95,8 @@ public:
 	reverse_iterator insert(const const_reverse_iterator& it, size_type num, const_reference val);
 	template <typename TIter> iterator insert(const const_iterator& it, const TIter& begin, const TIter& end);
 	template <typename TIter> reverse_iterator insert(const const_reverse_iterator& it, const TIter& begin, const TIter& end);
-	iterator insert(const const_iterator& it, std::initializer_list<value_type>&& lst);
-	iterator insert(const const_iterator& it, const std::initializer_list<value_type>& lst);
-	reverse_iterator insert(const const_reverse_iterator& it, std::initializer_list<value_type>&& lst);
-	reverse_iterator insert(const const_reverse_iterator& it, const std::initializer_list<value_type>& lst);
+	iterator insert(const const_iterator& it, std::initializer_list<value_type>& lst);
+	reverse_iterator insert(const const_reverse_iterator& it, std::initializer_list<value_type>& lst);
 	
 	template <typename... TArgs> iterator emplace(const const_iterator& it, TArgs&&... args);
 	template <typename... TArgs> reverse_iterator emplace(const const_reverse_iterator& it, TArgs&&... args);
@@ -183,22 +179,20 @@ vector<TType, TAlloc>::vector(vector&& other, const allocator_type& alloc)
 
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(std::initializer_list<value_type>&& init)
-: mSize{static_cast<size_type>(std::distance(init.begin(), init.end()))},
-  mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
+: mSize{init.size()}, mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
 	{ std::move(init.begin(), init.end(), mArray); }
 
 
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(std::initializer_list<value_type>&& init)
-: mSize{static_cast<size_type>(std::distance(init.begin(), init.end()))},
-  mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
+: mSize{init.size()}, mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
 	{ std::copy(init.begin(), init.end(), mArray); }
 
 
 template <typename TType, typename TAlloc>
 template <typename TIter>
 vector<TType, TAlloc>::vector(TIter&& begin, TIter&& end)
-: mSize{static_cast<size_type>(std::distance(begin, end))}, /// @todo const end param
+: mSize{static_cast<size_type>(std::distance(begin, end))},
   mCap{static_cast<size_type>(mSize * GROWTH_FACTOR)}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
 	{ std::copy(begin, end, mArray); }
 
@@ -206,6 +200,39 @@ vector<TType, TAlloc>::vector(TIter&& begin, TIter&& end)
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::~vector()
 	{ mAlloc.deallocate(mArray, mCap); }
+
+	
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::assign(
+	typename vector<TType, TAlloc>::size_type count,
+	typename vector<TType, TAlloc>::const_reference val
+) {
+	mAlloc.deallocate(mArray, mCap);
+	
+	mSize  = count;
+	mCap   = mSize * GROWTH_FACTOR;
+	mArray = mAlloc.allocate(mCap);
+	
+	std::fill(mArray, mArray + mSize, val);
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename TIter> 
+void vector<TType, TAlloc>::assign(const TIter& begin, const TIter& end) {
+	mAlloc.deallocate(mArray, mCap);
+	
+	mSize  = std::distance(begin, end);
+	mCap   = mSize * GROWTH_FACTOR;
+	mArray = mAlloc.allocate(mCap);
+	
+	std::copy(begin, end, mArray);
+}
+
+
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::assign(std::initializer_list<TType>& init)
+	{ assign(init.begin(), init.end()); }
 
 
 template <typename TType, typename TAlloc>
