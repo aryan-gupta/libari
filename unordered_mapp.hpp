@@ -6,6 +6,18 @@
 namespace ari {
 
 template <
+	typename TKey,
+	typename TType
+> struct ump_node {
+	using key_type = TKey;
+	using mapped_type = TType;
+
+	std::pair<const key_type, mapped_type> data;
+	ump_node* next;
+};
+
+
+template <
 	typename TKey
 	typename TType
 	typename THash
@@ -25,12 +37,12 @@ public:
 	using const_reference      = const value_type&;
 	using pointer              = typename std::allocator_traits<allocator_type>::pointer;
 	using const_pointer        = typename std::allocator_traits<allocator_type>::const_pointer;
-	/*using iterator             = ForwardIterator
-	using const_iterator       = Constant forward iterator
-	using local_iterator       = 
-	using const_local_iterator = 
-	using node_type            = 
-	using insert_return_type   = */
+	// using iterator             = ForwardIterator
+	// using const_iterator       = Constant forward iterator
+	// using local_iterator       = 
+	// using const_local_iterator = 
+	using node_type            = ump_node<key_type, mapped_type>;
+	// using insert_return_type   =
 	
 	unordered_map();
 	
@@ -45,7 +57,7 @@ public:
 	unordered_map(size_type bucket_count, const hasher& hash, const allocator_type& alloc);
 	explicit unordered_map(const allocator_type& alloc);
 	
-	template<typename TIter>
+	template <typename TIter>
 	unordered_map(
 		TIter first, TIter last,
 		size_type bucket_count = DEFAULT_BUCKET_COUNT,
@@ -54,10 +66,10 @@ public:
 		const allocator_type& alloc = allocator_type{}
 	);
 	
-	template<typename TIter>
+	template <typename TIter>
 	unordered_map(TIter first, TIter last, size_type bucket_count, const allocator_type& alloc);
 	
-	template<typename TIter>
+	template <typename TIter>
 	unordered_map(TIter first, TIter last, size_type bucket_count, const hasher& hash, const allocator_type& alloc);
 	
 	unordered_map(const unordered_map& other);
