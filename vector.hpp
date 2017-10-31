@@ -53,7 +53,7 @@ public:
 	~vector();
 	
 	void assign(size_type count, const_reference val);
-	template <typename TIter> void assign(TIter begin, const TIter& end);
+	template <typename TIter> void assign(const TIter& begin, const TIter& end);
 	void assign(std::initializer_list<value_type>& init);
 	
 	iterator begin() const;
@@ -178,15 +178,9 @@ vector<TType, TAlloc>::vector(vector&& other, const allocator_type& alloc)
 
 
 template <typename TType, typename TAlloc>
-vector<TType, TAlloc>::vector(std::initializer_list<value_type>&& init)
+vector<TType, TAlloc>::vector(std::initializer_list<value_type> init)
 : mSize{init.size()}, mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
 	{ std::move(init.begin(), init.end(), mArray); }
-
-
-template <typename TType, typename TAlloc>
-vector<TType, TAlloc>::vector(std::initializer_list<value_type>&& init)
-: mSize{init.size()}, mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
-	{ std::copy(init.begin(), init.end(), mArray); }
 
 
 template <typename TType, typename TAlloc>
@@ -393,18 +387,19 @@ void vector<TType, TAlloc>::insert(
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::insert(
-	const typename vector<TType, TAlloc>::iterator& it,
+typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::insert(
+	const typename vector<TType, TAlloc>::const_iterator& it,
 	typename vector<TType, TAlloc>::const_reference val
 ) {
 	move_up(it.base() - mArray);
 	*it = val;
+	return iterator(it.base());
 }
 
 
 template <typename TType, typename TAlloc>
-template <typename TIter, typename... TArgs>
-void vector<TType, TAlloc>::emplace(const TIter& it, TArgs&&... args) {
+template <typename... TArgs>
+typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::emplace(const const_iterator& it, TArgs&&... args) {
 	move_up(it.base() - mArray);
 	*it = value_type{std::forward<TArgs>(args)...};
 }
@@ -412,8 +407,8 @@ void vector<TType, TAlloc>::emplace(const TIter& it, TArgs&&... args) {
 
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
-void vector<TType, TAlloc>::emplace_back(TArgs&&... args) {
-	mArray[mSize++] = value_type{std::forward<TArgs>(args)...};
+typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::emplace_back(TArgs&&... args) {
+	return mArray[mSize++] = value_type{std::forward<TArgs>(args)...};
 }
 
 
@@ -452,7 +447,7 @@ vector<TType, TAlloc>::at(const typename vector<TType, TAlloc>::size_type idx) {
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::erase(typename vector<TType, TAlloc>::iterator it) {
+typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::erase(const typename vector<TType, TAlloc>::const_iterator& it) {
 	// go from the start to the end 
 	// and move everything back
 	while(++it != end) {
