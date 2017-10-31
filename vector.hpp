@@ -85,7 +85,7 @@ public:
 	void push_back(const_reference val);
 	void push_back(value_type&& val);
 	void pop_back();
-	
+
 	void insert(size_type idx, const_reference val); // maybe should remove this soon
 	iterator insert(const const_iterator& it, const_reference val);
 	reverse_iterator insert(const const_reverse_iterator& it, const_reference val);
