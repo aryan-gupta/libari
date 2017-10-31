@@ -19,6 +19,7 @@
 #define ARI_VECTOR_HPP
 
 #include <memory>
+#include <limits>
 
 #include "Iterator.h"
 
@@ -305,7 +306,7 @@ auto vector<TType, TAlloc>::size() const -> size_type
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::max_size() const -> size_type {
-	return 0; //std::numeric_limits<size_type>::max();
+	return std::numeric_limits<size_type>::max();
 }
 
 
