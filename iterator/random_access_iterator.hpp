@@ -47,7 +47,7 @@ public:
 	/// This attempts to copy another iterator if it can be converted
 	template <typename TOther>
 	random_access_iterator(const random_access_iterator<TOther>& it) 
-		: mCurrent{static_cast<TIter>(it.mCurrent)} { /* No Code */ }
+		: mCurrent{static_cast<TIter>(it.base())} { /* No Code */ }
 	
 	/// Assignment operator
 	/// Copies the underlying data over

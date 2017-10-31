@@ -93,28 +93,28 @@ protected:
 	
 /// @return if the underlyng data is less than the other
 template <typename TIter>
-bool operator<(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
+inline bool operator<(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() < b.base(); }
 
 /// @return if the underlying data is greater than the other
 template <typename TIter>
-bool operator>(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
+inline bool operator>(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() > b.base(); }
 
 /// @return if the underlyng data is less than or equal the other
 template <typename TIter>
-bool operator<=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
+inline bool operator<=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() <= b.base(); }
 
 /// @return if the underlying data is greater than or equal the other
 template <typename TIter>
-bool operator>=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
+inline bool operator>=(const reverse_iterator<TIter>& a, const reverse_iterator<TIter>& b) 
 	{ return a.base() >= b.base(); }
 
 /// @return reference to \c this
 /// This operator decrements mCurrent by the scale
 template <typename TIter>
-reverse_iterator<TIter> operator-(
+inline reverse_iterator<TIter> operator-(
 	const reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
 ) { return reverse_iterator<TIter>{it.base() - scale}; }
@@ -122,26 +122,26 @@ reverse_iterator<TIter> operator-(
 /// @return reference to \c this
 // This operator increments mCurrent by the scale
 template <typename TIter>
-reverse_iterator<TIter> operator+(
+inline reverse_iterator<TIter> operator+(
 	const reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
 ) { return reverse_iterator<TIter>{it.base() + scale}; }
 
 template <typename TIter>
-reverse_iterator<TIter>& operator+=(
+inline reverse_iterator<TIter>& operator+=(
 	reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
 ) { it = it + scale; return it; }
 
 template <typename TIter>
-reverse_iterator<TIter>& operator-=(
+inline reverse_iterator<TIter>& operator-=(
 	reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
 ) { it = it - scale; return it; }
 
 
 template <typename TIter>
-typename reverse_iterator<TIter>::difference_type operator-(
+inline typename reverse_iterator<TIter>::difference_type operator-(
 	const reverse_iterator<TIter>& a,
 	const reverse_iterator<TIter>& b
 ) { return a.base() - b.base(); }
