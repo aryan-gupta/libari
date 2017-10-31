@@ -138,15 +138,15 @@ vector<TType, TAlloc>::vector()
 
 
 template<typename TType, typename TAlloc>
-vector<TType, TAlloc>::vector(const typename vector<TType, TAlloc>::allocator_type& alloc) 
+vector<TType, TAlloc>::vector(const allocator_type& alloc) 
 : mSize{0}, mCap{INITIAL_CAP}, mAlloc{alloc}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
 
 
 template<typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(
-	const typename vector<TType, TAlloc>::size_type size, 
-	typename vector<TType, TAlloc>::const_reference val, 
-	const typename vector<TType, TAlloc>::allocator_type& alloc
+	const size_type size, 
+	const_reference val, 
+	const allocator_type& alloc
 ) : mSize{size}, mCap{mSize * GROWTH_FACTOR}, mAlloc{alloc}, mArray{mAlloc.allocate(mCap)}
 	{ std::fill(mArray, mArray + mSize, val); }
 
@@ -198,8 +198,8 @@ vector<TType, TAlloc>::~vector()
 	
 template <typename TType, typename TAlloc>
 void vector<TType, TAlloc>::assign(
-	typename vector<TType, TAlloc>::size_type count,
-	typename vector<TType, TAlloc>::const_reference val
+	size_type count,
+	const_reference val
 ) {
 	mAlloc.deallocate(mArray, mCap);
 	
@@ -230,72 +230,72 @@ void vector<TType, TAlloc>::assign(std::initializer_list<TType>& init)
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::begin() const
+auto vector<TType, TAlloc>::begin() const -> iterator
 	{ return iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::end() const
+auto vector<TType, TAlloc>::end() const -> iterator
 	{ return iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cbegin() const
+auto vector<TType, TAlloc>::cbegin() const -> const_iterator
 	{ return const_iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_iterator vector<TType, TAlloc>::cend() const
+auto vector<TType, TAlloc>::cend() const -> const_iterator
 	{ return const_iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rbegin() const
+auto vector<TType, TAlloc>::rbegin() const -> reverse_iterator
 	{ return reverse_iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reverse_iterator vector<TType, TAlloc>::rend() const
+auto vector<TType, TAlloc>::rend() const -> reverse_iterator
 	{ return reverse_iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crbegin() const 
+auto vector<TType, TAlloc>::crbegin() const -> const_reverse_iterator
 	{ return const_reverse_iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reverse_iterator vector<TType, TAlloc>::crend() const
+auto vector<TType, TAlloc>::crend() const -> const_reverse_iterator
 	{ return const_reverse_iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::front()
+auto vector<TType, TAlloc>::front() -> reference
 	{ return *mArray; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::front() const
+auto vector<TType, TAlloc>::front() const -> const_reference
 	{ return *mArray; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::back() 
+auto vector<TType, TAlloc>::back() -> reference
 	{ return *(mArray + mSize - 1); }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reference vector<TType, TAlloc>::back() const
+auto vector<TType, TAlloc>::back() const -> const_reference
 	{ return *(mArray + mSize - 1); }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::pointer vector<TType, TAlloc>::data()
+auto vector<TType, TAlloc>::data() -> pointer
 	{ return mArray; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_pointer vector<TType, TAlloc>::data() const
+auto vector<TType, TAlloc>::data() const -> const_pointer
 	{ return mArray; }
 
 
@@ -305,18 +305,18 @@ bool vector<TType, TAlloc>::empty() const
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::size() const
+auto vector<TType, TAlloc>::size() const -> size_type
 	{ return mSize; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::max_size() const {
+auto vector<TType, TAlloc>::max_size() const -> size_type {
 	return 0; //std::numeric_limits<size_type>::max();
 }
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::reserve(typename vector<TType, TAlloc>::size_type sz) {
+void vector<TType, TAlloc>::reserve(size_type sz) {
 	if (mSize >= sz) // just a pre check
 		return;
 	
@@ -329,7 +329,7 @@ void vector<TType, TAlloc>::reserve(typename vector<TType, TAlloc>::size_type sz
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::size_type vector<TType, TAlloc>::capacity() const
+auto vector<TType, TAlloc>::capacity() const -> size_type
 	{ return mCap; }
 
 
@@ -354,7 +354,7 @@ void vector<TType, TAlloc>::clear() {
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::push_back(typename vector<TType, TAlloc>::const_reference val) {
+void vector<TType, TAlloc>::push_back(const_reference val) {
 	if(mSize == mCap) { // USE EXPAND TO
 		size_type newCap = mSize * GROWTH_FACTOR;
 		pointer newArray = mAlloc.allocate(newCap);
@@ -378,8 +378,8 @@ void vector<TType, TAlloc>::pop_back()
 
 template <typename TType, typename TAlloc>
 void vector<TType, TAlloc>::insert(
-	typename vector<TType, TAlloc>::size_type idx,
-	typename vector<TType, TAlloc>::const_reference val
+	size_type idx,
+	const_reference val
 ) {
 	move_up(idx);
 	mArray[idx] = val;
@@ -387,10 +387,10 @@ void vector<TType, TAlloc>::insert(
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::insert(
-	const typename vector<TType, TAlloc>::const_iterator& it,
-	typename vector<TType, TAlloc>::const_reference val
-) {
+auto vector<TType, TAlloc>::insert(
+	const const_iterator& it,
+	const_reference val
+) -> iterator {
 	move_up(it.base() - mArray);
 	*it = val;
 	return iterator(it.base());
@@ -399,7 +399,7 @@ typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::insert(
 
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
-typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::emplace(const const_iterator& it, TArgs&&... args) {
+auto vector<TType, TAlloc>::emplace(const const_iterator& it, TArgs&&... args) -> iterator {
 	move_up(it.base() - mArray);
 	*it = value_type{std::forward<TArgs>(args)...};
 }
@@ -407,26 +407,23 @@ typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::emplace(const co
 
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
-typename vector<TType, TAlloc>::reference vector<TType, TAlloc>::emplace_back(TArgs&&... args) {
+auto vector<TType, TAlloc>::emplace_back(TArgs&&... args) -> reference {
 	return mArray[mSize++] = value_type{std::forward<TArgs>(args)...};
 }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reference 
-vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) const
+auto vector<TType, TAlloc>::operator[](size_type idx) const -> const_reference
 	{ return mArray[idx]; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reference
-vector<TType, TAlloc>::operator[](typename vector<TType, TAlloc>::size_type idx) 
+auto vector<TType, TAlloc>::operator[](size_type idx) -> reference
 	{ return mArray[idx]; }
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::const_reference
-vector<TType, TAlloc>::at(const typename vector<TType, TAlloc>::size_type idx) const {
+auto vector<TType, TAlloc>::at(const size_type idx) const -> const_reference {
 	if(idx >= mSize) {
 		throw std::out_of_range("The specified index: " + std::to_string(idx) + ", is out of range");
 	}
@@ -436,8 +433,7 @@ vector<TType, TAlloc>::at(const typename vector<TType, TAlloc>::size_type idx) c
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::reference
-vector<TType, TAlloc>::at(const typename vector<TType, TAlloc>::size_type idx) {
+auto vector<TType, TAlloc>::at(const size_type idx) -> reference {
 	if(idx >= mSize) {
 		throw std::out_of_range("The specified index: " + std::to_string(idx) + ", is out of range");
 	}
@@ -447,7 +443,7 @@ vector<TType, TAlloc>::at(const typename vector<TType, TAlloc>::size_type idx) {
 
 
 template <typename TType, typename TAlloc>
-typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::erase(const typename vector<TType, TAlloc>::const_iterator& it) {
+auto vector<TType, TAlloc>::erase(const const_iterator& it) -> iterator{
 	// go from the start to the end 
 	// and move everything back
 	while(++it != end) {
@@ -459,7 +455,7 @@ typename vector<TType, TAlloc>::iterator vector<TType, TAlloc>::erase(const type
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::expand_to(typename vector<TType, TAlloc>::size_type sz) {
+void vector<TType, TAlloc>::expand_to(size_type sz) {
 	pointer tmpArray = mAlloc.allocate(sz);
 	
 	// if the first expression of the ?: operator runs then we are expanding the array
@@ -479,7 +475,7 @@ void vector<TType, TAlloc>::expand_to(typename vector<TType, TAlloc>::size_type 
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::move_up(typename vector<TType, TAlloc>::size_type idx) {
+void vector<TType, TAlloc>::move_up(size_type idx) {
 	if(mSize == mCap) {
 		size_type newCap = mSize * GROWTH_FACTOR;
 		pointer newArray = mAlloc.allocate(newCap);
