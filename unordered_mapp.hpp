@@ -101,7 +101,18 @@ public:
 	);
 	
 private:
+	using node_allocator_type = typename allocator_type::rebind<node_type>::other;
+	using node_type_pointer   = typename std::allocator_traits<node_allocator_type>::pointer;
+	
 	static const size_type DEFAULT_BUCKET_COUNT = 10;
+	
+	node_allocator_type mAlloc;
+	node_type_pointer mMap;
+	size_type mNumBucket;
+	size_type mNumSize;
+	hasher mHash;
+	key_equal mEq;
+	
 };
 
 } // end namespace ari
