@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <limits>
+#include <initializer_list>
 
 #include "Iterator.h"
 
@@ -50,13 +51,13 @@ public:
 	vector(vector&& other);
 	vector(vector&& other, const allocator_type& alloc);
 	vector(std::initializer_list<value_type> init);
-	template <typename TIter> vector(TIter&& begin, TIter&& end);
+	template <typename TIter> vector(TIter begin, TIter end);
 	
 	~vector();
 	
 	void assign(size_type count, const_reference val);
-	template <typename TIter> void assign(const TIter& begin, const TIter& end);
-	void assign(std::initializer_list<value_type>& init);
+	template <typename TIter> void assign(TIter begin, TIter end);
+	void assign(std::initializer_list<value_type> init);
 	
 	iterator begin();
 	iterator end();
@@ -98,8 +99,8 @@ public:
 	reverse_iterator insert(const_reverse_iterator it, value_type&& val);
 	reverse_iterator insert(const_reverse_iterator it, size_type num, const_reference val);
 	
-	template <typename TIter> iterator insert(const_iterator it, const TIter& begin, const TIter& end);
-	template <typename TIter> reverse_iterator insert(const_reverse_iterator it, const TIter& begin, const TIter& end);
+	template <typename TIter> iterator insert(const_iterator it, TIter begin, TIter end);
+	template <typename TIter> reverse_iterator insert(const_reverse_iterator it, TIter begin, TIter end);
 	
 	iterator insert(const_iterator it, std::initializer_list<value_type> lst);
 	reverse_iterator insert(const_reverse_iterator it, std::initializer_list<value_type> lst);
@@ -192,7 +193,7 @@ vector<TType, TAlloc>::vector(std::initializer_list<value_type> init)
 
 template <typename TType, typename TAlloc>
 template <typename TIter>
-vector<TType, TAlloc>::vector(TIter&& begin, TIter&& end)
+vector<TType, TAlloc>::vector(TIter begin, TIter end)
 : mSize{static_cast<size_type>(std::distance(begin, end))},
   mCap{static_cast<size_type>(mSize * GROWTH_FACTOR)}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
 	{ std::copy(begin, end, mArray); }
@@ -217,7 +218,7 @@ void vector<TType, TAlloc>::assign(size_type count, const_reference val) {
 
 template <typename TType, typename TAlloc>
 template <typename TIter> 
-void vector<TType, TAlloc>::assign(const TIter& begin, const TIter& end) {
+void vector<TType, TAlloc>::assign(TIter begin, TIter end) {
 	mAlloc.deallocate(mArray, mCap);
 	
 	mSize  = std::distance(begin, end);
@@ -229,7 +230,7 @@ void vector<TType, TAlloc>::assign(const TIter& begin, const TIter& end) {
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::assign(std::initializer_list<TType>& init)
+void vector<TType, TAlloc>::assign(std::initializer_list<TType> init)
 	{ assign(init.begin(), init.end()); }
 
 
@@ -424,13 +425,13 @@ template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const_reverse_iterator it, size_type num, const_reference val) -> reverse_iterator {
 	difference_type idx = it - crbegin();
 	pointer pos = this->insert_base(mArray + idx, val, num);
-	return reverse_iterator{it.base()};
+	return reverse_iterator{pos};
 }
 
 
 template <typename TType, typename TAlloc>
 template <typename TIter>
-auto vector<TType, TAlloc>::insert(const_iterator it, const TIter& begin, const TIter& end) -> iterator {
+auto vector<TType, TAlloc>::insert(const_iterator it, TIter begin, TIter end) -> iterator {
 	difference_type idx = it - cbegin();
 	pointer pos = this->insert_base(mArray + idx, begin, end);
 	return iterator{pos};
@@ -439,7 +440,7 @@ auto vector<TType, TAlloc>::insert(const_iterator it, const TIter& begin, const 
 
 template <typename TType, typename TAlloc>
 template <typename TIter>
-auto vector<TType, TAlloc>::insert(const_reverse_iterator it, const TIter& begin, const TIter& end) -> reverse_iterator {
+auto vector<TType, TAlloc>::insert(const_reverse_iterator it, TIter begin, TIter end) -> reverse_iterator {
 	difference_type idx = it - crbegin();
 	pointer pos = this->insert_base(mArray + idx, begin, end); // this needs more work. Maybe convert these into reverse iterators?
 	// maybe force the user to use reverse iterators and do no work here?
