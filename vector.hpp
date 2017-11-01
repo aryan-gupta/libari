@@ -466,15 +466,29 @@ auto vector<TType, TAlloc>::insert(const_reverse_iterator it, std::initializer_l
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
 auto vector<TType, TAlloc>::emplace(const_iterator it, TArgs&&... args) -> iterator {
-	move_up(it.base() - mArray); /// @todo fix this
-	*it = value_type{std::forward<TArgs>(args)...};
+	pointer pos = mArray + (it - cbegin());
+	pos = move_up(pos);
+	mAlloc.construct(pos, std::forward<TArgs>(args)...);
+	return iterator{pos};
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename... TArgs>
+auto vector<TType, TAlloc>::emplace(const_reverse_iterator it, TArgs&&... args) -> reverse_iterator {
+	pointer pos = mArray + (it - crbegin());
+	pos = move_up(pos);
+	mAlloc.construct(pos, std::forward<TArgs>(args)...);
+	return iterator{pos};
 }
 
 
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
 auto vector<TType, TAlloc>::emplace_back(TArgs&&... args) -> reference {
-	return mArray[mSize++] = value_type{std::forward<TArgs>(args)...};
+	pointer pos = mArray + mSize++;
+	mAlloc.construct(pos, std::forward<TArgs>(args)...);
+	return *(mArray + mSize++);
 }
 
 
