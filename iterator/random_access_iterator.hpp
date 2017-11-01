@@ -111,6 +111,9 @@ public:
 	// @return if the data is not equal to other data
 	bool operator!=(const random_access_iterator& it) const { return mCurrent != it.mCurrent; }
     
+	// @return the distance between two iterators
+	difference_type operator-(const random_access_iterator& it) const { return mCurrent - it.mCurrent; }
+	
 	/// @return mCurrent
 	/// returns a const reference to the base of the iterator
 	const iterator_type& base() const { return mCurrent; }
