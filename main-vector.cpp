@@ -43,7 +43,7 @@ struct Copy {
 	Copy& operator=(Copy&& other) { cout << "Im being move assigned\n"; return *this; }
 	
 	int _a, _b, _c;
-}
+};
 
 int main(int argc, char* argv[]) {
 	cout << endl << "Default c'tor test" << endl;
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 	cout << endl << a.size() << '\t' << a.capacity() << endl;
 	
 	cout << endl << "Size c'tor test" << endl;
-	ari::vector<int> b{10U, 12};
+	ari::vector<int> b(10U, 12);
 	cout << endl << b.size() << '\t' << b.capacity() << endl;
 	output(b);
 	
@@ -200,7 +200,6 @@ int main(int argc, char* argv[]) {
 	test.insert(test.cbegin(), lst.begin(), lst.end());
 	output(test);
 	
-	auto lst = {1, 2, 3};
 	test.insert(test.crbegin(), lst.begin(), lst.end());
 	output(test);
 	
