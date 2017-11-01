@@ -88,7 +88,7 @@ public:
 	void push_back(value_type&& val);
 	void pop_back();
 
-	void insert(size_type idx, const_reference val); // maybe should remove this soon
+	[[deprecated]] void insert(size_type idx, const_reference val); // maybe should remove this soon
 	iterator insert(const_iterator it, const_reference val);
 	reverse_iterator insert(const_reverse_iterator it, const_reference val);
 	iterator insert(const_iterator it, value_type&& val);
@@ -117,7 +117,6 @@ public:
 	
 private:	
 	[[deprecated]] void expand_to(size_type sz); // depreciated
-	/// Moves [idx, mSize] forward by one, leaving a gap at idx and increasing mSize by one
 	pointer move_up(pointer pos, size_type num = 1);
 	
 	pointer insert_base(pointer pos, const_reference val, size_type num = 1);
