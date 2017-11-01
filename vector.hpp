@@ -593,12 +593,8 @@ auto vector<TType, TAlloc>::move_up(pointer pos, size_type idx) -> pointer {
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert_base(pointer pos, const_reference val, size_type num) -> pointer {
 	pos = move_up(pos, num);
-	pointer ret = pos;
-	
-	while (num --> 0)
-		*pos++ = val;
-	
-	return ret;
+	std::fill(pos, pos + num, val);
+	return pos;
 }
 
 
