@@ -451,19 +451,13 @@ auto vector<TType, TAlloc>::insert(const_reverse_iterator it, TIter begin, TIter
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::insert(const_iterator it, std::initializer_list<value_type> lst) -> iterator {
-	difference_type idx = it - cbegin();
-	pointer pos = this->insert_base(mArray + idx, lst.begin(), lst.end());
-	return iterator{pos};
-}
+auto vector<TType, TAlloc>::insert(const_iterator it, std::initializer_list<value_type> lst) -> iterator
+	{ return this->insert(it, lst.begin(), lst.end()); }
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::insert(const_reverse_iterator it, std::initializer_list<value_type> lst) -> reverse_iterator {
-	difference_type idx = it - crbegin();
-	pointer pos = this->insert_base(mArray + idx, std::rbegin(lst), std::rend(lst));
-	return reverse_iterator{pos};
-}
+auto vector<TType, TAlloc>::insert(const_reverse_iterator it, std::initializer_list<value_type> lst) -> reverse_iterator
+	{ return this->insert(it, std::rbegin(lst), std::rend(lst)); }
 
 
 template <typename TType, typename TAlloc>
@@ -619,10 +613,9 @@ auto vector<TType, TAlloc>::insert_base(pointer pos, value_type&& val) -> pointe
 template <typename TType, typename TAlloc>
 template <typename TIter>
 auto vector<TType, TAlloc>::insert_base(pointer pos, TIter begin, TIter end) -> pointer {
-	move_up(pos, std::distance(begin, end));
-	
-	while (begin != end)
-		*pos++ = *begin++;
+	pos = move_up(pos, std::distance(begin, end));
+	std::copy(begin, end, pos);
+	return pos;
 }
 
 
