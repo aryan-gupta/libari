@@ -80,8 +80,12 @@ public:
 	bool operator!=(const reverse_iterator& it) const { return mCurrent != it.mCurrent; }
     
 	/// @return mCurrent
-	/// returns the base of the iterator
+	/// returns a const reference to the base of the iterator
 	const iterator_type& base() const { return mCurrent; }
+
+	/// @return mCurrent
+	/// returns the base of the iterator
+	iterator_type& base() { return mCurrent; }
 	
 protected:
 	iterator_type mCurrent;
