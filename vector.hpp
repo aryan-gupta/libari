@@ -96,8 +96,8 @@ public:
 	reverse_iterator insert(const const_reverse_iterator& it, size_type num, const_reference val);
 	template <typename TIter> iterator insert(const const_iterator& it, const TIter& begin, const TIter& end);
 	template <typename TIter> reverse_iterator insert(const const_reverse_iterator& it, const TIter& begin, const TIter& end);
-	iterator insert(const const_iterator& it, std::initializer_list<value_type>& lst);
-	reverse_iterator insert(const const_reverse_iterator& it, std::initializer_list<value_type>& lst);
+	iterator insert(const const_iterator& it, std::initializer_list<value_type> lst);
+	reverse_iterator insert(const const_reverse_iterator& it, std::initializer_list<value_type> lst);
 	
 	template <typename... TArgs> iterator emplace(const const_iterator& it, TArgs&&... args);
 	template <typename... TArgs> reverse_iterator emplace(const const_reverse_iterator& it, TArgs&&... args);
@@ -119,8 +119,12 @@ private:
 	/// Moves [idx, mSize] forward by one, leaving a gap at idx and increasing mSize by one
 	void move_up(size_type idx);
 	
-	void erase(const pointer pt);
-	void erase(const pointer begin, const pointer end);
+	void insert_base(const pointer pos, const_reference val, size_type num = 1);
+	void insert_base(const pointer pos, value_type&& val);
+	template <typename TIter> void insert_base(const pointer pos, TIter begin, TIter end);
+	
+	void erase_base(const pointer pos);
+	void erase_base(const pointer begin, const pointer end);
 	
 	static constexpr double GROWTH_FACTOR  = 2;
 	static constexpr size_type INITIAL_CAP = 5;
@@ -380,9 +384,74 @@ void vector<TType, TAlloc>::insert(size_type idx, const_reference val) {
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const const_iterator& it, const_reference val) -> iterator {
-	move_up(it.base() - mArray);
-	*it = val;
-	return iterator(it.base());
+	this->insert_base(it.base(), val);
+	return iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const const_reverse_iterator& it, const_reference val) -> reverse_iterator {
+	this->insert_base(it.base(), val);
+	return reverse_iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const const_iterator& it, value_type&& val) -> iterator {
+	this->insert_base(it.base(), std::move(val));
+	return iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const const_reverse_iterator& it, value_type&& val) -> reverse_iterator {
+	this->insert_base(it.base(), std::move(val));
+	return reverse_iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const const_iterator& it, size_type num, const_reference val) -> iterator {
+	this->insert_base(it.base(), val, num);
+	return iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const const_reverse_iterator& it, size_type num, const_reference val) -> reverse_iterator {
+	this->insert_base(it.base(), val, num);
+	return reverse_iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename TIter>
+auto vector<TType, TAlloc>::insert(const const_iterator& it, const TIter& begin, const TIter& end) -> iterator {
+	this->insert_base(it.base(), begin, end);
+	return iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename TIter>
+auto vector<TType, TAlloc>::insert(const const_reverse_iterator& it, const TIter& begin, const TIter& end) -> reverse_iterator {
+	this->insert_base(it.base(), end, begin); // this needs more work. Maybe convert these into reverse iterators?
+	// maybe force the user to use reverse iterators and do no work here?
+	return reverse_iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const const_iterator& it, std::initializer_list<value_type> lst) -> iterator {
+	this->insert_base(it.base(), lst.begin(), lst.end());
+	return iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const const_reverse_iterator& it, std::initializer_list<value_type> lst) -> reverse_iterator {
+	this->insert_base(it.base(), lst.rbegin(), lst.rend());
+	return reverse_iterator{it.base()};
 }
 
 
