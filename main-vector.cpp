@@ -216,8 +216,8 @@ int main(int argc, char* argv[]) {
 	copy_test.emplace_back(3, 2, 1);
 	copy_test.emplace_back(2, 1, 3);
 	
-	copy_test.emplace(copy_test.begin(), 1, 2, 3);
-	copy_test.emplace(copy_test.begin(), 3, 2, 1);
+	copy_test.emplace(copy_test.end(), 1, 2, 3);
+	copy_test.emplace(copy_test.end(), 3, 2, 1);
 	copy_test.emplace(copy_test.rbegin(), 3, 2, 1);
 	copy_test.emplace(copy_test.crbegin(), 2, 2, 1);
 	
