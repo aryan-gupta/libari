@@ -115,7 +115,7 @@ public:
 	reverse_iterator erase(const const_reverse_iterator& begin, const const_reverse_iterator& end);
 	
 private:	
-	void expand_to(size_type sz);
+	[[deprecated]] void expand_to(size_type sz); // depreciated
 	/// Moves [idx, mSize] forward by one, leaving a gap at idx and increasing mSize by one
 	void move_up(size_type idx);
 	
@@ -369,8 +369,7 @@ void vector<TType, TAlloc>::pop_back()
 
 template <typename TType, typename TAlloc>
 void vector<TType, TAlloc>::insert(size_type idx, const_reference val) {
-	move_up(idx);
-	mArray[idx] = val;
+	this->insert_base(mArray + idx, val);
 }
 
 
@@ -450,7 +449,7 @@ auto vector<TType, TAlloc>::insert(const const_reverse_iterator& it, std::initia
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
 auto vector<TType, TAlloc>::emplace(const const_iterator& it, TArgs&&... args) -> iterator {
-	move_up(it.base() - mArray);
+	move_up(it.base() - mArray); /// @todo fix this
 	*it = value_type{std::forward<TArgs>(args)...};
 }
 
@@ -520,8 +519,9 @@ auto vector<TType, TAlloc>::erase(const const_reverse_iterator& begin, const con
 }
 
 
+[[deprecated]]
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::expand_to(size_type sz) {
+void vector<TType, TAlloc>::expand_to(size_type sz) { // depreciated
 	pointer tmpArray = mAlloc.allocate(sz);
 	
 	// if the first expression of the ?: operator runs then we are expanding the array
