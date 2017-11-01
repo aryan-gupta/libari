@@ -36,6 +36,8 @@ public:
 	using pointer           = typename traits_type::pointer;
 	using reference         = typename traits_type::reference;
 	
+	using iterator_category = typename traits_type::iterator_category;
+	
 	reverse_iterator() : mCurrent{} { /* No Code */ }
 	
 	explicit reverse_iterator(iterator_type dat) : mCurrent{--dat} { /* No Code */ }
