@@ -45,7 +45,7 @@ public:
 		
 	template <typename TOther>
 	reverse_iterator(const reverse_iterator<TOther>& it)
-		: mCurrent{static_cast<TIter>(it.mCurrent)} { /* No Code */ }
+		: mCurrent{static_cast<TIter>(it.base())} { /* No Code */ }
 		
 	reverse_iterator& operator=(const reverse_iterator& it) const { mCurrent = it.mCurrent; }
 	
