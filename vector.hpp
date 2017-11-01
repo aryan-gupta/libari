@@ -493,14 +493,30 @@ auto vector<TType, TAlloc>::at(const size_type idx) -> reference {
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::erase(const const_iterator& it) -> iterator{
-	// go from the start to the end 
-	// and move everything back
-	while(++it != end) {
-		*(it - 1) = *it; 
-	}
-	
-	mSize--;
+auto vector<TType, TAlloc>::erase(const const_iterator& it) -> iterator {
+	this->erase_base(it.base());
+	return iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::erase(const const_reverse_iterator& it) -> reverse_iterator {
+	this->erase_base(it.base());
+	return reverse_iterator{it.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::erase(const const_iterator& begin, const const_iterator& end) -> iterator {
+	this->erase_base(begin.base(), end.base());
+	return iterator{begin.base()};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::erase(const const_reverse_iterator& begin, const const_reverse_iterator& end) -> reverse_iterator {
+	this->erase_base(end.base(), begin.base());
+	return iterator{begin.base()};
 }
 
 
