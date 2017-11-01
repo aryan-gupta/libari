@@ -29,6 +29,8 @@ public:
 	using pointer           = typename traits_type::pointer;
 	using reference         = typename traits_type::reference;
 	
+	using iterator_category = std::random_access_iterator_tag; // ugh we need this for now, remove later
+	
 	/// Default constructor
 	/// Intializes \c mCurrent to \c 0 or \c nullptr if its a pointer
 	random_access_iterator() : mCurrent{} { /* No Code */ }
