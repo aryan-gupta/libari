@@ -167,20 +167,20 @@ vector<TType, TAlloc>::vector(const vector& other)
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(vector&& other)
 : mSize{other.mSize}, mCap{other.mCap}, mAlloc{other.mAlloc}, mArray{other.mArray} {
-	// need to do more reaserch on whether allocators can be moved
-	other.mArray = pointer{}; // or should I change it to allocate INITIAL_CAP?
 	other.mSize = size_type{};
 	other.mCap = INITIAL_CAP;
+	other.mAlloc = allocator_type{};
+	other.mArray = mAlloc.allocate(other.mCap);
 }
 
 
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(vector&& other, const allocator_type& alloc)
 : mSize{other.mSize}, mCap{other.mCap}, mAlloc{alloc}, mArray{other.mArray} {
-	// need to do more reaserch on whether allocators can be moved
-	other.mArray = pointer{}; // or should I change it to allocate INITIAL_CAP?
 	other.mSize = size_type{};
 	other.mCap = INITIAL_CAP;
+	other.mAlloc = allocator_type{};
+	other.mArray = mAlloc.allocate(other.mCap);
 }
 
 
