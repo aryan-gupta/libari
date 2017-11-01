@@ -58,12 +58,12 @@ public:
 	template <typename TIter> void assign(const TIter& begin, const TIter& end);
 	void assign(std::initializer_list<value_type>& init);
 	
-	iterator begin() const;
-	iterator end() const;
+	iterator begin();
+	iterator end();
 	const_iterator cbegin() const;
 	const_iterator cend() const;
-	reverse_iterator rbegin() const;
-	reverse_iterator rend() const;
+	reverse_iterator rbegin();
+	reverse_iterator rend();
 	const_reverse_iterator crbegin() const;
 	const_reverse_iterator crend() const;
 	
@@ -79,7 +79,7 @@ public:
 	size_type size() const;
 	size_type max_size() const;
 	void reserve(size_type sz);
-	void reserve(size_type sz, const_reference value);
+	[[deprecated]] void reserve(size_type sz, const_reference value);
 	size_type capacity() const;
 	void shrink_to_fit();
 	void clear();
@@ -88,15 +88,19 @@ public:
 	void push_back(value_type&& val);
 	void pop_back();
 
-	[[deprecated]] void insert(size_type idx, const_reference val); // maybe should remove this soon
+	[[deprecated]] void insert(size_type idx, const_reference val);
+	
 	iterator insert(const_iterator it, const_reference val);
-	reverse_iterator insert(const_reverse_iterator it, const_reference val);
 	iterator insert(const_iterator it, value_type&& val);
-	reverse_iterator insert(const_reverse_iterator it, value_type&& val);
 	iterator insert(const_iterator it, size_type num, const_reference val);
+	
+	reverse_iterator insert(const_reverse_iterator it, const_reference val);
+	reverse_iterator insert(const_reverse_iterator it, value_type&& val);
 	reverse_iterator insert(const_reverse_iterator it, size_type num, const_reference val);
+	
 	template <typename TIter> iterator insert(const_iterator it, const TIter& begin, const TIter& end);
 	template <typename TIter> reverse_iterator insert(const_reverse_iterator it, const TIter& begin, const TIter& end);
+	
 	iterator insert(const_iterator it, std::initializer_list<value_type> lst);
 	reverse_iterator insert(const_reverse_iterator it, std::initializer_list<value_type> lst);
 	
@@ -111,8 +115,9 @@ public:
 	reference at(const size_type idx);
 	
 	iterator erase(const_iterator it);
-	reverse_iterator erase(const_reverse_iterator it);
 	iterator erase(const_iterator begin, const_iterator end);
+	
+	reverse_iterator erase(const_reverse_iterator it);
 	reverse_iterator erase(const_reverse_iterator begin, const_reverse_iterator end);
 	
 private:	
@@ -139,12 +144,12 @@ private:
 
 template<typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector() 
-: mSize{0}, mCap{INITIAL_CAP}, mAlloc{}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
+: mSize{}, mCap{INITIAL_CAP}, mAlloc{}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
 
 
 template<typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(const allocator_type& alloc) 
-: mSize{0}, mCap{INITIAL_CAP}, mAlloc{alloc}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
+: mSize{}, mCap{INITIAL_CAP}, mAlloc{alloc}, mArray{mAlloc.allocate(mCap)} { /* No Code */ }
 
 
 template<typename TType, typename TAlloc>
@@ -229,12 +234,12 @@ void vector<TType, TAlloc>::assign(std::initializer_list<TType>& init)
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::begin() const -> iterator
+auto vector<TType, TAlloc>::begin() -> iterator
 	{ return iterator{mArray}; }
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::end() const -> iterator
+auto vector<TType, TAlloc>::end() -> iterator
 	{ return iterator{mArray + mSize}; }
 
 
@@ -249,12 +254,12 @@ auto vector<TType, TAlloc>::cend() const -> const_iterator
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::rbegin() const -> reverse_iterator
+auto vector<TType, TAlloc>::rbegin() -> reverse_iterator
 	{ return reverse_iterator{mArray + mSize}; }
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::rend() const -> reverse_iterator
+auto vector<TType, TAlloc>::rend() -> reverse_iterator
 	{ return reverse_iterator{mArray}; }
 
 
@@ -382,14 +387,6 @@ auto vector<TType, TAlloc>::insert(const_iterator it, const_reference val) -> it
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::insert(const_reverse_iterator it, const_reference val) -> reverse_iterator {
-	difference_type idx = it - crbegin();
-	iterator pos = this->insert_base(mArray + idx, val);
-	return reverse_iterator{pos};
-}
-
-
-template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const_iterator it, value_type&& val) -> iterator {
 	difference_type idx = it - cbegin();
 	pointer pos = this->insert_base(mArray + idx, std::move(val));
@@ -398,18 +395,26 @@ auto vector<TType, TAlloc>::insert(const_iterator it, value_type&& val) -> itera
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::insert(const_reverse_iterator it, value_type&& val) -> reverse_iterator {
+auto vector<TType, TAlloc>::insert(const_iterator it, size_type num, const_reference val) -> iterator {
+	difference_type idx = it - cbegin();
+	pointer pos = this->insert_base(mArray + idx, val, num);
+	return iterator{pos};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::insert(const_reverse_iterator it, const_reference val) -> reverse_iterator {
 	difference_type idx = it - crbegin();
-	pointer pos = this->insert_base(mArray + idx, std::move(val));
+	iterator pos = this->insert_base(mArray + idx, val);
 	return reverse_iterator{pos};
 }
 
 
 template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::insert(const_iterator it, size_type num, const_reference val) -> iterator {
-	difference_type idx = it - cbegin();
-	pointer pos = this->insert_base(mArray + idx, val, num);
-	return iterator{pos};
+auto vector<TType, TAlloc>::insert(const_reverse_iterator it, value_type&& val) -> reverse_iterator {
+	difference_type idx = it - crbegin();
+	pointer pos = this->insert_base(mArray + idx, std::move(val));
+	return reverse_iterator{pos};
 }
 
 
@@ -575,13 +580,12 @@ auto vector<TType, TAlloc>::move_up(pointer pos, size_type idx) -> pointer {
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert_base(pointer pos, const_reference val, size_type num) -> pointer {
 	pos = move_up(pos, num);
-	
-	// pointer ret = pos;
+	pointer ret = pos;
 	
 	while (num --> 0)
 		*pos++ = val;
 	
-	// return ret;
+	return ret;
 }
 
 
@@ -589,7 +593,7 @@ template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert_base(pointer pos, value_type&& val) -> pointer {
 	pos = move_up(pos);
 	*pos = std::move(val);
-	// return pos;
+	return pos;
 }
 
 
