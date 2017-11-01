@@ -155,14 +155,15 @@ vector<TType, TAlloc>::vector(const allocator_type& alloc)
 
 template<typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(const size_type size, const_reference val, const allocator_type& alloc)
-: mSize{size}, mCap{mSize * GROWTH_FACTOR}, mAlloc{alloc}, mArray{mAlloc.allocate(mCap)}
+: mSize{size}, mCap{static_cast<size_type>(mSize * GROWTH_FACTOR)}, mAlloc{alloc},
+  mArray{mAlloc.allocate(mCap)}
 	{ std::fill(mArray, mArray + mSize, val); }
 
 
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(const vector& other)
 : mSize{other.mSize}, mCap{other.mCap}, mAlloc{other.mAlloc}, mArray{mAlloc.allocate(mCap)}
-	{ std::copy(other.begin(), other.end(), mArray); }
+	{ std::copy(other.cbegin(), other.cend(), mArray); }
 
 
 template <typename TType, typename TAlloc>
@@ -187,7 +188,8 @@ vector<TType, TAlloc>::vector(vector&& other, const allocator_type& alloc)
 
 template <typename TType, typename TAlloc>
 vector<TType, TAlloc>::vector(std::initializer_list<value_type> init)
-: mSize{init.size()}, mCap{mSize * GROWTH_FACTOR}, mAlloc{}, mArray{mAlloc.allocate(mCap)}
+: mSize{init.size()}, mCap{static_cast<size_type>(mSize * GROWTH_FACTOR)}, mAlloc{},
+  mArray{mAlloc.allocate(mCap)}
 	{ std::move(init.begin(), init.end(), mArray); }
 
 
@@ -408,7 +410,7 @@ auto vector<TType, TAlloc>::insert(const_iterator it, size_type num, const_refer
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const_reverse_iterator it, const_reference val) -> reverse_iterator {
 	difference_type idx = it - crbegin();
-	iterator pos = this->insert_base(mArray + idx, val);
+	pointer pos = this->insert_base(mArray + idx, val);
 	return reverse_iterator{pos};
 }
 
@@ -459,7 +461,7 @@ auto vector<TType, TAlloc>::insert(const_iterator it, std::initializer_list<valu
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const_reverse_iterator it, std::initializer_list<value_type> lst) -> reverse_iterator {
 	difference_type idx = it - crbegin();
-	pointer pos = this->insert_base(mArray + idx, lst.rbegin(), lst.rend());
+	pointer pos = this->insert_base(mArray + idx, std::rbegin(lst), std::rend(lst));
 	return reverse_iterator{pos};
 }
 
@@ -480,7 +482,7 @@ auto vector<TType, TAlloc>::emplace(const_reverse_iterator it, TArgs&&... args) 
 	pointer pos = mArray + (it - crbegin());
 	pos = move_up(pos);
 	mAlloc.construct(pos, std::forward<TArgs>(args)...);
-	return iterator{pos};
+	return reverse_iterator{pos};
 }
 
 
