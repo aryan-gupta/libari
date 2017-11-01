@@ -483,7 +483,7 @@ auto vector<TType, TAlloc>::emplace(const_reverse_iterator it, TArgs&&... args) 
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
 auto vector<TType, TAlloc>::emplace_back(TArgs&&... args) -> reference {
-	pointer pos = mArray + mSize++;
+	pointer pos = mArray + mSize;
 	mAlloc.construct(pos, std::forward<TArgs>(args)...);
 	return *(mArray + mSize++);
 }
