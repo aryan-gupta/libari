@@ -353,21 +353,13 @@ void vector<TType, TAlloc>::clear() {
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::push_back(const_reference val) {
-	if(mSize == mCap) { // USE EXPAND TO
-		size_type newCap = mSize * GROWTH_FACTOR;
-		pointer newArray = mAlloc.allocate(newCap);
-		
-		std::copy(mArray, mArray + mSize, newArray);
-		
-		mAlloc.deallocate(mArray, mCap);
-		
-		mArray = newArray;
-		mCap = newCap;
-	}
-	
-	mArray[mSize++] = val;
-}
+void vector<TType, TAlloc>::push_back(const_reference val)
+	{ this->insert_base(mArray + mSize, val); }
+
+
+template <typename TType, typename TAlloc>
+void vector<TType, TAlloc>::push_back(value_type&& val)
+	{ this->insert_base(mArray + mSize, std::move(val)); }
 
 
 template <typename TType, typename TAlloc>
