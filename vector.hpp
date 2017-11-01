@@ -551,21 +551,24 @@ void vector<TType, TAlloc>::expand_to(size_type sz) { // depreciated
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::move_up(size_type idx) {
-	if(mSize == mCap) {
-		size_type newCap = mSize * GROWTH_FACTOR;
+auto vector<TType, TAlloc>::move_up(pointer pos, size_type idx) -> pointer {
+	size_type newSize = mSize + idx;
+	if(newSize >= mCap) { // if our new size will exceed our capacity
+		size_type newCap = newSize * GROWTH_FACTOR;
 		pointer newArray = mAlloc.allocate(newCap);
 		
-		std::move(mArray, mArray + idx, newArray);
-		std::move(mArray + idx, mArray + mSize, newArray + idx + 1);
+		pointer newPos = std::move(mArray, pos, newArray); // move lower end
+		std::move(pos, mArray + mSize, newPos + idx); // move upper end making a hole 
 		
 		mAlloc.deallocate(mArray, mCap);
 		mArray = newArray;
 		mCap = newCap;
-		++mSize;
+		mSize = newSize;
+		return newPos;
 	} else {
-		std::move_backward(mArray + idx, mArray + mSize, mArray + mSize + 1);
-		++mSize;
+		std::move_backward(pos, mArray + mSize, mArray + mSize + idx);
+		mSize = newSize;
+		return pos;
 	}
 }
 
