@@ -368,8 +368,10 @@ void vector<TType, TAlloc>::push_back(value_type&& val)
 
 
 template <typename TType, typename TAlloc>
-void vector<TType, TAlloc>::pop_back() 
-	{ mSize--; }
+void vector<TType, TAlloc>::pop_back() {
+	--mSize;
+	mAlloc.destroy(mArray + mSize);
+}
 
 
 template <typename TType, typename TAlloc>
