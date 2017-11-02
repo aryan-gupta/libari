@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 	
 	cout << endl << "Auo expansion test" << endl;
 	cout << test.capacity() << endl;
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < 9; ++i) {
 		test.push_back(i);
 	}
 	cout << test.capacity() << endl;
@@ -235,7 +235,19 @@ int main(int argc, char* argv[]) {
 		cout << "Exception caught" << endl;
 	}
 	
-	// todo erase tests
+	output(test);
+	
+	test.erase(test.begin(), test.begin() + 5);
+	output(test);
+	
+	test.erase(test.rbegin(), test.rbegin() + 5);
+	output(test);
+	
+	test.erase(test.begin());
+	output(test);
+	
+	test.erase(test.rbegin());
+	output(test);
 	
 	cout << endl << "Clear test" << endl;
 	test.clear();
