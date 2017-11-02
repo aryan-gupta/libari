@@ -71,7 +71,7 @@ public:
 	size_type size() const;
 	bool empty() const;
 	void swap(priority_queue& other);
-	void priority_queueify();
+	void heapify();
 	
 //#if __cplusplus >= 201703L // becaise I'm using g++ 6.4 to compile
 // https://stackoverflow.com/questions/38456127/what-is-the-value-of-cplusplus-for-c17
@@ -114,28 +114,28 @@ priority_queue<TType, TCont, TPred>::priority_queue(value_compare cmp)
 template <typename TType, typename TCont, typename TPred>
 priority_queue<TType, TCont, TPred>::priority_queue(container_type cont)
 : mHeap{cont}, mComp{} {
-	priority_queueify();
+	heapify();
 }
 
 
 template <typename TType, typename TCont, typename TPred>
 priority_queue<TType, TCont, TPred>::priority_queue(container_type cont, value_compare cmp)
 : mHeap{cont}, mComp{cmp} {
-	priority_queueify();
+	heapify();
 }
 
 
 template <typename TType, typename TCont, typename TPred>
 priority_queue<TType, TCont, TPred>::priority_queue(std::initializer_list<value_type> lst)
 : mHeap{lst.begin(), lst.end()}, mComp{} {
-	priority_queueify();
+	heapify();
 }
 
 
 template <typename TType, typename TCont, typename TPred>
 priority_queue<TType, TCont, TPred>::priority_queue(std::initializer_list<value_type> lst, value_compare cmp)
 : mHeap{lst.begin(), lst.end()}, mComp{cmp} {
-	priority_queueify();
+	heapify();
 }
 
 
@@ -153,7 +153,7 @@ template <typename TType, typename TCont, typename TPred>
 template <typename TIter>
 priority_queue<TType, TCont, TPred>::priority_queue(TIter begin, TIter end)
 : mHeap{begin, end} {
-	priority_queueify();
+	heapify();
 }
 
 
@@ -161,7 +161,7 @@ template <typename TType, typename TCont, typename TPred>
 template <typename TIter>
 priority_queue<TType, TCont, TPred>::priority_queue(TIter begin, TIter end, value_compare cmp)
 : mHeap{begin, end}, mComp{cmp} {
-	priority_queueify();
+	heapify();
 }
 
 
@@ -190,7 +190,7 @@ auto priority_queue<TType, TCont, TPred>::operator=(priority_queue&& other) -> p
 
 
 template <typename TType, typename TCont, typename TPred>
-void priority_queue<TType, TCont, TPred>::priority_queueify() {
+void priority_queue<TType, TCont, TPred>::heapify() {
 	for (
 		auto b = mHeap.begin() - 1, e = std::next(mHeap.begin(), mHeap.size() / 2 - 1);
 		b != e; 

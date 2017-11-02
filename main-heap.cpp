@@ -73,11 +73,11 @@ int main(int argc, char* argv[]) {
 	
 	using push_back_func_t = void(std::vector<int>::*)(const int&);
 	test.call_member(static_cast<push_back_func_t>(&std::vector<int>::push_back), 0);
-	test.priority_queueify();
+	test.heapify();
 	
 	test.call_member([](auto& c){ c.insert(c.begin(), 0); });
 	test.call_member([](auto& c, auto num){ c.insert(c.begin(), num); }, 0);
-	test.priority_queueify();
+	test.heapify();
 	
 	cout << "Top, Pop ,and Empty Test" << endl;
 	while (!test.empty()) {
