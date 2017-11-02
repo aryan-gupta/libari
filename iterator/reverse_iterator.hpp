@@ -123,7 +123,7 @@ template <typename TIter>
 inline reverse_iterator<TIter> operator-(
 	const reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
-) { return reverse_iterator<TIter>{it.base() - scale}; }
+) { return reverse_iterator<TIter>{it.base() + scale}; }
 
 /// @return reference to \c this
 // This operator increments mCurrent by the scale
@@ -131,19 +131,19 @@ template <typename TIter>
 inline reverse_iterator<TIter> operator+(
 	const reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
-) { return reverse_iterator<TIter>{it.base() + scale}; }
+) { return reverse_iterator<TIter>{it.base() - scale}; }
 
 template <typename TIter>
 inline reverse_iterator<TIter>& operator+=(
 	reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
-) { it = it + scale; return it; }
+) { it = it - scale; return it; }
 
 template <typename TIter>
 inline reverse_iterator<TIter>& operator-=(
 	reverse_iterator<TIter>& it,
 	typename reverse_iterator<TIter>::difference_type scale
-) { it = it - scale; return it; }
+) { it = it + scale; return it; }
 
 
 template <typename TIter>
