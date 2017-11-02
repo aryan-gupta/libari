@@ -20,7 +20,7 @@
 #include <vector>
 #include <functional>
 
-#include "heap.hpp"
+#include "priority_queue.hpp"
 
 using namespace std;
 
@@ -36,14 +36,14 @@ int main(int argc, char* argv[]) {
 	vector<int> tmp = {5, 2, 8, 6, 4, 7, 3, 6, 4, 5, 1, 0, 0, 0};
 	
 	cout << "std::initializer_list test" << endl;
-	ari::heap<int> tmp0 = {1, 3, 5, 1, 7, 2, 6, 3, 8, 9, 12, 5, 3};
+	ari::priority_queue<int> tmp0 = {1, 3, 5, 1, 7, 2, 6, 3, 8, 9, 12, 5, 3};
 	while (!tmp0.empty()) {
 		cout << tmp0.top() << endl;
 		tmp0.pop();
 	}
 	
 	cout << "std::initializer_list and compare test" << endl;
-	ari::heap<int, std::vector<int>, bool (*) (int, int)> tmp1{
+	ari::priority_queue<int, std::vector<int>, bool (*) (int, int)> tmp1{
 		{1, 3, 5, 1, 7, 2, 6, 3, 8, 9, 12, 5, 3}, 
 		[](int a, int b) { return a < b; }
 	};
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 	
 	
 	cout << "Iterator Constructor Test" << endl;
-	ari::heap<int, vector<int>, std::function<bool(int, int)> > tmp2{tmp.begin(), tmp.end(), [](int a, int b) { return a < b; }};
+	ari::priority_queue<int, vector<int>, std::function<bool(int, int)> > tmp2{tmp.begin(), tmp.end(), [](int a, int b) { return a < b; }};
 	
 	auto test = tmp2;
 	
@@ -73,11 +73,11 @@ int main(int argc, char* argv[]) {
 	
 	using push_back_func_t = void(std::vector<int>::*)(const int&);
 	test.call_member(static_cast<push_back_func_t>(&std::vector<int>::push_back), 0);
-	test.heapify();
+	test.priority_queueify();
 	
 	test.call_member([](auto& c){ c.insert(c.begin(), 0); });
 	test.call_member([](auto& c, auto num){ c.insert(c.begin(), num); }, 0);
-	test.heapify();
+	test.priority_queueify();
 	
 	cout << "Top, Pop ,and Empty Test" << endl;
 	while (!test.empty()) {
