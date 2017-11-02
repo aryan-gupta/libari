@@ -409,7 +409,7 @@ auto vector<TType, TAlloc>::insert(const_iterator it, size_type num, const_refer
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const_reverse_iterator it, const_reference val) -> reverse_iterator {
-	difference_type idx = it - crbegin();
+	difference_type idx = it - crend() - 1;
 	pointer pos = this->insert_base(mArray + idx, val);
 	return reverse_iterator{pos};
 }
@@ -417,7 +417,7 @@ auto vector<TType, TAlloc>::insert(const_reverse_iterator it, const_reference va
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const_reverse_iterator it, value_type&& val) -> reverse_iterator {
-	difference_type idx = it - crbegin();
+	difference_type idx = it - crend() - 1;
 	pointer pos = this->insert_base(mArray + idx, std::move(val));
 	return reverse_iterator{pos};
 }
@@ -425,7 +425,7 @@ auto vector<TType, TAlloc>::insert(const_reverse_iterator it, value_type&& val) 
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::insert(const_reverse_iterator it, size_type num, const_reference val) -> reverse_iterator {
-	difference_type idx = it - crbegin();
+	difference_type idx = it - crend() - 1;
 	pointer pos = this->insert_base(mArray + idx, val, num);
 	return reverse_iterator{pos};
 }
@@ -443,7 +443,7 @@ auto vector<TType, TAlloc>::insert(const_iterator it, TIter begin, TIter end) ->
 template <typename TType, typename TAlloc>
 template <typename TIter>
 auto vector<TType, TAlloc>::insert(const_reverse_iterator it, TIter begin, TIter end) -> reverse_iterator {
-	difference_type idx = it - crbegin();
+	difference_type idx = it - crend();
 	pointer pos = this->insert_base(mArray + idx, begin, end); // this needs more work. Maybe convert these into reverse iterators?
 	// maybe force the user to use reverse iterators and do no work here?
 	return reverse_iterator{pos};
@@ -473,7 +473,7 @@ auto vector<TType, TAlloc>::emplace(const_iterator it, TArgs&&... args) -> itera
 template <typename TType, typename TAlloc>
 template <typename... TArgs>
 auto vector<TType, TAlloc>::emplace(const_reverse_iterator it, TArgs&&... args) -> reverse_iterator {
-	pointer pos = mArray + (it - crbegin());
+	pointer pos = mArray + (it - crend() + 1);
 	pos = move_up(pos);
 	mAlloc.construct(pos, std::forward<TArgs>(args)...);
 	return reverse_iterator{pos};
