@@ -521,29 +521,35 @@ auto vector<TType, TAlloc>::at(const size_type idx) -> reference {
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::erase(const_iterator it) -> iterator {
-	this->erase_base(it.base());
-	return iterator{it.base()};
-}
-
-
-template <typename TType, typename TAlloc>
-auto vector<TType, TAlloc>::erase(const_reverse_iterator it) -> reverse_iterator {
-	this->erase_base(it.base());
-	return reverse_iterator{it.base()};
+	difference_type idx = it - cbegin();
+	pointer pos = this->erase_base(mArray + idx);
+	return iterator{pos};
 }
 
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::erase(const_iterator begin, const_iterator end) -> iterator {
-	this->erase_base(begin.base(), end.base());
-	return iterator{begin.base()};
+	difference_type st = begin - cbegin();
+	difference_type ed = end - cbegin();
+	pointer pos = this->erase_base(mArray + st, mArray + ed);
+	return iterator{pos};
+}
+
+
+template <typename TType, typename TAlloc>
+auto vector<TType, TAlloc>::erase(const_reverse_iterator it) -> reverse_iterator {
+	difference_type idx = it - crend() - 1;
+	pointer pos = this->erase_base(mArray + idx);
+	return reverse_iterator{pos};
 }
 
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::erase(const_reverse_iterator begin, const_reverse_iterator end) -> reverse_iterator {
-	this->erase_base(end.base(), begin.base());
-	return iterator{begin.base()};
+	difference_type st = begin - crend();
+	difference_type ed = end - crend() + 1;
+	pointer pos = this->erase_base(mArray + ed, mArray + st);
+	return reverse_iterator{pos};
 }
 
 
@@ -617,13 +623,23 @@ auto vector<TType, TAlloc>::insert_base(pointer pos, TIter begin, TIter end) -> 
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::erase_base(pointer pos) -> pointer {
-	
+	mAlloc.destroy(pos);
+	std::move(pos + 1, mArray + mSize, pos);
+	--mSize;
+	return pos;
 }
 
 
 template <typename TType, typename TAlloc>
 auto vector<TType, TAlloc>::erase_base(pointer begin, const pointer end) -> pointer {
+	pointer b = begin;
 	
+	while (b != end)
+		mAlloc.destroy(b++);
+
+	std::move(end, mArray + mSize, begin);
+	mSize -= std::distance(begin, end);
+	return begin;
 }
 
 
