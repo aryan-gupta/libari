@@ -25,6 +25,14 @@
 #include "Iterator.h"
 
 namespace ari {
+	
+/** Things still need to be done:
+ *    - improve the reverse iterator algorithms
+ *    - improve reverse iterators in general
+ *    - add back inserter iterator
+ *    
+ *    - general code cleanup
+ */
 
 template <typename TType, typename TAlloc = std::allocator<TType>>
 class vector {
