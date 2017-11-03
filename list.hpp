@@ -20,7 +20,7 @@
 
 namespace ari {
 
-template <typename TType, TAlloc>
+template <typename TType>
 struct node_type {
 	node_pointer prev;
 	TType data;
@@ -148,7 +148,19 @@ public:
 	void sort();
 	template <TBPred> void sort(TBPred binp)
 	
-private:	
+private:
+	node_pointer insert_base(node_pointer pos, const_reference val, size_type count = 1);
+	node_pointer insert_base(node_pointer pos, value_type&& val);
+	node_pointer insert_base(node_pointer pos, node_pointer obegin, node_pointer oend); // may soon be depreciated
+	template <typename TIter> node_pointer insert_base(node_pointer pos, TIter begin, TIter end);
+	
+	void splice_base(node_pointer pos, node_pointer obegin, node_pointer oend);
+	void merge_base(node_pointer obegin, node_pointer oend);
+	
+	node_pointer erase_base(node_pointer pos);
+	node_pointer erase_base(node_pointer start, node_pointer end);
+	
+	node_allocator_type mAlloc;
 	node_pointer mHead;
 	node_pointer mTail;
 	size_type mSize;
