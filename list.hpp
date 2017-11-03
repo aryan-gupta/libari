@@ -20,21 +20,21 @@
 
 namespace ari {
 
-template <typename TType>
-struct list_node {
-	list_node* prev;
+template <typename TType, TAlloc>
+struct node_type {
+	node_pointer prev;
 	TType data;
-	list_node* next;
+	node_pointer next;
 };
 
 
 
-template <typename TType, typename TAlloc = std::allocator<TType>>
+template <typename TType, TAlloc, typename TAlloc = std::allocator<TType>>
 class list {
 public:
 	using value_type      = TType;
 	using allocator_type  = TAlloc;
-	using size_type       = size_t;
+	using size_type       = size_type;
 	using reference       = value_type&;	
 	using const_reference = const value_type&;
 	using pointer         = typename std::allocator_traits<allocator_type>::pointer;
@@ -42,7 +42,7 @@ public:
 	using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
 	
 private:
-	using node_type            = list_node<value_type>;
+	using node_type            = node_type<value_type>;
 	using node_allocator_type  = allocator_type::template rebind<node_type>::other;
 	using node_pointer         = typename std::allocator_traits<node_allocator_type>::pointer;
 	using const_node_pointer   = typename std::allocator_traits<node_allocator_type>::const_pointer;
@@ -158,29 +158,29 @@ private:
 
 // IMPLEMENTATION
 
-template <typename TYPE> 
-DList<TYPE>::DList() {
+template <typename TType, TAlloc> 
+list<TType, TAlloc>::list() {
 	mHead = nullptr;
 	mTail = nullptr;
 	mSize = 0;
 }
 
 
-template <typename TYPE> 
-DList<TYPE>::DList(const DList& other) {
+template <typename TType, TAlloc> 
+list<TType, TAlloc>::list(const list& other) {
 	mHead = nullptr;
 	mSize = 0;
 	
 	if(other.size() > 0) {
-		mHead = new Node{nullptr, other[0], nullptr};
+		mHead = new node_type{nullptr, other[0], nullptr};
 		mSize++;
 	}
 	
-	Node* current = mHead, *prev = nullptr;
+	node_pointer current = mHead, *prev = nullptr;
 	
-	for(size_t i = 1; i < other.size(); ++i) {
+	for(size_type i = 1; i < other.size(); ++i) {
 		prev = current;
-		current = new Node{prev, other[i], nullptr};
+		current = new node_type{prev, other[i], nullptr};
 		prev->next = current;
 		
 		mSize++;
@@ -190,21 +190,21 @@ DList<TYPE>::DList(const DList& other) {
 }
 
 
-template <typename TYPE> 
-DList<TYPE>::DList(const size_t size, const TYPE& val) {
+template <typename TType, TAlloc> 
+list<TType, TAlloc>::list(const size_type size, const TType& val) {
 	mHead = nullptr;
 	mSize = 0; /// @todo make one statement later rather than incrementing everytime
 	
 	if(size > 0) {
-		mHead = new Node{nullptr, val, nullptr};
+		mHead = new node_type{nullptr, val, nullptr};
 		mSize++;
 	}
 	
-	Node* current = mHead, *prev = nullptr;
+	node_pointer current = mHead, *prev = nullptr;
 	
-	for(size_t i = 0; i < size; ++i) {
+	for(size_type i = 0; i < size; ++i) {
 		prev = current;
-		current = new Node{prev, val, nullptr};
+		current = new node_type{prev, val, nullptr};
 		prev->next = current;
 		
 		mSize++;
@@ -213,22 +213,22 @@ DList<TYPE>::DList(const size_t size, const TYPE& val) {
 	mTail = current;
 }
 
-template <typename TYPE>
-template <typename ITER, typename>
-DList<TYPE>::DList(ITER&& begin, ITER&& end) {
+template <typename TType, TAlloc>
+template <typename TIter, typename>
+list<TType, TAlloc>::list(TIter&& begin, TIter&& end) {
 	mHead = nullptr;
 	mSize = 0;
 	
 	if(std::distance(begin, end) > 0) {
-		mHead = new Node{nullptr, *begin++, nullptr};
+		mHead = new node_type{nullptr, *begin++, nullptr};
 		mSize++;
 	}
 	
-	Node* current = mHead, *prev = nullptr;
+	node_pointer current = mHead, *prev = nullptr;
 	
 	while(begin != end) {
 		prev = current;
-		current = new Node{prev, *begin++, nullptr};
+		current = new node_type{prev, *begin++, nullptr};
 		prev->next = current;
 		
 		mSize++;
@@ -238,22 +238,22 @@ DList<TYPE>::DList(ITER&& begin, ITER&& end) {
 }
 
 
-template <typename TYPE> 
-typename DList<TYPE>::iterator DList<TYPE>::begin() const {
+template <typename TType, TAlloc> 
+typename list<TType, TAlloc>::iterator list<TType, TAlloc>::begin() const {
 	return iterator(mHead);
 }
 
 
-template <typename TYPE> 
-typename DList<TYPE>::iterator DList<TYPE>::end() const {
+template <typename TType, TAlloc> 
+typename list<TType, TAlloc>::iterator list<TType, TAlloc>::end() const {
 	return iterator(mTail);
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::clear() {
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::clear() {
 	while(mHead != nullptr) {
-		Node* rem = mHead;
+		node_pointer rem = mHead;
 		mHead = mHead->next;
 		delete rem;
 	}
@@ -264,34 +264,34 @@ void DList<TYPE>::clear() {
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::push_back(const TYPE& val) {
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::push_back(const TType& val) {
 	if(mHead == nullptr && mTail == nullptr)
-		mHead = mTail = new Node{nullptr, val, nullptr};
+		mHead = mTail = new node_type{nullptr, val, nullptr};
 	else
-		mTail = mTail->next = new Node{mTail, val, nullptr};
+		mTail = mTail->next = new node_type{mTail, val, nullptr};
 	
 	mSize++;
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::push_front(const TYPE& val) {
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::push_front(const TType& val) {
 	if(mHead == nullptr && mTail == nullptr)
-		mHead = mTail = new Node{nullptr, val, nullptr};
+		mHead = mTail = new node_type{nullptr, val, nullptr};
 	else
-		mHead = mHead->prev = new Node{nullptr, val, mHead};
+		mHead = mHead->prev = new node_type{nullptr, val, mHead};
 	
 	mSize++;
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::pop_back() {
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::pop_back() {
 	if(mSize == 0)
 		throw std::out_of_range("No elements to remove");
 	
-	Node* rem = mTail;
+	node_pointer rem = mTail;
 	mTail = mTail->prev;
 	delete rem;
 	mTail->next = nullptr;
@@ -302,12 +302,12 @@ void DList<TYPE>::pop_back() {
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::pop_front() {
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::pop_front() {
 	if(mSize == 0)
 		throw std::out_of_range("No elements to remove");
 	
-	Node* rem = mHead;
+	node_pointer rem = mHead;
 	mHead = mHead->next;
 	delete rem;
 	mHead->prev = nullptr;
@@ -318,8 +318,8 @@ void DList<TYPE>::pop_front() {
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::insert(size_t idx, const TYPE& val) {
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::insert(size_type idx, const TType& val) {
 	if(idx > mSize)
 		throw std::out_of_range("Supplied index was out of range");
 	
@@ -328,13 +328,13 @@ void DList<TYPE>::insert(size_t idx, const TYPE& val) {
 	} else if(idx == mSize) {
 		push_back(val);
 	} else {
-		Node* current = mHead;
+		node_pointer current = mHead;
 		
 		while(idx --> 0)
 			current = current->next;
 		
-		Node* newPrev = current->prev;
-		current->prev = new Node{newPrev, val, current};
+		node_pointer newPrev = current->prev;
+		current->prev = new node_type{newPrev, val, current};
 		newPrev->next = current->prev;
 		
 		mSize++;
@@ -342,20 +342,20 @@ void DList<TYPE>::insert(size_t idx, const TYPE& val) {
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::insert(const DList<TYPE>::iterator it, const TYPE& val) {
-	Node* current = it.getNode();
-	Node* newPrev = current->prev;
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::insert(const list<TType, TAlloc>::iterator it, const TType& val) {
+	node_pointer current = it.getnode_type();
+	node_pointer newPrev = current->prev;
 	
-	current->prev = new Node{newPrev, val, current};
+	current->prev = new node_type{newPrev, val, current};
 	
 	mSize++;
 }
 
 
-template <typename TYPE> 
-void DList<TYPE>::remove(const TYPE& val) {
-	Node* current = mHead, *rem = nullptr;
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::remove(const TType& val) {
+	node_pointer current = mHead, *rem = nullptr;
 	
 	while(current != nullptr) {
 		if(current->data == val) {
@@ -383,15 +383,15 @@ void DList<TYPE>::remove(const TYPE& val) {
 }
 
 
-template <typename TYPE> 
-size_t DList<TYPE>::size() const {
+template <typename TType, TAlloc> 
+size_type list<TType, TAlloc>::size() const {
 	return mSize;
 }
 
 
-template <typename TYPE> 
-const TYPE& DList<TYPE>::operator[](size_t idx) const {
-	Node* current = mHead;
+template <typename TType, TAlloc> 
+const TType& list<TType, TAlloc>::operator[](size_type idx) const {
+	node_pointer current = mHead;
 	
 	while(idx --> 0)
 		current = current->next;
@@ -400,9 +400,9 @@ const TYPE& DList<TYPE>::operator[](size_t idx) const {
 }
 
 
-template <typename TYPE> 
-TYPE& DList<TYPE>::operator[](size_t idx) {
-	Node* current = mHead;
+template <typename TType, TAlloc> 
+TType& list<TType, TAlloc>::operator[](size_type idx) {
+	node_pointer current = mHead;
 	
 	while(idx --> 0)
 		current = current->next;
@@ -410,116 +410,6 @@ TYPE& DList<TYPE>::operator[](size_t idx) {
 	return current->data;
 }
 
-// ITERATOR
+} // end namespace ari
 
-
-template <typename TYPE> 
-DList<TYPE>::iterator::iterator() {
-	data = nullptr;
-}
-
-
-template <typename TYPE> 
-DList<TYPE>::iterator::iterator(Node* const node) {
-	data = node;
-}
-
-
-template <typename TYPE> 
-DList<TYPE>::iterator::iterator(const DList<TYPE>::iterator& it) {
-	data = it.data;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator++() {
-	data = data->next;
-	
-	return *this;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator--() {
-	data = data->prev;
-	
-	return *this;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::iterator DList<TYPE>::iterator::operator++(int) {
-	DList<TYPE>::iterator orig(data);
-	
-	data = data->next;
-	
-	return orig;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::iterator DList<TYPE>::iterator::operator--(int) {
-	DList<TYPE>::iterator orig(data);
-	
-	data = data->prev;
-	
-	return orig;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator=(const iterator& it) {
-	data = it.data;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator-(int scale) {
-	scale = abs(scale);
-	
-	while(scale --> 0)
-		data = data->prev;
-
-	return *this;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::iterator& DList<TYPE>::iterator::operator+(int scale) {
-	scale = abs(scale);
-	
-	while(scale --> 0)
-		data = data->next;
-
-	return *this;
-}
-
-
-template <typename TYPE> 
-bool DList<TYPE>::iterator::operator==(const iterator& it) {
-	return data == it.data;
-}
-
-
-template <typename TYPE> 
-bool DList<TYPE>::iterator::operator!=(const iterator& it) {
-	return !operator==(it);
-}
-
-
-template <typename TYPE> 
-TYPE& DList<TYPE>::iterator::operator*() {
-	return data->data;
-}
-
-
-template <typename TYPE> 
-TYPE& DList<TYPE>::iterator::operator->() {
-	return data->data;
-}
-
-
-template <typename TYPE> 
-typename DList<TYPE>::Node* DList<TYPE>::iterator::getNode() {
-	return data;
-}
+#endif // ARI_LIST_HPP defined
