@@ -15,79 +15,143 @@
  * =============================================================================
  */
 
-#pragma once
+#ifndef ARI_LIST_HPP
+#define ARI_LIST_HPP
 
-template <typename TYPE>
-class DList {
+namespace ari {
+
+template <typename TType>
+struct list_node {
+	list_node* prev;
+	TType data;
+	list_node* next;
+};
+
+
+
+template <typename TType, typename TAlloc = std::allocator<TType>>
+class list {
 public:
-	struct Node {
-		Node* prev;
-		TYPE data;
-		Node* next;
-	};
+	using value_type      = TType;
+	using allocator_type  = TAlloc;
+	using size_type       = size_t;
+	using reference       = value_type&;	
+	using const_reference = const value_type&;
+	using pointer         = typename std::allocator_traits<allocator_type>::pointer;
+	using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
+	using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
 	
-	class iterator {
-	public:
-		iterator();
-		iterator(Node* const node);
-		iterator(const iterator& it);
+private:
+	using node_type            = list_node<value_type>;
+	using node_allocator_type  = allocator_type::template rebind<node_type>::other;
+	using node_pointer         = typename std::allocator_traits<node_allocator_type>::pointer;
+	using const_node_pointer   = typename std::allocator_traits<node_allocator_type>::const_pointer;
 	
-		iterator& operator++(); // preincrement
-		iterator& operator--();
-		
-		iterator operator++(int); // postincrement
-		iterator operator--(int);
-		
-		iterator& operator=(const iterator& it);
-
-		iterator& operator-(int scale);
-		iterator& operator+(int scale);
-		
-		bool operator==(const iterator& it);
-		bool operator!=(const iterator& it);
-		
-		TYPE& operator*();
-		TYPE& operator->();
-		
-		Node* getNode();
-		
-	private:
-		Node* data;
-		
-	};
+public:	
+	list();
+	explicit list(const allocator_type& alloc);
+	list(size_type count, const_reference val, const allocator_type& alloc = allocator_type{});
+	list(size_type count);
+	list(size_type count, const_reference val, const allocator_type& alloc);
+	template <typename TIter> list(TIter begin, TIter end, const allocator_type& alloc = allocator_type{});
+	list(const list& other);
+	list(const list& other, const allocator_type& alloc);
+	list(list&& other);
+	list(list&& other, const allocator_type& alloc);
+	list(std::initializer_list<value_type> init);
 	
-	DList();
-	DList(const DList& other);
+	~list();
 	
-	DList(const size_t size, const TYPE& val = TYPE());
+	list& operator=(const list& other);
+	list& operator=(list&& other); //? add noexcept?
+	list& operator=(std::initializer_list<value_type> ilst);
 	
-	template <typename ITER, typename = decltype(*ITER())>
-	DList(ITER&& begin, ITER&& end);
+	void assign(size_type count, const_reference val);
+	template <typename TIter> assign(TIter begin, TIter end);
+	void assign(std::initializer_list<value_type> ilst);
 	
-	iterator begin() const;
-	iterator end() const;
+	allocator_type get_allocator() const; 
+	
+	reference front();
+	const_reference front() const;
+	reference back();
+	const_reference back() const;	
+	
+	iterator begin();
+	iterator end();
+	const_iterator cbegin() const;
+	const_iterator cend() const;
+	reverse_iterator rbegin();
+	reverse_iterator rend();
+	const_reverse_iterator crbegin() const;
+	const_reverse_iterator crend() const;
+	
+	std::pair<node_pointer, node_pointer> data();
+	std::pair<const_node_pointer, const_node_pointer> data() const;
+	
+	bool empty() const;
+	size_type size() const;
+	size_type max_size() const;
 	
 	void clear();
+	// insert
+	iterator insert(const_iterator pos, const_reference val);
+	iterator insert(const_iterator pos, value_type&& val);
+	iterator insert(const_iterator pos, size_type count, const_reference value);
+	template <typename TIter> iterator insert(const_iterator pos, TIter first, TIter last);
+	iterator insert(const_iterator pos, std::initializer_list<value_type> ilst);
 	
-	void push_back(const TYPE& val);
-	void push_front(const TYPE& val);
+	// emplace
+	template <typename TArgs...> emplace(const_iterator pos, TArgs&&... args);
+	template <typename TArgs...> emplace_back(TArgs&&... args);
+	template <typename TArgs...> emplace_front(TArgs&&... args);
 	
+	// erase
+	iterator erase(const_iterator pos);
+	iterator erase(const_iterator begin, const_iterator end);
+	
+	// push ends
+	void push_back(const_reference val);
+	void push_back(value_type&& val);
+	void push_front(const_reference val);
+	void push_front(value_type&& val);
+	
+	// pop ends
 	void pop_back();
 	void pop_front();
 	
-	void insert(size_t idx, const TYPE& val);
-	void insert(const DList<TYPE>::iterator it, const TYPE& val);
-	void remove(const TYPE& val);
+	void resize(size_type count);
+	void resize(size_type count, const_reference val = val{});
 	
-	size_t size() const;
+	void swap(list& other);
 	
-	const TYPE& operator[](size_t idx) const;
-	TYPE& operator[](size_t idx);
+	void merge(list& other);
+	void merge(list&& other);
+	template <typename TPred> void merge(list& other, TPred cmp);
+	template <typename TPred> void merge(list&& other, TPred cmp);
+	
+	void splice(const_iterator pos, list& other);
+	void splice(const_iterator pos, list&& other);
+	void splice(const_iterator pos, list& other, const_iterator it);
+	void splice(const_iterator pos, list&& other, const_iterator it);
+	void splice(const_iterator pos, list& other, const_iterator first, const_iterator last);
+	void splice(const_iterator pos, list&& other, const_iterator first, const_iterator last);
+	
+	void remove(const_reference val);
+	template <typename TUPred> void remove_if(TUPred pred);
+	
+	void reverse();
+	
+	void unique();
+	template <TBPred> void unique(TBPred binp);
+
+	void sort();
+	template <TBPred> void sort(TBPred binp)
 	
 private:	
-	Node* mHead; /// @todo convert to iterators?
-	Node* mTail;
-	size_t mSize;
+	node_pointer mHead;
+	node_pointer mTail;
+	size_type mSize;
 	
 };
 
