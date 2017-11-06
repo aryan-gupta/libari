@@ -172,18 +172,116 @@ private:
 	using node_allocator_type = typename allocator_type::rebind<node_type>::other;
 	using node_type_pointer   = typename std::allocator_traits<node_allocator_type>::pointer;
 	
+	template <typename TIter> insert_base(TIter begin, TIter end);
+	
 	static const size_type DEFAULT_BUCKET_COUNT = 10;
 	static const ratio_type DEFAULT_LOAD_FACTOR = 1.0;
 	
+	size_type mSize;
+	size_type mBuckets;
 	node_allocator_type mAlloc;
 	node_type_pointer mMap;
-	size_type mNumBucket;
-	size_type mNumSize;
 	hasher mHash;
 	key_equal mEq;
 	ratio_type mLoadFactor;
 	
 };
+
+
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map()
+: unordered_map{DEFAULT_BUCKET_COUNT} { /* No Code */ }
+
+
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(
+	size_type bc,
+	const hasher& hash,
+	const key_equal& equal,
+	const allocator_type& alloc
+) : mSize{}, mBuckets{bc}, mAlloc{}, mMap{mAlloc.allocate(mBuckets)}, mHash{hash}, mEq{equal},
+    mLoadFactor{DEFAULT_LOAD_FACTOR} { /* No Code */ }
+	
+
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(
+	size_type bc,
+	const allocator_type& alloc
+) : mSize{}, mBuckets{bc}, mAlloc{alloc}, mMap{mAlloc.allocate(mBuckets)}, mHash{}, mEq{},
+    mLoadFactor{DEFAULT_LOAD_FACTOR} { /* No Code */ }
+	
+	
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(
+	size_type bc,
+	const hasher& hash,
+	const allocator_type& alloc
+) : mSize{}, mBuckets{bc}, mAlloc{alloc}, mMap{mAlloc.allocate(mBuckets)}, mHash{hash}, mEq{},
+    mLoadFactor{DEFAULT_LOAD_FACTOR} { /* No Code */ }
+
+	
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(
+	const allocator_type& alloc
+) : mSize{}, mBuckets{DEFAULT_BUCKET_COUNT}, mAlloc{alloc}, mMap{mAlloc.allocate(mBuckets)}, mHash{},
+    mEq{}, mLoadFactor{DEFAULT_LOAD_FACTOR} { /* No Code */ }
+	
+	
+template <TKey, TType, THash, TKeyEq, TAlloc>
+template <TIter>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(
+	TIter first,
+	TIter last,
+	size_type bc,
+	const hasher& hash,
+	const key_equal& equal,
+	const allocator_type& alloc
+) : mSize{std::distance(first, last)}, mBuckets{mSize}, mAlloc{alloc}, mMap{mAlloc.allocate(mBuckets)},
+    mHash{hash}, mEq{equal}, mLoadFactor{DEFAULT_LOAD_FACTOR} { insert_base(first, last); }
+	
+	
+template <TKey, TType, THash, TKeyEq, TAlloc>
+template <typename TIter>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(
+	TIter first,
+	TIter last,
+	size_type bc,
+	const allocator_type& alloc
+) : mSize{std::distance(first, last)}, mBuckets{bc}, mAlloc{alloc},
+    mMap{mAlloc.allocate(mBuckets)}, mHash{hash}, mEq{equal}, mLoadFactor{DEFAULT_LOAD_FACTOR} 
+	{ insert_base(first, last); }
+	
+	
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(const unordered_map& other)
+: mSize{other.mSize}, mBuckets{other.mBuckets}, mAlloc{other.mAlloc}, mMap{mAlloc.allocate(mBuckets)},
+  mHash{other.mHash}, mEq{other.mEq}, mLoadFactor{other.mLoadFactor}
+	{ insert_base(other.begin(), other.end()); }
+	
+	
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(const unordered_map& other, const allocator_type& alloc)
+: mSize{other.mSize}, mBuckets{other.mBuckets}, mAlloc{alloc}, mMap{mAlloc.allocate(mBuckets)},
+  mHash{other.mHash}, mEq{other.mEq}, mLoadFactor{other.mLoadFactor}
+	{ insert_base(other.begin(), other.end()); }
+	
+
+/// TODO
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(unordered_map&& other)
+: mSize{other.mSize}, mBuckets{other.mBuckets}, mAlloc{other.mAlloc}, mMap{mAlloc.allocate(mBuckets)},
+  mHash{other.mHash}, mEq{other.mEq}, mLoadFactor{other.mLoadFactor}
+	{ insert_base(other.begin(), other.end()); }
+	
+	
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(unordered_map&& other, const allocator_type& alloc)
+: mSize{other.mSize}, mBuckets{other.mBuckets}, mAlloc{alloc}, mMap{mAlloc.allocate(mBuckets)},
+  mHash{other.mHash}, mEq{other.mEq}, mLoadFactor{other.mLoadFactor}
+	{ insert_base(other.begin(), other.end()); }
+	
+/// END TODO
+
 
 } // end namespace ari
 
