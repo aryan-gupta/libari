@@ -43,13 +43,14 @@ public:
 	// using const_local_iterator = 
 	using node_type            = ump_node<key_type, mapped_type>;
 	// using insert_return_type   =
+	using ratio_type           = float;
 	
 	unordered_map();
 	
 	explicit unordered_map(
 		size_type bucket_count,
-		const hasher& hash = hasher{},
-		const key_equal& equal = key_equal{},
+		const hasher& hash          = hasher{},
+		const key_equal& equal      = key_equal{},
 		const allocator_type& alloc = allocator_type{}
 	);
 	
@@ -60,18 +61,14 @@ public:
 	template <typename TIter>
 	unordered_map(
 		TIter first, TIter last,
-		size_type bucket_count = DEFAULT_BUCKET_COUNT,
-		const hasher& hash = hasher{},
-		const key_equal& equal = key_equal{},
+		size_type bucket_count      = DEFAULT_BUCKET_COUNT,
+		const hasher& hash          = hasher{},
+		const key_equal& equal      = key_equal{},
 		const allocator_type& alloc = allocator_type{}
 	);
 	
-	template <typename TIter>
-	unordered_map(TIter first, TIter last, size_type bucket_count, const allocator_type& alloc);
-	
-	template <typename TIter>
-	unordered_map(TIter first, TIter last, size_type bucket_count, const hasher& hash, const allocator_type& alloc);
-	
+	template <typename TIter> unordered_map(TIter first, TIter last, size_type bucket_count, const allocator_type& alloc);
+	template <typename TIter> unordered_map(TIter first, TIter last, size_type bucket_count, const hasher& hash, const allocator_type& alloc);
 	unordered_map(const unordered_map& other);
 	unordered_map(const unordered_map& other, const allocator_type& alloc);
 	unordered_map(unordered_map&& other);
@@ -79,34 +76,104 @@ public:
 	
 	unordered_map(
 		std::initializer_list<value_type> init,
-		size_type bucket_count = /*implementation-defined*/,
-		const hasher& hash = hasher{},
-		const key_equalual& equal = key_equalual{},
-		const allocator_type& alloc = allocator_type{}
+		size_type bucket_count                   = DEFAULT_BUCKET_COUNT,
+		const hasher& hash                       = hasher{},
+		const key_equalual& equal                = key_equalual{},
+		const allocator_type& alloc              = allocator_type{}
 	);
 
-
-	unordered_map(
-		std::initializer_list<value_type> init,
-		size_type bucket_count,
-		const allocator_type& alloc
-	);
-
-
-	unordered_map(
-		std::initializer_list<value_type> init,
-		size_type bucket_count,
-		const hasher& hash,
-		const allocator_type& alloc
-	);
+	unordered_map(std::initializer_list<value_type> init, size_type bucket_count, const allocator_type& alloc);
+	unordered_map(std::initializer_list<value_type> init, size_type bucket_count, const hasher& hash, const allocator_type& alloc);
 	
 	~unordered_map();
+	
+	unordered_map& operator=(const unordered_map& other);
+	unordered_map& operator=(unordered_map&& other);
+	unordered_map& operator=(std::initializer_list<value_type> ilist);
+	
+	allocator_type get_allocator() const;
+	
+	iterator begin();
+	iterator end();
+	const_iterator begin() const; 
+	const_iterator end() const;
+	const_iterator cbegin() const;
+	const_iterator cend() const;
+	
+	bool empty() const;
+	size_type size() const;
+	size_type max_size() const;
+	
+	void clear();
+	
+	// insert
+	std::pair<iterator, bool> insert(cont_reference val);
+	template <typename P> std::pair<iterator, bool> insert(P&& val);
+	std::pair<iterator, bool> insert(value_type&& val);
+	iterator insert(const_iterator hint, const_reference val);
+	template <typename P> iterator insert(const_iterator hint, value_type&& val);	
+	iterator insert(const_iterator hint, value_type&& val);
+	template <typename TIter> void insert(TIter first, TIter last);
+	void insert(std::initializer_list<value_type> ilist);
+	insert_return_type insert(node_type&& nh);
+	iterator insert(const_iterator hint, node_type&& nh);
+	
+	// insert_or_assign
+	template <typename M> std::pair<iterator, bool> insert_or_assign(const key_type& k, M&& obj);
+	template <typename M> std::pair<iterator, bool> insert_or_assign(key_type&& k, M&& obj);
+	template <typename M> std::pair<iterator, bool> insert_or_assign(const_iterator hint, const key_type& k, M&& obj);
+	template <typename M> std::pair<iterator, bool> insert_or_assign(const_iterator hint, key_type&& k, M&& obj);
+	
+	// emplace
+	template <typename... TArgs> std::pair<iterator, bool> emplace(TArgs&&... args);
+	template <typename... TArgs> std::pair<iterator, bool> emplace_hint(const_iterator hint, TArgs&&... args);
+	template <typename... TArgs> std::pair<iterator, bool> try_emplace(const key_type& k, TArgs&&... args);
+	template <typename... TArgs> std::pair<iterator, bool> try_emplace(key_type&& k, TArgs&&... args);
+	template <typename... TArgs> std::pair<iterator, bool> try_emplace(const_iterator hint, const key_type& k, TArgs&&... args);
+	template <typename... TArgs> std::pair<iterator, bool> try_emplace(const_iterator hint, key_type&& k, TArgs&&... args);
+	
+	// erase
+	iterator erase(const_iterator pos);
+	iterator erase(const_iterator first, const_iterator last);
+	iterator erase(const key_type& key);
+	
+	void swap(unordered_map& other);
+	
+	node_type extract(const_iterator pos);
+	node_type extract(const key_type& k);
+	
+	template <typename THash2, typename TKeyEq2> void merge(const ari::unordered_map<TKey, TType, THash2, TKeyEq2, TAlloc>& source);
+	template <typename THash2, typename TKeyEq2> void merge(ari::unordered_map<TKey, TType, THash2, TKeyEq2, TAlloc>&& source);
+	// will do when we code a multimap
+	// template <typename THash2, typename TKeyEq2> void merge(const ari::unordered_multimap<TKey, TType, THash2, TKeyEq2, TAlloc>& source);
+	// template <typename THash2, typename TKeyEq2> void merge(ari::unordered_multimap<TKey, TType, THash2, TKeyEq2, TAlloc>&& source);
+	
+	// bucket interface
+	local_iterator begin(size_type n);
+	const_local_iterator begin(size_type n) const;
+	const_local_iterator cbegin(size_type n) const;
+	local_iterator end(size_type n);
+	const_local_iterator end(size_type n) const;
+	const_local_iterator cend(size_type n) const;
+	size_type bucket_count() const;
+	size_type max_bucket_count() const;
+	size_type bucket_size(size_type n) const;
+	size_type bucket(const key_type& key) const;
+	
+	ratio_type load_factor() const;
+	ratio_type max_load_factor() const;
+	void max_load_factor(float nlf);
+	void rehash(size_type count);
+	void reserve(size_type count);
+	hasher hash_function() const;
+	key_equal key_eq() const;	
 	
 private:
 	using node_allocator_type = typename allocator_type::rebind<node_type>::other;
 	using node_type_pointer   = typename std::allocator_traits<node_allocator_type>::pointer;
 	
 	static const size_type DEFAULT_BUCKET_COUNT = 10;
+	static const ratio_type DEFAULT_LOAD_FACTOR = 1.0;
 	
 	node_allocator_type mAlloc;
 	node_type_pointer mMap;
@@ -114,6 +181,7 @@ private:
 	size_type mNumSize;
 	hasher mHash;
 	key_equal mEq;
+	ratio_type mLoadFactor;
 	
 };
 
