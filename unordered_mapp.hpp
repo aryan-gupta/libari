@@ -100,6 +100,8 @@ public:
 		const allocator_type& alloc
 	);
 	
+	~unordered_map();
+	
 private:
 	using node_allocator_type = typename allocator_type::rebind<node_type>::other;
 	using node_type_pointer   = typename std::allocator_traits<node_allocator_type>::pointer;
