@@ -48,27 +48,27 @@ public:
 	unordered_map();
 	
 	explicit unordered_map(
-		size_type bucket_count,
+		size_type bc,
 		const hasher& hash          = hasher{},
 		const key_equal& equal      = key_equal{},
 		const allocator_type& alloc = allocator_type{}
 	);
 	
-	unordered_map(size_type bucket_count, const allocator_type& alloc);
-	unordered_map(size_type bucket_count, const hasher& hash, const allocator_type& alloc);
+	unordered_map(size_type bc, const allocator_type& alloc);
+	unordered_map(size_type bc, const hasher& hash, const allocator_type& alloc);
 	explicit unordered_map(const allocator_type& alloc);
 	
 	template <typename TIter>
 	unordered_map(
 		TIter first, TIter last,
-		size_type bucket_count      = DEFAULT_BUCKET_COUNT,
+		size_type bc                = DEFAULT_BUCKET_COUNT,
 		const hasher& hash          = hasher{},
 		const key_equal& equal      = key_equal{},
 		const allocator_type& alloc = allocator_type{}
 	);
 	
-	template <typename TIter> unordered_map(TIter first, TIter last, size_type bucket_count, const allocator_type& alloc);
-	template <typename TIter> unordered_map(TIter first, TIter last, size_type bucket_count, const hasher& hash, const allocator_type& alloc);
+	template <typename TIter> unordered_map(TIter first, TIter last, size_type bc, const allocator_type& alloc);
+	template <typename TIter> unordered_map(TIter first, TIter last, size_type bc, const hasher& hash, const allocator_type& alloc);
 	unordered_map(const unordered_map& other);
 	unordered_map(const unordered_map& other, const allocator_type& alloc);
 	unordered_map(unordered_map&& other);
@@ -76,14 +76,14 @@ public:
 	
 	unordered_map(
 		std::initializer_list<value_type> init,
-		size_type bucket_count                   = DEFAULT_BUCKET_COUNT,
-		const hasher& hash                       = hasher{},
-		const key_equalual& equal                = key_equalual{},
-		const allocator_type& alloc              = allocator_type{}
+		size_type bc                            = DEFAULT_BUCKET_COUNT,
+		const hasher& hash                      = hasher{},
+		const key_equalual& equal               = key_equalual{},
+		const allocator_type& alloc             = allocator_type{}
 	);
 
-	unordered_map(std::initializer_list<value_type> init, size_type bucket_count, const allocator_type& alloc);
-	unordered_map(std::initializer_list<value_type> init, size_type bucket_count, const hasher& hash, const allocator_type& alloc);
+	unordered_map(std::initializer_list<value_type> init, size_type bc, const allocator_type& alloc);
+	unordered_map(std::initializer_list<value_type> init, size_type bc, const hasher& hash, const allocator_type& alloc);
 	
 	~unordered_map();
 	
