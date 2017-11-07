@@ -236,49 +236,58 @@ list<TType, TAlloc>::list(std::initializer_list<value_type> init)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{}
 	{ mTail = insert_base(mHead, init.begin(), init.end()); }
 	
-	node_pointer rem = mHead;
-	mHead = mHead->next;
-	delete rem;
-	mHead->prev = nullptr;
 	
-	mSize--;
-	if(mSize == 0)
-		mTail = nullptr;
+template <typename TType, TAlloc> 
+list<TType, TAlloc>::~list() { clear(); }
+
+
+template <typename TType, TAlloc> 
+auto list<TType, TAlloc>::begin() -> iterator
+	{ return iterator{mHead}; }
+
+
+template <typename TType, TAlloc> 
+auto list<TType, TAlloc>::end() -> iterator
+	{ return iterator{mTail}; }
+
+
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::clear()
+	{ erase_base(mHead, mTail); }
+
+
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::push_back(const_reference val)
+	{ insert_base(mTail, val); }
+
+
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::push_front(const_reference val)
+	{ insert_base(mHead, val); }
+
+
+template <typename TType, TAlloc> 
+void list<TType, TAlloc>::pop_back() {
+	if(empty()) throw std::out_of_range("No elements to remove");
+	erase_base(mTail);
 }
 
 
 template <typename TType, TAlloc> 
-void list<TType, TAlloc>::insert(size_type idx, const TType& val) {
-	if(idx > mSize)
-		throw std::out_of_range("Supplied index was out of range");
-	
-	if       (idx == 0) {
-		push_front(val);
-	} else if(idx == mSize) {
-		push_back(val);
-	} else {
-		node_pointer current = mHead;
-		
-		while(idx --> 0)
-			current = current->next;
-		
-		node_pointer newPrev = current->prev;
-		current->prev = new node_type{newPrev, val, current};
-		newPrev->next = current->prev;
-		
-		mSize++;
-	}
+void list<TType, TAlloc>::pop_front() {
+	if(empty()) throw std::out_of_range("No elements to remove");
+	erase_base(mHead);
 }
 
 
 template <typename TType, TAlloc> 
-void list<TType, TAlloc>::insert(const list<TType, TAlloc>::iterator it, const TType& val) {
-	node_pointer current = it.getnode_type();
-	node_pointer newPrev = current->prev;
-	
-	current->prev = new node_type{newPrev, val, current};
-	
-	mSize++;
+void list<TType, TAlloc>::insert(iterator it, const_reference val) {
+	// the reason we can do const_cast is because even though we might
+	// do list<const T> the node is NOT a const only the data is. 
+	// however, if we do const_cast on ari::vector<const T>
+	// we will cause undefined behavior because we are removeing the 
+	// const on the actual data (which is const). 
+	insert_base(const_cast<node_pointer>(it.base()), val);
 }
 
 
@@ -313,31 +322,8 @@ void list<TType, TAlloc>::remove(const TType& val) {
 
 
 template <typename TType, TAlloc> 
-size_type list<TType, TAlloc>::size() const {
-	return mSize;
-}
-
-
-template <typename TType, TAlloc> 
-const TType& list<TType, TAlloc>::operator[](size_type idx) const {
-	node_pointer current = mHead;
-	
-	while(idx --> 0)
-		current = current->next;
-	
-	return current->data;
-}
-
-
-template <typename TType, TAlloc> 
-TType& list<TType, TAlloc>::operator[](size_type idx) {
-	node_pointer current = mHead;
-	
-	while(idx --> 0)
-		current = current->next;
-	
-	return current->data;
-}
+size_type list<TType, TAlloc>::size() const
+	{ return mSize; }
 
 } // end namespace ari
 
