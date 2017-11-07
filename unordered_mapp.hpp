@@ -286,6 +286,43 @@ unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::unordered_map(unordered_map&&
 	
 /// END TODO
 
+template <TKey, TType, THash, TKeyEq, TAlloc>
+unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::empty() const { return mSize == 0; }
+
+
+template <TKey, TType, THash, TKeyEq, TAlloc>
+auto unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::size() const -> size_type { return mSize; }
+
+
+template <TKey, TType, THash, TKeyEq, TAlloc>
+auto unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::max_size() const -> size_type 
+	{ return std::numeric_limits<size_type>::max(); }
+	
+
+template <TKey, TType, THash, TKeyEq, TAlloc>
+void unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::clear() {
+	for (size_type ii = 0; ii < mBuckets; ++ii) {
+		node_pointer current = mMap[ii];
+		while (current != nullptr) {
+			node_pointer tmp = current->next;
+			mAlloc.deallocate(current, 1);
+			current = tmp;
+		}
+	}
+}
+
+
+template <TKey, TType, THash, TKeyEq, TAlloc>
+void unordered_map<TKey, TType, THash, TKeyEq, TAlloc>::insert(const_reference val) {
+	size_type idx = mHash(val) % mBuckets;
+	
+	
+	
+	if (mMap[idx] == nullptr)
+}
+
+
+
 
 } // end namespace ari
 
