@@ -1,7 +1,7 @@
 
 
-#ifndef ARI_REVERSE_ITERATOR_H
-#define ARI_REVERSE_ITERATOR_H
+#ifndef ARI_REVERSE_ITERATOR_HPP
+#define ARI_REVERSE_ITERATOR_HPP
 
 #include <cstddef>
 #include <iterator>
@@ -49,7 +49,8 @@ public:
 	reverse_iterator(const reverse_iterator<TOther>& it)
 		: mCurrent{static_cast<TIter>(it.base())} { /* No Code */ }
 		
-	reverse_iterator& operator=(const reverse_iterator& it) const { mCurrent = it.mCurrent; }
+	reverse_iterator& operator=(const reverse_iterator& it) const
+		{ mCurrent = it.mCurrent; return *this; }
 	
 	/// @return a reference to the this, just incremented by one
 	reverse_iterator& operator++() { 
@@ -155,4 +156,4 @@ inline typename reverse_iterator<TIter>::difference_type operator-(
 
 } // end namespace ari
 
-#endif // ARI_REVERSE_ITERATOR_H defined
+#endif // ARI_REVERSE_ITERATOR_HPP defined
