@@ -15,10 +15,20 @@
  * =============================================================================
  */
 
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
+#include <iostream>
+using namespace std; 
+ 
+int pre() {
+	int dat = 5;
+	return ++dat;
+}
 
-
-int main(int argc, char* argv[]);
-
-#endif // MAIN_H_INCLUDED
+int post() {
+	int dat = 5;
+	return dat++;
+}
+ 
+int main() {
+	cout << pre() << endl;
+	cout << post() << endl;
+}
