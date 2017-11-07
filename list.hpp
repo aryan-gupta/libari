@@ -58,7 +58,7 @@ public:
 	explicit list(const allocator_type& alloc);
 	list(size_type count, const_reference val, const allocator_type& alloc = allocator_type{});
 	list(size_type count);
-	list(size_type count, const_reference val, const allocator_type& alloc);
+	list(size_type count, const allocator_type& alloc = allocator_type{});
 	template <typename TIter> list(TIter begin, TIter end, const allocator_type& alloc = allocator_type{});
 	list(const list& other);
 	list(const list& other, const allocator_type& alloc);
@@ -177,153 +177,64 @@ private:
 // IMPLEMENTATION
 
 template <typename TType, TAlloc> 
-list<TType, TAlloc>::list() {
-	mHead = nullptr;
-	mTail = nullptr;
-	mSize = 0;
-}
+list<TType, TAlloc>::list()
+: mAlloc{}, mHead{}, mTail{}, mSize{} { /* No Code */ }
 
 
 template <typename TType, TAlloc> 
-list<TType, TAlloc>::list(const list& other) {
-	mHead = nullptr;
-	mSize = 0;
-	
-	if(other.size() > 0) {
-		mHead = new node_type{nullptr, other[0], nullptr};
-		mSize++;
-	}
-	
-	node_pointer current = mHead, *prev = nullptr;
-	
-	for(size_type i = 1; i < other.size(); ++i) {
-		prev = current;
-		current = new node_type{prev, other[i], nullptr};
-		prev->next = current;
-		
-		mSize++;
-	}
-	
-	mTail = current;
-}
+list<TType, TAlloc>::list(const allocator_type& alloc)
+: mAlloc{alloc}, mHead{}, mTail{}, mSize{} { /* No Code */ }
 
 
 template <typename TType, TAlloc> 
-list<TType, TAlloc>::list(const size_type size, const TType& val) {
-	mHead = nullptr;
-	mSize = 0; /// @todo make one statement later rather than incrementing everytime
-	
-	if(size > 0) {
-		mHead = new node_type{nullptr, val, nullptr};
-		mSize++;
-	}
-	
-	node_pointer current = mHead, *prev = nullptr;
-	
-	for(size_type i = 0; i < size; ++i) {
-		prev = current;
-		current = new node_type{prev, val, nullptr};
-		prev->next = current;
-		
-		mSize++;
-	}
-	
-	mTail = current;
-}
-
-template <typename TType, TAlloc>
-template <typename TIter, typename>
-list<TType, TAlloc>::list(TIter&& begin, TIter&& end) {
-	mHead = nullptr;
-	mSize = 0;
-	
-	if(std::distance(begin, end) > 0) {
-		mHead = new node_type{nullptr, *begin++, nullptr};
-		mSize++;
-	}
-	
-	node_pointer current = mHead, *prev = nullptr;
-	
-	while(begin != end) {
-		prev = current;
-		current = new node_type{prev, *begin++, nullptr};
-		prev->next = current;
-		
-		mSize++;
-	}
-	
-	mTail = current;
-}
+list<TType, TAlloc>::list(size_type count, const_reference val, const allocator_type& alloc)
+: mAlloc{alloc}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, val); }
 
 
 template <typename TType, TAlloc> 
-typename list<TType, TAlloc>::iterator list<TType, TAlloc>::begin() const {
-	return iterator(mHead);
-}
+list<TType, TAlloc>::list(size_type count)
+: mAlloc{}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, value_type{}); }
 
 
 template <typename TType, TAlloc> 
-typename list<TType, TAlloc>::iterator list<TType, TAlloc>::end() const {
-	return iterator(mTail);
-}
+list<TType, TAlloc>::list(size_type count, const allocator_type& alloc)
+: mAlloc{alloc}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, value_type{}); }
 
 
 template <typename TType, TAlloc> 
-void list<TType, TAlloc>::clear() {
-	while(mHead != nullptr) {
-		node_pointer rem = mHead;
-		mHead = mHead->next;
-		delete rem;
-	}
-	mHead = nullptr;
-	mTail = nullptr;
-	
-	mSize = 0;
-}
+template <typename TIter>
+list<TType, TAlloc>::list(TIter begin, TIter end, const allocator_type& alloc);
+: mAlloc{alloc}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, begin, end); }
 
 
 template <typename TType, TAlloc> 
-void list<TType, TAlloc>::push_back(const TType& val) {
-	if(mHead == nullptr && mTail == nullptr)
-		mHead = mTail = new node_type{nullptr, val, nullptr};
-	else
-		mTail = mTail->next = new node_type{mTail, val, nullptr};
-	
-	mSize++;
-}
+list<TType, TAlloc>::list(const list& other)
+: mAlloc{}, mHead{}, mTail{}, mSize{}
+	{ mTail = insert_base(mHead, other.mHead, other.mTail); } // maybe convert to iterators? would remove one copy_base overload
 
 
 template <typename TType, TAlloc> 
-void list<TType, TAlloc>::push_front(const TType& val) {
-	if(mHead == nullptr && mTail == nullptr)
-		mHead = mTail = new node_type{nullptr, val, nullptr};
-	else
-		mHead = mHead->prev = new node_type{nullptr, val, mHead};
-	
-	mSize++;
-}
+list<TType, TAlloc>::list(const list& other, const allocator_type& alloc)
+: mAlloc{alloc}, mHead{}, mTail{}, mSize{}
+	{ mTail = insert_base(mHead, other.mHead, other.mTail); }
 
 
 template <typename TType, TAlloc> 
-void list<TType, TAlloc>::pop_back() {
-	if(mSize == 0)
-		throw std::out_of_range("No elements to remove");
-	
-	node_pointer rem = mTail;
-	mTail = mTail->prev;
-	delete rem;
-	mTail->next = nullptr;
-	
-	mSize--;
-	if(mSize == 0) /// @todo Check mSize is 1 condition (do we need to change mTail to nullptr?)
-		mHead = nullptr;
-}
+list<TType, TAlloc>::list(list&& other)
+: mAlloc{}, mHead{}, mTail{}, mSize{}
+	{ mTail = insert_base(mHead, other.mHead, other.mTail); }
 
 
 template <typename TType, TAlloc> 
-void list<TType, TAlloc>::pop_front() {
-	if(mSize == 0)
-		throw std::out_of_range("No elements to remove");
+list<TType, TAlloc>::list(list&& other, const allocator_type& alloc)
+: mAlloc{alloc}, mHead{}, mTail{}, mSize{}
+	{ mTail = insert_base(mHead, other.mHead, other.mTail); }
+
+
+template <typename TType, TAlloc> 
+list<TType, TAlloc>::list(std::initializer_list<value_type> init)
+: mAlloc{alloc}, mHead{}, mTail{}, mSize{}
+	{ mTail = insert_base(mHead, init.begin(), init.end()); }
 	
 	node_pointer rem = mHead;
 	mHead = mHead->next;
