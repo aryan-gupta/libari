@@ -170,8 +170,10 @@ public:
 	key_equal key_eq() const;	
 	
 private:
-	using node_allocator_type = typename allocator_type::rebind<node_type>::other;
-	using node_type_pointer   = typename std::allocator_traits<node_allocator_type>::pointer;
+	using node_allocator_type    = typename allocator_type::rebind<node_type>::other;
+	using node_pointer           = typename std::allocator_traits<node_allocator_type>::pointer;
+	using node_pointer_allocator = typename allocator_type::rebind<node_pointer>::other;
+	using node_pointer_array     = typename std::allocator_traits<node_allocator_type>::pointer;
 	
 	template <typename TIter> insert_base(TIter begin, TIter end);
 	
@@ -180,8 +182,9 @@ private:
 	
 	size_type mSize;
 	size_type mBuckets;
-	node_allocator_type mAlloc;
-	node_type_pointer mMap;
+	node_allocator_type mNodeAlloc;
+	node_pointer_allocator mMapAlloc;
+	node_pointer_array mMap;
 	hasher mHash;
 	key_equal mEq;
 	ratio_type mLoadFactor;
