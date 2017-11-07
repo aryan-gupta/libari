@@ -35,6 +35,7 @@ public:
 	using allocator_type       = TAlloc;
 	using reference            = value_type&;
 	using const_reference      = const value_type&;
+	using rvalue_reference     = rvalue_reference;
 	using pointer              = typename std::allocator_traits<allocator_type>::pointer;
 	using const_pointer        = typename std::allocator_traits<allocator_type>::const_pointer;
 	// using iterator             = ForwardIterator
@@ -109,10 +110,10 @@ public:
 	// insert
 	std::pair<iterator, bool> insert(cont_reference val);
 	template <typename P> std::pair<iterator, bool> insert(P&& val);
-	std::pair<iterator, bool> insert(value_type&& val);
+	std::pair<iterator, bool> insert(rvalue_reference val);
 	iterator insert(const_iterator hint, const_reference val);
-	template <typename P> iterator insert(const_iterator hint, value_type&& val);	
-	iterator insert(const_iterator hint, value_type&& val);
+	template <typename P> iterator insert(const_iterator hint, rvalue_reference val);	
+	iterator insert(const_iterator hint, rvalue_reference val);
 	template <typename TIter> void insert(TIter first, TIter last);
 	void insert(std::initializer_list<value_type> ilist);
 	insert_return_type insert(node_type&& nh);
