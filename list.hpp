@@ -22,11 +22,17 @@ namespace ari {
 
 template <typename TType>
 struct node_type {
+	using value_type      = TType;
+	using pointer         = TType*;
+	using difference_type = ptrdiff_t;
+	using reference       = TType&;
+	
+	using node_pointer    = node_type*;
+	
 	node_pointer prev;
-	TType data;
+	value_type   data;
 	node_pointer next;
 };
-
 
 
 template <typename TType, TAlloc, typename TAlloc = std::allocator<TType>>
