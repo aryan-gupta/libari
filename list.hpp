@@ -312,39 +312,36 @@ void list<TType, TAlloc>::insert(iterator it, const_reference val) {
 }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::remove(const TType& val) {
-	node_pointer current = mHead, *rem = nullptr;
-	
-	while(current != nullptr) {
-		if(current->data == val) {
-			rem = current; /// @todo we can shorted this by a line
-			
-			if       (rem == mTail) {
-				mTail = mTail->prev;
-				mTail->next = nullptr;
-			} else if(rem == mHead) {
-				mHead = mHead->next;
-				mHead->prev = nullptr;
-			} else {
-				current->prev->next = current->next;
-				current->next->prev = current->prev;
-			}
-			
-			current = current->next;
-			delete rem;
-			
-			mSize--;
-		} else {
-			current = current->next;
-		}
-	}
+	node_pointer c = mHead;
+	while (c != nullptr)
+		if (c->data == val)
+			erase_base(c);
 }
 
 
-template <typename TType, TAlloc> 
-size_type list<TType, TAlloc>::size() const
-	{ return mSize; }
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::size() const -> size_type	{ return mSize; }
+	
+
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::erase_base(node_pointer pos) -> iterator {
+	if (pos == mTail) {
+		mTail = mTail->prev;
+		mTail->next = nullptr;
+	} else if(pos == mHead) {
+		mHead = mHead->next;
+		mHead->prev = nullptr;
+	} else {
+		pos->prev->next = pos->next;
+		pos->next->prev = pos->prev;
+	}
+	
+	mAlloc.deallocate(pos, 1);
+}
+
+template <>
 
 } // end namespace ari
 
