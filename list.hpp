@@ -35,7 +35,7 @@ struct node_type {
 };
 
 
-template <typename TType, TAlloc, typename TAlloc = std::allocator<TType>>
+template <typename TType, typename TAlloc, typename TAlloc = std::allocator<TType>>
 class list {
 public:
 	using value_type      = TType;
@@ -176,111 +176,132 @@ private:
 
 // IMPLEMENTATION
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list()
 : mAlloc{}, mHead{}, mTail{}, mSize{} { /* No Code */ }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(const allocator_type& alloc)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{} { /* No Code */ }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(size_type count, const_reference val, const allocator_type& alloc)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, val); }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(size_type count)
 : mAlloc{}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, value_type{}); }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(size_type count, const allocator_type& alloc)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, value_type{}); }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 template <typename TIter>
 list<TType, TAlloc>::list(TIter begin, TIter end, const allocator_type& alloc);
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, begin, end); }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(const list& other)
 : mAlloc{}, mHead{}, mTail{}, mSize{}
 	{ mTail = insert_base(mHead, other.mHead, other.mTail); } // maybe convert to iterators? would remove one copy_base overload
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(const list& other, const allocator_type& alloc)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{}
 	{ mTail = insert_base(mHead, other.mHead, other.mTail); }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(list&& other)
 : mAlloc{}, mHead{}, mTail{}, mSize{}
 	{ mTail = insert_base(mHead, other.mHead, other.mTail); }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(list&& other, const allocator_type& alloc)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{}
 	{ mTail = insert_base(mHead, other.mHead, other.mTail); }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(std::initializer_list<value_type> init)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{}
 	{ mTail = insert_base(mHead, init.begin(), init.end()); }
 	
 	
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::~list() { clear(); }
 
 
-template <typename TType, TAlloc> 
-auto list<TType, TAlloc>::begin() -> iterator
-	{ return iterator{mHead}; }
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::begin() -> iterator { return iterator{mHead}; }
 
 
-template <typename TType, TAlloc> 
-auto list<TType, TAlloc>::end() -> iterator
-	{ return iterator{mTail}; }
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::end() -> iterator	{ return iterator{nullptr}; }
 
 
-template <typename TType, TAlloc> 
-void list<TType, TAlloc>::clear()
-	{ erase_base(mHead, mTail); }
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::cbegin() const -> const_iterator { return const_iterator{mHead}; }
 
 
-template <typename TType, TAlloc> 
-void list<TType, TAlloc>::push_back(const_reference val)
-	{ insert_base(mTail, val); }
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::cend() const -> const_iterator { return const_iterator{nullptr}; }
 
 
-template <typename TType, TAlloc> 
-void list<TType, TAlloc>::push_front(const_reference val)
-	{ insert_base(mHead, val); }
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::rbegin() -> reverse_iterator { return reverse_iterator{mTail}; }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::rend() -> reverse_iterator { return reverse_iterator{nullptr}; }
+
+
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::crbegin() const -> const_reverse_iterator
+	{ return const_reverse_iterator{mTail}; }
+
+
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::crend() const -> const_reverse_iterator
+	{ return const_reverse_iterator{nullptr}; }
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::clear() { erase_base(mHead, mTail); }
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::push_back(const_reference val) { insert_base(mTail, val); }
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::push_front(const_reference val) { insert_base(mHead, val); }
+
+
+template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::pop_back() {
 	if(empty()) throw std::out_of_range("No elements to remove");
 	erase_base(mTail);
 }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::pop_front() {
 	if(empty()) throw std::out_of_range("No elements to remove");
 	erase_base(mHead);
 }
 
 
-template <typename TType, TAlloc> 
+template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::insert(iterator it, const_reference val) {
 	// the reason we can do const_cast is because even though we might
 	// do list<const T> the node is NOT a const only the data is. 
