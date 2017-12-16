@@ -35,7 +35,7 @@ struct node_type {
 };
 
 
-template <typename TType, typename TAlloc, typename TAlloc = std::allocator<TType>>
+template <typename TType, typename TAlloc = std::allocator<TType>>
 class list {
 public:
 	using value_type      = TType;
@@ -43,6 +43,7 @@ public:
 	using size_type       = size_type;
 	using reference       = value_type&;	
 	using const_reference = const value_type&;
+	using move_reference  = value_type&&;
 	using pointer         = typename std::allocator_traits<allocator_type>::pointer;
 	using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
 	using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
@@ -57,7 +58,7 @@ public:
 	list();
 	explicit list(const allocator_type& alloc);
 	list(size_type count, const_reference val, const allocator_type& alloc = allocator_type{});
-	list(size_type count);
+	explicit list(size_type count);
 	list(size_type count, const allocator_type& alloc = allocator_type{});
 	template <typename TIter> list(TIter begin, TIter end, const allocator_type& alloc = allocator_type{});
 	list(const list& other);
@@ -73,7 +74,7 @@ public:
 	list& operator=(std::initializer_list<value_type> ilst);
 	
 	void assign(size_type count, const_reference val);
-	template <typename TIter> assign(TIter begin, TIter end);
+	template <typename TIter> void assign(TIter begin, TIter end);
 	void assign(std::initializer_list<value_type> ilst);
 	
 	allocator_type get_allocator() const; 
@@ -160,7 +161,7 @@ private:
 	node_pointer insert_base(node_pointer pos, node_pointer obegin, node_pointer oend); // may soon be depreciated
 	template <typename TIter> node_pointer insert_base(node_pointer pos, TIter begin, TIter end);
 	
-	void splice_base(node_pointer pos, node_pointer obegin, node_pointer oend);
+	node_pointer splice_base(node_pointer pos, node_pointer obegin, node_pointer oend);
 	void merge_base(node_pointer obegin, node_pointer oend);
 	
 	node_pointer erase_base(node_pointer pos);
