@@ -614,18 +614,17 @@ void list<TType, TAlloc>::sort(TPred binp) {
 
 template <typename TType, typename TAlloc> 
 auto list<TType, TAlloc>::erase_base(node_pointer pos) -> node_pointer {
-	if (pos == mTail) {
-		mTail = mTail->prev;
-		mTail->next = nullptr;
-	} else if(pos == mHead) {
-		mHead = mHead->next;
-		mHead->prev = nullptr;
-	} else {
-		pos->prev->next = pos->next;
-		pos->next->prev = pos->prev;
-	}
+	pos->prev->next = pos->next;
+	pos->next->prev = pos->prev;
+	
+	auto ret = pos->next;
 	
 	mAlloc.deallocate(pos, 1);
+	
+	return ret;
+}
+
+	
 }
 
 
