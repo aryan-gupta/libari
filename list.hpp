@@ -653,6 +653,18 @@ auto list<TType, TAlloc>::insert_base(node_pointer pos, node_pointer obegin, nod
 }
 
 
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::splice_base(node_pointer pos, node_pointer obegin, node_pointer oend) -> node_pointer {	
+	auto prev = pos->prev;
+	
+	prev->next = obegin;
+	pos->prev = oend->prev;
+	pos->prev->next = pos;
+	
+	obegin->prev->next = oend;
+	oend->prev = obegin->prev;
+	obegin->prev = prev;
+}
 
 
 template <typename TType, typename TAlloc> 
