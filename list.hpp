@@ -679,7 +679,19 @@ auto list<TType, TAlloc>::erase_base(node_pointer pos) -> node_pointer {
 	return ret;
 }
 
+
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::erase_base(node_pointer start, node_pointer end) -> node_pointer {
+	start->prev->next = end;
+	end->prev = start->prev;
 	
+	while (start != end) {
+		auto del = start;
+		start = start->next;
+		mAlloc.deallocate(del, 1);
+	}
+	
+	return end;	
 }
 
 
