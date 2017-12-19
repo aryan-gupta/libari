@@ -566,49 +566,64 @@ void list<TType, TAlloc>::splice(const_iterator pos, list&& other, const_iterato
 
 template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::remove(const TType& val) {
-	node_pointer c = mHead;
-	while (c != nullptr)
+	node_pointer c = mHead->next;
+	while (c != mTail) {
 		if (c->data == val)
-			erase_base(c);
+			c = erase_base(c);
+		else
+			c = c->next;
+	}
 }
 
 
 template <typename TType, typename TAlloc>
 template <typename TPred>
 void list<TType, TAlloc>::remove_if(TPred pred) {
-	
+	node_pointer c = mHead->next;
+	while (c != mTail) {
+		if (pred(c->data))
+			c = erase_base(c);
+		else
+			c = c->next;
+	}
 }
 
 
 template <typename TType, typename TAlloc>
 void list<TType, TAlloc>::reverse() {
-	
+	auto nums = mSize/2;
+	auto begin = begin(), end = end();
+	while (nums --> 0) {
+		std::iter_swap(begin, end);
+	}
 }
 
 
 template <typename TType, typename TAlloc>
 void list<TType, TAlloc>::unique() {
-	
+	sort();
+	std::unique(begin(), end());
 }
 
 
 template <typename TType, typename TAlloc>
 template <typename TPred>
 void list<TType, TAlloc>::unique(TPred binp) {
-	
+	sort();
+	std::unique(begin(), end(), binp);
 }
 
 
 template <typename TType, typename TAlloc>
 void list<TType, TAlloc>::sort() {
-	
+	std::sort(begin(), end());
 }
 
 
 template <typename TType, typename TAlloc>
 template <typename TPred>
 void list<TType, TAlloc>::sort(TPred binp) {
-	
+	std::sort(begin(), end(), binp);
 }
 
 /// @todo fix this to replicate the move insert_base function
