@@ -622,6 +622,7 @@ auto list<TType, TAlloc>::insert_base(node_pointer pos, const_reference val, siz
 		*(pos->next) = val;
 		pos->next->prev = pos;
 		pos = pos->next;
+		++mSize;
 	}
 	
 	pos->next = on;
@@ -634,6 +635,8 @@ auto list<TType, TAlloc>::insert_base(node_pointer pos, value_type&& val) -> nod
 	*n = {pos->prev, std::move(val), pos};
 	
 	pos->prev = pos->prev->next = n;
+	
+	++mSize;
 }
 
 
@@ -647,6 +650,7 @@ auto list<TType, TAlloc>::insert_base(node_pointer pos, node_pointer obegin, nod
 		*(pos->next) = {pos, obegin->data, nullptr};
 		pos = pos->next;
 		obegin = obegin->next;
+		++mSize;
 	}
 	
 	pos->next = on;
@@ -655,7 +659,11 @@ auto list<TType, TAlloc>::insert_base(node_pointer pos, node_pointer obegin, nod
 
 template <typename TType, typename TAlloc> 
 auto list<TType, TAlloc>::splice_base(node_pointer pos, node_pointer obegin, node_pointer oend) -> node_pointer {	
-	auto prev = pos->prev;
+	auto prev = obegin;
+	while (prev != oend)
+		++mSize;
+	
+	prev = pos->prev;
 	
 	prev->next = obegin;
 	pos->prev = oend->prev;
@@ -671,6 +679,7 @@ template <typename TType, typename TAlloc>
 auto list<TType, TAlloc>::erase_base(node_pointer pos) -> node_pointer {
 	pos->prev->next = pos->next;
 	pos->next->prev = pos->prev;
+	--mSize;
 	
 	auto ret = pos->next;
 	
