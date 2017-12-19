@@ -501,6 +501,7 @@ void list<TType, TAlloc>::swap(list& other) {
 }
 
 
+/// @todo research why we need 2 of these, seems redundant
 template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::merge(list& other) {
 	
@@ -528,22 +529,21 @@ void list<TType, TAlloc>::merge(list&& other, TPred cmp) {
 
 
 // splice
+/// @todo research more on what this does exactally 
 template <typename TType, typename TAlloc>
-void list<TType, TAlloc>::splice(const_iterator pos, list& other) {
-	
-}
-
-
-template <typename TType, typename TAlloc>
-void list<TType, TAlloc>::splice(const_iterator pos, list&& other) {
-	
-}
+void list<TType, TAlloc>::splice(const_iterator pos, list& other)
+	{ insert_base(pos, other.mHead->next, other.mTail->prev); }
 
 
 template <typename TType, typename TAlloc>
-void list<TType, TAlloc>::splice(const_iterator pos, list& other, const_iterator it) {
-	
-}
+void list<TType, TAlloc>::splice(const_iterator pos, list&& other)
+	{ splice_base(pos, other.mHead->next, other.mTail->prev); }
+
+
+/// @tod This too. Research what all of these does
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::splice(const_iterator pos, list& other, const_iterator it)
+	{ splice_base(pos, it.base(), it.base()->next); }
 
 
 template <typename TType, typename TAlloc>
