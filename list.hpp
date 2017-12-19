@@ -611,6 +611,49 @@ void list<TType, TAlloc>::sort(TPred binp) {
 	
 }
 
+/// @todo fix this to replicate the move insert_base function
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::insert_base(node_pointer pos, const_reference val, size_type count) -> node_pointer {
+	auto on = pos;
+	pos = pos->prev;
+	
+	while (count --> 0) {
+		pos->next = mAlloc.allocate(1);
+		*(pos->next) = val;
+		pos->next->prev = pos;
+		pos = pos->next;
+	}
+	
+	pos->next = on;
+}
+
+
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::insert_base(node_pointer pos, value_type&& val) -> node_pointer {
+	auto n = mAlloc.allocate(1);
+	*n = {pos->prev, std::move(val), pos};
+	
+	pos->prev = pos->prev->next = n;
+}
+
+
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::insert_base(node_pointer pos, node_pointer obegin, node_pointer oend) -> node_pointer {	
+	auto on = pos;
+	pos = pos->prev;
+	
+	while (obegin != oend) {
+		pos->next = mAlloc.allocate(1);
+		*(pos->next) = {pos, obegin->data, nullptr};
+		pos = pos->next;
+		obegin = obegin->next;
+	}
+	
+	pos->next = on;
+}
+
+
+
 
 template <typename TType, typename TAlloc> 
 auto list<TType, TAlloc>::erase_base(node_pointer pos) -> node_pointer {
