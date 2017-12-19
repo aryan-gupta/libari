@@ -44,27 +44,27 @@ struct node_type {
 template <typename TType, typename TAlloc = std::allocator<TType>>
 class list {
 public:
-	using value_type      = TType;
-	using allocator_type  = TAlloc;
-	using size_type       = size_type;
-	using reference       = value_type&;	
-	using const_reference = const value_type&;
-	using move_reference  = value_type&&;
-	using pointer         = typename std::allocator_traits<allocator_type>::pointer;
-	using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
-	using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
+	using value_type             = TType;
+	using allocator_type         = TAlloc;
+	using size_type              = size_type;
+	using reference              = value_type&;	
+	using const_reference        = const value_type&;
+	using move_reference         = value_type&&;
+	using pointer                = typename std::allocator_traits<allocator_type>::pointer;
+	using const_pointer          = typename std::allocator_traits<allocator_type>::const_pointer;
+	using difference_type        = typename std::allocator_traits<allocator_type>::difference_type;
 	
 private:
-	using node_type            = node_type<value_type>;
-	using node_allocator_type  = typename allocator_type::template rebind<node_type>::other;
-	using node_pointer         = typename std::allocator_traits<node_allocator_type>::pointer;
-	using const_node_pointer   = typename std::allocator_traits<node_allocator_type>::const_pointer;
+	using node_type              = node_type<value_type>;
+	using node_allocator_type    = typename allocator_type::template rebind<node_type>::other;
+	using node_pointer           = typename std::allocator_traits<node_allocator_type>::pointer;
+	using const_node_pointer     = typename std::allocator_traits<node_allocator_type>::const_pointer;
 	
 public:	
-	using iterator             = ari::random_access_iterator<node_pointer>;
-	using const_iterator       = ari::random_access_iterator<const_node_pointer>;
-	using reverse_iterator     = ari::random_access_iterator<const_node_pointer>;
-	using const_reverse_iterator= ari::random_access_iterator<const_node_pointer>;
+	using iterator               = ari::random_access_iterator<node_pointer>;
+	using const_iterator         = ari::random_access_iterator<const_node_pointer>;
+	using reverse_iterator       = ari::random_access_iterator<const_node_pointer>;
+	using const_reverse_iterator = ari::random_access_iterator<const_node_pointer>;
 	
 	
 	list();
