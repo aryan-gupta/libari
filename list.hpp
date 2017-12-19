@@ -612,6 +612,7 @@ void list<TType, TAlloc>::sort(TPred binp) {
 }
 
 /// @todo fix this to replicate the move insert_base function
+/// @todo see if we can prevent code duplication on the while loop
 template <typename TType, typename TAlloc> 
 auto list<TType, TAlloc>::insert_base(node_pointer pos, const_reference val, size_type count) -> node_pointer {
 	auto on = pos;
@@ -650,6 +651,24 @@ auto list<TType, TAlloc>::insert_base(node_pointer pos, node_pointer obegin, nod
 		*(pos->next) = {pos, obegin->data, nullptr};
 		pos = pos->next;
 		obegin = obegin->next;
+		++mSize;
+	}
+	
+	pos->next = on;
+}
+
+
+template <typename TType, typename TAlloc> 
+template <typename TIter>
+auto list<TType, TAlloc>::insert_base(node_pointer pos, TIter begin, TIter end) {
+	auto on = pos;
+	pos = pos->prev;
+	
+	while (begin != end) {
+		pos->next = mAlloc.allocate(1);
+		*(pos->next) = {pos, obegin->data, nullptr};
+		pos = pos->next;
+		++begin;
 		++mSize;
 	}
 	
@@ -702,7 +721,6 @@ auto list<TType, TAlloc>::erase_base(node_pointer start, node_pointer end) -> no
 	
 	return end;	
 }
-
 
 } // end namespace ari
 
