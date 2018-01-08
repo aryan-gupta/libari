@@ -504,13 +504,13 @@ void list<TType, TAlloc>::swap(list& other) {
 /// @todo research why we need 2 of these, seems redundant
 template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::merge(list& other) {
-	
+	merge_base(other.mHead->next, other.mTail);
 }
 
 
 template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::merge(list&& other) {
-	
+	merge_base(other.mHead->next, other.mTail);
 }
 
 
@@ -681,7 +681,7 @@ auto list<TType, TAlloc>::insert_base(node_pointer pos, TIter begin, TIter end) 
 	
 	while (begin != end) {
 		pos->next = mAlloc.allocate(1);
-		*(pos->next) = {pos, obegin->data, nullptr};
+		*(pos->next) = {pos, *begin, nullptr};
 		pos = pos->next;
 		++begin;
 		++mSize;
@@ -706,6 +706,17 @@ auto list<TType, TAlloc>::splice_base(node_pointer pos, node_pointer obegin, nod
 	obegin->prev->next = oend;
 	oend->prev = obegin->prev;
 	obegin->prev = prev;
+}
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::merge_base(node_pointer obegin, node_pointer oend) {
+	auto begin = mHead->next;
+	while (begin != mTail and obegin != oend) {
+		if (obegin->data < begin->data) {
+			begin->prev->next = ;
+		}
+	}
 }
 
 
