@@ -6,36 +6,40 @@
 #include <any> // for std::bad_any_cast
 
 namespace ari {
+// namespace ari is a namespace I have been
+// using for alot of my code where I implement
+// my 'own' std:: stuctures and algorithms
+
+
+struct any_base {
+	virtual ~any_base() = default;
+	virtual any_base* clone() const = 0;
+	virtual const std::type_info& type_id() const = 0;
+};
+
+
+template <typename T>
+struct any_data : public any_base {
+	using value_type = T;
+	
+	any_data(const value_type& vt) : mData{ vt } {}
+	
+	virtual ~any_data() = default;
+	virtual const std::type_info& type_id() const { return typeid(value_type); }
+	virtual any_data* clone() const { return new any_data{ mData }; }
+	
+	value_type mData;
+};
 
 
 /// @brief A class that can hold one of any type of data
+/**
+	A lot of this implementation was used from
+	http://www.two-sdg.demon.co.uk/curbralan/papers/ValuedConversions.pdf
+	This is a good read if you want to better understand what's going on here
+*/
+
 class any {
-	using heap_pointer = void*;
-	using stack_storage = aligned_storage<sizeof(mStorage), alignof(void*)>::type;
-	
-	// if you are those people that read whats in the system headers, you will realize that
-	// this is exactally how GCC implements std::any
-	enum class OP { ACCESS, TYPEID, CLONE, DESTROY, MOVE };
-	union ManageArg {
-		heap_pointer mObj;
-		const std::type_info* mType;
-		any* mAny;
-	};
-	
-	/// Private members
-	void (*mManage) (Op oper, any& a, ManageArg& m); // function pointer -- return void pointer
-	union {
-		heap_pointer mPointer;
-		stack_storage mStorage;
-	} 
-	
-	// This 'function' alows us to choose between whether we should use SIO or an heap object
-	// if our type T fits into our union, then we want to use stack (use_stack is true)
-	template <
-		typename T,
-		bool F = (sizeof(T) < sizeof(heap_pointer)) and (alignof(T) <= alignof(heap_pointer))
-	> using use_stack = std::integral_constant<bool, F>;
-	
 public:
 	/// @brief A list of the friend classes, used so we can cast it to the proper type
 	template <typename T> friend T* any_cast(any* a);
@@ -45,27 +49,16 @@ public:
 	template <typename T> friend T any_cast(any&& a);
 	
 	/// @brief Creates an empty any 
-	constexpr any() noexcept : mManage{}, mStorage{} {}
-	
+	constexpr any() noexcept : mStorage{ nullptr }, mGet{ nullptr } {}
 	
 	/// @brief Copies constructs a another any
 	/// @param other The any type to copy
-	any(const any& other) : mManage{ other.mManage }, mStorage{} {
-		if (!mManage) return;
-		
-		ManageArg arg;
-		arg.mAny = this;
-		mManage(OP::CLONE, other, arg);
+	any(const any& other) : mStorage{ other.mStorage->clone() }, mGet{ other.mGet } {}
+	
+	any(any&& other) noexcept : mStorage{ other.mStorage }, mGet { other.mGet } {
+		other.mStorage = nullptr;
+		other.mGet = nullptr;
 	}
-	
-	
-	any(any&& other) noexcept : mManage { other.mManage } {
-		if (!mManage) return;
-		
-		ManageArg arg;
-		
-	}
-	
 	
 	/**
 		This function firsts decays T, this is mostly used if we want to 
@@ -76,7 +69,7 @@ public:
 		typename T,
 		typename D = std::decay_t<T>,
 		std::enable_if_t<!std::is_same_v<std::decay_t<T>, ari::any>>* = nullptr
-	> any(T&& d) : mStorage{ new data<T>(std::forward<T>(d)) }, mManage{ &<D> } {}
+	> any(T&& d) : mStorage{ new data<T>(std::forward<T>(d)) }, mGet{ &get_pointer<D> } {}
 
 	~any() { reset(); }
 	
@@ -88,20 +81,20 @@ public:
 	}
 	
 	void reset() noexcept {
-		if (!mManage) return;
+		if (!mGet) return;
 		
 		delete mStorage;
-		mManage = nullptr;
+		mGet = nullptr;
 		mStorage = nullptr;
 	}
 	
 	void swap(any& other) noexcept {
 		std::swap(mStorage, other.mStorage);
-		std::swap(mManage, other.mManage);
+		std::swap(mGet, other.mGet);
 	}
 	
 	bool has_value() const noexcept {
-		return mManage != nullptr;
+		return mGet != nullptr;
 	}
 	
 	const std::type_info& type() const noexcept {
@@ -111,7 +104,7 @@ public:
 	any& operator=(const any& rhs) {
 		reset();
 		mStorage = rhs.mStorage->clone();
-		mManage = rhs.mManage;
+		mGet = rhs.mGet;
 		return *this;
 	}
 	
@@ -127,13 +120,16 @@ public:
 	> any& operator=(T&& rhs) {
 		reset();
 		mStorage = new data<T>(std::forward<T>(rhs));
-		mManage = &get_pointer<D>;
+		mGet = &get_pointer<D>;
 		return *this;
 	}
 	
 private:	
-	// I was really hoping that I didn't have to copy other people's code
-	// but the GCC implementation is soooo good
+	using base = any_base;
+	template <typename T> using data = any_data<T>;
+	
+	base* mStorage;
+	void* (*mGet) (const any& a); // function pointer -- return void pointer 
 	
 	/// After looking through GCC's implementation of std::any, they use a
 	/// cool approch that I will try to emplain below. 
@@ -155,65 +151,10 @@ private:
 		function for it
 	*/
 	template <typename T>
-	static void manage_pointer(Op oper, any& a, ManageArg& m) {
-		auto ptr = static_cast<T*>(a.mPointer);
-		switch (oper) {
-			case ACCESS: // returns the data from \param a storing it in \param m
-				m.mObj = ptr;
-			return;
-			
-			case TYPEID: // returns the typeid of \param a and stores it in \param m
-				// This feels really wrong taking the addess of an expiring value, need to research
-				m.mType = &typeid(T);
-			return;
-			
-			case CLONE: // clone \param a into \param m (source, dest)
-				m.mAny->mPointer = new T{*ptr};
-				m.mAny->mManage = a.mManage;
-			return;
-			
-			case DESTROY: // destroys \param a
-				delete ptr;
-			return;
-			
-			case MOVE: // moves \param a to \param m
-				m.mAny->mPointer = ptr;
-				m.mAny->mManage = a.mManage;
-				a = any{};
-			return;
-		}
+	static void* get_pointer(const any& a) {
+		auto p = static_cast<any_data<T>*>(a.mStorage);
+		return static_cast<T*>(&p->mData);
 	}
-	
-	template <typename T>
-	static void manage_small_item_opt(Op oper, any& a, ManageArg& m) {
-		auto ptr = reinterpret_cast<T*>(&a.mStorage);
-		switch (oper) {
-			case ACCESS:
-				m.mObj = ptr;
-			return;
-			
-			case TYPEID:
-				// This feels really wrong taking the addess of an expiring value, need to research
-				m.mType = &typeid(T);
-			return;
-			
-			case CLONE:
-				m.mAny->mPointer = new T{*ptr};
-				m.mAny->mManage = a.mManage;
-			return;
-			
-			case DESTROY:
-				ptr->~T(); // call destructor
-			return;
-			
-			case MOVE:
-				
-			return;
-		}
-	}
-	
-	template <typename T>
-	static void create_small_item_opt()
 	
 }; // end class any
 
@@ -224,8 +165,8 @@ const T* any_cast(const any* a) {
 	using D = std::decay_t<T>;
 	
 	if (!a)	return nullptr;
-	if constexpr (!std::is_copy_constructible_v<std::decay_t<T>>) return nullptr;
-	if (a->mManage != &any::get_pointer<D>) return nullptr; 
+	// if constexpr (!std::is_copy_constructible_v<std::decay_t<T>>) return nullptr;
+	if (a->mGet != &any::get_pointer<D>) return nullptr; 
 	
 	// Ok alot is happening on this line. First we take the ari::any private pointer (any_base*)
 	// and we cast it to a derived class any_data<T> pointer.
@@ -238,26 +179,24 @@ const T* any_cast(const any* a) {
 }
 
 template <typename T>
+T* any_cast(any* a) {
+	using D = std::decay_t<T>;
+	
+	if (!a)	return nullptr;
+	if constexpr (!std::is_copy_constructible_v<std::decay_t<T>>) return nullptr;
+	if (a->mGet != &any::get_pointer<D>) return nullptr; 
+	
+	auto p = static_cast<any_data<T>*>(a->mStorage);
+	return static_cast<T*>(&p->mData);
+}
+
+template <typename T>
 const T any_cast(const any& a) {
 	// See http://en.cppreference.com/w/cpp/utility/any/any_cast
 	// for why we did any_cast_t<T>
 	auto p = any_cast<any_cast_t<T>>(&a);
 	if (!p) throw std::bad_any_cast{};
 	return static_cast<T>(*p);
-}
-
-/// The below 3 functions are just non-const and r-value variations of the top 2 functions
-
-template <typename T>
-T* any_cast(any* a) {
-	using D = std::decay_t<T>;
-	
-	if (!a)	return nullptr;
-	if constexpr (!std::is_copy_constructible_v<std::decay_t<T>>) return nullptr;
-	if (a->mManage != &any::get_pointer<D>) return nullptr; 
-	
-	auto p = static_cast<any_data<T>*>(a->mStorage);
-	return static_cast<T*>(&p->mData);
 }
 
 template <typename T>
