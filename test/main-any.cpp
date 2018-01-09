@@ -80,7 +80,14 @@ int main() {
 	
 	{
 		ari::any a = std::array<uintmax_t, 2048>{};
-		auto a_d = ari::any_cast<std::array<uintmax_t, 2048>>(a);
+		try {
+			ari::any_cast<std::array<uintmax_t, 2048>>(a);
+		} catch (std::exception e) {
+			std::cerr << e.what() << "\n";
+		} catch (...) {
+			std::cerr << "Somthing broke, dont know what :P\n"; 
+		}
+		
 		a = 'b';
 		std::cout << ari::any_cast<char>(a) << std::endl;
 	}
