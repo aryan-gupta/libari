@@ -16,47 +16,21 @@
 .DEFAULT_GOAL := all
 # ==========================  CONST MACROS  ====================================
 CC = g++
-RES = windres
 BIN = bin
 
-# ============================  SDL LIBS  ======================================
-L_SDLC = -IC:/Compiler/SDL/include/SDL2  
-L_SDLL = $(GRAPHICS) -LC:/Compiler/SDL/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf -lSDL2_image
-
 # ==============================  MACROS  ======================================
-CFLAGS = $(DEBUG) -Wall -std=c++11 -c
-LFLAGS = $(DEBUG) -Wall
-OBJS = $(BIN)/res.o $(BIN)/main.o
-
-TEST = DList.h
+STD    = -std=c++17
+CFLAGS = -Wall $(STD)
+LFLAGS = -Wall
 
 # ============================ RECEPIES ========================================
 
-$(BIN)/main.o: main.cpp $(TEST)
-	$(CC) main.cpp -o $@ $(CFLAGS) $(L_SDLC)
-
-$(BIN)/%.o: %.cpp
-	$(CC) $^ -o $@ $(CFLAGS) $(L_SDLC)
-
-$(BIN)/res.o: res.rc info.h
-	$(RES) res.rc  $@
-	
-# Link
-$(BIN)/main.exe: DEBUG = -g -DDEBUG
-$(BIN)/main.exe: $(OBJS)
-	$(CC) $^ -o $(BIN)/main.exe $(LFLAGS) $(L_SDLL)
+any : test/main-any.cpp include/any.hpp
+	g++ $(CFLAGS) -o bin/any.exe $<
 
 # ============================= PHONY RECEPIES =================================
 .PHONY: all
-all: clean $(OBJS)
-	$(CC) $(OBJS) $(LFLAGS) $(L_SDLL) -o $(BIN)/final.exe
-
-.PHONY: install
-install: DEBUG = -O2 -s -DNDEBUG
-install: GRAPHICS = -w -Wl,-subsystem,windows
-install: all Runner.cpp $(BIN)/res.o
-	$(CC) Runner.cpp $(BIN)/res.o -static -o Play.exe
-	Play.exe
+all: clean $(TESTS)
 	
 .PHONY: clean
 clean:

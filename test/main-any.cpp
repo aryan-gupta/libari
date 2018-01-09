@@ -6,6 +6,15 @@
 
 #include "../include/any.hpp"
 
+
+std::string multiply_string(std::string str, size_t n) {
+	std::string result;
+	while (n --> 0) {
+		result += str;
+	}
+	return result;
+}
+
 int main() {
 	
 	{
@@ -45,13 +54,7 @@ int main() {
 	{
 		ari::any a;
 		a = 4;
-		a = std::string{"dfhskdjhflksjdhgfkdjhfgjkdhsfjkgsdjkfghdlksjhfgjkhdsfjgkhfeuihrfuisdbfhbjk"
-			"kdjhflksjdhfkjsdhfjdshkgjsfdgshdjkfgkjhsdgfkajhsgeufiawbcuebwuecbayuwbchjkxjckhabwecuy"
-			"jhflkjsdhfdhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
-			"jhflkjsdhfdhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
-			"jhflkjsdhfdhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
-			"jhflkjsdhfdhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
-		};
+		a = multiply_string("Hello", 10);
 		
 		ari::any b;
 		b = 2.0;
@@ -66,15 +69,20 @@ int main() {
 	}
 	
 	{
-		// std::any a = "Hello";
-		// std::cout << std::any_cast<const char*>(a) << std::endl;
-		// std::cout << std::any_cast<std::string>(a) << std::endl;
+		ari::any a = "Hello";
+		std::cout << ari::any_cast<const char*>(a) << std::endl;
+		try {
+			std::cout << ari::any_cast<std::string>(a) << std::endl;
+		} catch (std::bad_any_cast) {
+			std::cout << "GOOD: bad any_cast caught properly\n";
+		}
 	}
 	
 	{
-		ari::any a = "Hello";
-		std::cout << ari::any_cast<const char*>(a) << std::endl;
-		std::cout << ari::any_cast<std::string>(a) << std::endl;
+		ari::any a = std::array<uintmax_t, 2048>{};
+		auto a_d = ari::any_cast<std::array<uintmax_t, 2048>>(a);
+		a = 'b';
+		std::cout << ari::any_cast<char>(a) << std::endl;
 	}
 	
 	{
@@ -85,10 +93,10 @@ int main() {
 		stuff.push_back('2');
 		stuff.push_back('a');
 		
-		std::cout << ari::any_cast<int>              (stuff[0])
-				  << ari::any_cast<double>           (stuff[1])
-				  << ari::any_cast<char>             (stuff[2])
-				  << ari::any_cast<char>             (stuff[2])
+		std::cout << ari::any_cast<int>   (stuff[0])
+				  << ari::any_cast<double>(stuff[1])
+				  << ari::any_cast<char>  (stuff[2])
+				  << ari::any_cast<char>  (stuff[2])
 				  << std::endl;
 	}
 
