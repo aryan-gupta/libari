@@ -68,9 +68,6 @@ class any {
 			::new (&dest.mBuf) T{ std::move(reinterpret_cast<T&>(src.mBuf)) };
 		}
 		
-		// static void swap(AnyStorage& a, AnyStorage& b) {
-			// std::swap(reinterpret_cast<T&>(a.mBuf), reinterpret_cast<T&>(b.mBuf));
-		// }
 	};
 	
 	template <typename T>
@@ -105,9 +102,6 @@ class any {
 			src.mPtr = nullptr;
 		}
 		
-		// static void swap(AnyStorage& a, AnyStorage& b) {
-			// std::swap(static_cast<T*>(a.mPtr), static_cast<T*>(b.mPtr));
-		// }
 	};
 	
 	template <typename T>
@@ -155,9 +149,10 @@ public:
 	
 	template <
 		typename T,
+		typename D = std::decay_t<T>,
 		std::enable_if_t<!std::is_same_v<std::decay_t<T>, ari::any>>* = nullptr
-	> any(T&& d) : mManager{ get_manager<T>() } {
-		mStorage = manager_type<T>::create(d);
+	> any(T&& d) : mManager{ get_manager<D>() } {
+		mStorage = manager_type<D>::create(d);
 	}
 
 	~any() { reset(); }
@@ -204,11 +199,12 @@ public:
 
 	template <
 		typename T,
+		typename D = std::decay_t<T>,
 		std::enable_if_t<!std::is_same_v<std::decay_t<T>, ari::any>>* = nullptr
 	> any& operator=(T&& rhs) {
 		reset();
-		mManager = get_manager<T>();
-		mStorage = manager_type<T>::create(std::forward<T>(rhs));
+		mManager = get_manager<D>();
+		mStorage = manager_type<D>::create(std::forward<T>(rhs));
 		return *this;
 	}
 	
