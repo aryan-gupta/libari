@@ -70,10 +70,21 @@ int main() {
 	
 	{
 		ari::any a = "Hello";
-		std::cout << ari::any_cast<const char*>(a) << std::endl;
+		
+		// int status;
+		// auto realname = abi::__cxa_demangle(a.type().name(), 0, 0, &status);
+		// std::cout << realname << "\n";
+		
+		try {
+			std::cout << ari::any_cast<const char*>(a) << std::endl;
+			// std::cout << ari::any_cast<const char (&) [6]>(a) << std::endl;
+		} catch (...) {
+			std::cout << "ERROR: bad any_cast caught when it shouldn't\n";
+		}
+		
 		try {
 			std::cout << ari::any_cast<std::string>(a) << std::endl;
-		} catch (std::bad_any_cast) {
+		} catch (ari::bad_any_cast) {
 			std::cout << "GOOD: bad any_cast caught properly\n";
 		}
 	}
