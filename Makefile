@@ -27,6 +27,9 @@ LFLAGS = -Wall
 
 any : test/main-any.cpp include/any.hpp
 	g++ $(CFLAGS) -o bin/any.exe $<
+	
+heap : test/main-heap.cpp include/priority_queue.hpp
+	g++ $(CFLAGS) -o bin/heap.exe $<
 
 # ============================= PHONY RECEPIES =================================
 .PHONY: all
