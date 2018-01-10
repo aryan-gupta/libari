@@ -6,41 +6,11 @@
 #include <any> // for std::bad_any_cast
 
 namespace ari {
-// namespace ari is a namespace I have been
-// using for alot of my code where I implement
-// my 'own' std:: stuctures and algorithms
-
-
-struct any_base {
-	virtual ~any_base() = default;
-	virtual any_base* clone() const = 0;
-	virtual const std::type_info& type_id() const = 0;
-};
-
-
-template <typename T>
-struct any_data : public any_base {
-	using value_type = T;
 	
-	any_data(const value_type& vt) : mData{ vt } {}
-	
-	virtual ~any_data() = default;
-	virtual const std::type_info& type_id() const { return typeid(value_type); }
-	virtual any_data* clone() const { return new any_data{ mData }; }
-	
-	value_type mData;
-};
-
+using std::bad_any_cast;
 
 /// @brief A class that can hold one of any type of data
-/**
-	A lot of this implementation was used from
-	http://www.two-sdg.demon.co.uk/curbralan/papers/ValuedConversions.pdf
-	This is a good read if you want to better understand what's going on here
-*/
-
 class any {
-public:
 	/// @brief A list of the friend classes, used so we can cast it to the proper type
 	template <typename T> friend T* any_cast(any* a);
 	template <typename T> friend const T* any_cast(const any* a);
@@ -48,28 +18,147 @@ public:
 	template <typename T> friend T any_cast(any& a);
 	template <typename T> friend T any_cast(any&& a);
 	
-	/// @brief Creates an empty any 
-	constexpr any() noexcept : mStorage{ nullptr }, mGet{ nullptr } {}
+	using heap_storage = void*;
+	using stack_storage = std::aligned_storage<sizeof(void*), std::alignment_of<void*>::value>::type;
 	
-	/// @brief Copies constructs a another any
-	/// @param other The any type to copy
-	any(const any& other) : mStorage{ other.mStorage->clone() }, mGet{ other.mGet } {}
+	union AnyStorage {
+		heap_storage  mPtr;
+		stack_storage mBuf;
+	};
 	
-	any(any&& other) noexcept : mStorage{ other.mStorage }, mGet { other.mGet } {
-		other.mStorage = nullptr;
-		other.mGet = nullptr;
+	struct AnyManager {
+		// void (*create) (AnyStorage&);
+		void* (*get) (AnyStorage&);
+		const std::type_info& (*type_id) ();
+		AnyStorage (*clone) (const AnyStorage&);
+		void (*destroy) (AnyStorage&);
+		void (*move) (AnyStorage&, AnyStorage&);
+		void (*swap) (AnyStorage& a, AnyStorage& b);
+	};
+	
+	template <typename T>
+	struct AnyManagerStack {
+		
+		template <typename... A>
+		static AnyStorage create(A&&... args) {
+			AnyStorage dest;
+			::new (&dest.mBuf) T{ std::forward<A>(args)... };
+			return dest;
+		}
+		
+		static void* get(AnyStorage& dat) noexcept {
+			return reinterpret_cast<T*>(&dat.mBuf);
+		}
+		
+		static const std::type_info& type_id() noexcept {
+			return typeid(T);
+		}
+		
+		static AnyStorage clone(const AnyStorage& src) {
+			AnyStorage dest;
+			::new (&dest.mBuf) T{ reinterpret_cast<const T&>(src.mBuf) };
+			return dest;
+		}
+		
+		static void destroy(AnyStorage& dat) {
+			reinterpret_cast<T*>(&dat.mBuf)->~T(); // call to destructor
+		}
+		
+		static void move(AnyStorage& src, AnyStorage& dest) {
+			::new (&dest.mBuf) T{ std::move(reinterpret_cast<T&>(src.mBuf)) };
+		}
+		
+		// static void swap(AnyStorage& a, AnyStorage& b) {
+			// std::swap(reinterpret_cast<T&>(a.mBuf), reinterpret_cast<T&>(b.mBuf));
+		// }
+	};
+	
+	template <typename T>
+	struct AnyManagerHeap {
+		template <typename... A>
+		static AnyStorage create(A&&... args) {
+			AnyStorage dest;
+			dest.mPtr = new T{ std::forward<A>(args)... };
+			return dest; // RVO
+		}
+		
+		static void* get(AnyStorage& dat) noexcept {
+			return static_cast<T*>(dat.mPtr);
+		}
+		
+		static const std::type_info& type_id() noexcept {
+			return typeid(T);
+		}
+		
+		static AnyStorage clone(const AnyStorage& src) {
+			AnyStorage dest;
+			dest.mPtr = new T{*static_cast<T*>(src.mPtr)};
+			return dest;
+		}
+		
+		static void destroy(AnyStorage& dat) {
+			delete static_cast<T*>(dat.mPtr);
+		}
+		
+		static void move(AnyStorage& src, AnyStorage& dest) {
+			dest.mPtr = src.mPtr;
+			src.mPtr = nullptr;
+		}
+		
+		// static void swap(AnyStorage& a, AnyStorage& b) {
+			// std::swap(static_cast<T*>(a.mPtr), static_cast<T*>(b.mPtr));
+		// }
+	};
+	
+	template <typename T>
+	constexpr static bool requires_allocation() {
+		return sizeof(T) >= sizeof(AnyStorage) and alignof(T) >= alignof(AnyStorage);
 	}
 	
-	/**
-		This function firsts decays T, this is mostly used if we want to 
-		store a static array. It will store the actual array, however,
-		the function will store the decay type information
-	*/
+	template <typename T, bool b = requires_allocation<T>()> 
+	using manager_type = std::conditional_t<b, AnyManagerHeap<std::decay_t<T>>, AnyManagerStack<std::decay_t<T>>>;
+	
+	template <typename T>
+	static AnyManager* get_manager() {
+		using F = manager_type<T>;
+		
+		static AnyManager manager { &F::get, &F::type_id, &F::clone, &F::destroy, &F::move/*, &F::swap */};
+		
+		return &manager;
+	}
+	
+	template <typename T>
+	T* get() {
+		return static_cast<T*>(mManager->get(mStorage));
+	}
+	
+	// template <typename T>
+	// const T* get() const {
+		// return static_cast<const T*>(mManager->get(mStorage));
+	// }
+	
+	AnyManager* mManager;
+	AnyStorage  mStorage;
+	
+public:
+	/// @brief Creates an empty any 
+	constexpr any() noexcept : mManager{ nullptr }, mStorage{ nullptr } {}
+	
+	/// @brief Copies constructs an another any from \param other
+	/// @param other The any type to copy
+	any(const any& other) : mManager{ other.mManager }, mStorage{ mManager->clone(other.mStorage) } {}
+	
+	any(any&& other) noexcept : mManager { other.mManager } {
+		mManager->move(other.mStorage, this->mStorage);
+		other.mManager = nullptr;
+	}
+	
 	template <
 		typename T,
-		typename D = std::decay_t<T>,
 		std::enable_if_t<!std::is_same_v<std::decay_t<T>, ari::any>>* = nullptr
-	> any(T&& d) : mStorage{ new data<T>(std::forward<T>(d)) }, mGet{ &get_pointer<D> } {}
+	> any(T&& d) : mManager{ get_manager<T>() } {
+		mStorage = manager_type<T>::create(d);
+	}
 
 	~any() { reset(); }
 	
@@ -77,34 +166,34 @@ public:
 	template <typename T, typename... A>
 	T& emplace(A&&... args) {
 		reset();
-		mStorage = new data<T>(std::forward<A>(args)...);
+		mManager = get_manager<T>();
+		mStorage = manager_type<T>::create(std::forward<A>(args)...);
 	}
 	
 	void reset() noexcept {
-		if (!mGet) return;
+		if (!mManager) return;
 		
-		delete mStorage;
-		mGet = nullptr;
-		mStorage = nullptr;
+		mManager->destroy(mStorage);
+		mManager = nullptr;
 	}
 	
 	void swap(any& other) noexcept {
 		std::swap(mStorage, other.mStorage);
-		std::swap(mGet, other.mGet);
+		std::swap(mManager, other.mManager);
 	}
 	
 	bool has_value() const noexcept {
-		return mGet != nullptr;
+		return mManager != nullptr;
 	}
 	
 	const std::type_info& type() const noexcept {
-		return has_value()? mStorage->type_id() : typeid(void);
+		return has_value()? mManager->type_id() : typeid(void);
 	}
 	
 	any& operator=(const any& rhs) {
 		reset();
-		mStorage = rhs.mStorage->clone();
-		mGet = rhs.mGet;
+		mManager = rhs.mManager;
+		mStorage = mManager->clone(rhs.mStorage);
 		return *this;
 	}
 	
@@ -115,45 +204,12 @@ public:
 
 	template <
 		typename T,
-		typename D = std::decay_t<T>,
 		std::enable_if_t<!std::is_same_v<std::decay_t<T>, ari::any>>* = nullptr
 	> any& operator=(T&& rhs) {
 		reset();
-		mStorage = new data<T>(std::forward<T>(rhs));
-		mGet = &get_pointer<D>;
+		mManager = get_manager<T>();
+		mStorage = manager_type<T>::create(std::forward<T>(rhs));
 		return *this;
-	}
-	
-private:	
-	using base = any_base;
-	template <typename T> using data = any_data<T>;
-	
-	base* mStorage;
-	void* (*mGet) (const any& a); // function pointer -- return void pointer 
-	
-	/// After looking through GCC's implementation of std::any, they use a
-	/// cool approch that I will try to emplain below. 
-	/**
-		The private member of std::any is the actual storage, a union of a
-		void pointer and a arbitrary storage same size of the void pointer. 
-		This makes this the overall size of the storage just sizeof(void*)
-		The other member data is function pointer to a 'manager' this manager
-		does most of the hardwork. There are 2 types of managers that they 
-		implement, one for the void* (heap item) and one for aligned storage
-		(stack item). The pointer changes depending on what item is stored
-		this way when you do an any_cast, it checks if the address of the 
-		actual function of the type is equal to the private member of 
-		std::any. 
-	*/
-	/// @brief get function for the pointer.
-	/**
-		@todo when we implement small item optimization, we will another
-		function for it
-	*/
-	template <typename T>
-	static void* get_pointer(const any& a) {
-		auto p = static_cast<any_data<T>*>(a.mStorage);
-		return static_cast<T*>(&p->mData);
 	}
 	
 }; // end class any
@@ -162,32 +218,24 @@ template <typename T> using any_cast_t = std::remove_cv_t<std::remove_reference_
 
 template <typename T>
 const T* any_cast(const any* a) {
-	using D = std::decay_t<T>;
-	
 	if (!a)	return nullptr;
-	// if constexpr (!std::is_copy_constructible_v<std::decay_t<T>>) return nullptr;
-	if (a->mGet != &any::get_pointer<D>) return nullptr; 
+	if constexpr (!std::is_copy_constructible_v<std::decay_t<T>>) return nullptr;
+	if (a->mManager != any::get_manager<std::decay_t<T>>()) return nullptr; 
 	
-	// Ok alot is happening on this line. First we take the ari::any private pointer (any_base*)
-	// and we cast it to a derived class any_data<T> pointer.
-	auto p = static_cast<any_data<T>*>(a->mStorage);
-	
-	// Then we cast it to the proper type
-	// Note that becsue this returns a pointer, it takes care of the static array 
-	// issue we had in the earlier version
-	return static_cast<T*>(&p->mData);
+	return a->get<std::decay_t<T>>();
 }
 
 template <typename T>
 T* any_cast(any* a) {
-	using D = std::decay_t<T>;
-	
 	if (!a)	return nullptr;
 	if constexpr (!std::is_copy_constructible_v<std::decay_t<T>>) return nullptr;
-	if (a->mGet != &any::get_pointer<D>) return nullptr; 
 	
-	auto p = static_cast<any_data<T>*>(a->mStorage);
-	return static_cast<T*>(&p->mData);
+	// std::cout << a->mManager << "\n" << any::get_manager<std::decay_t<T>>() << "\n";
+	
+	if (a->mManager != any::get_manager<T>()) return nullptr; 
+	// std::cout << "ANYCAST 1\n";
+	
+	return a->get<std::decay_t<T>>();
 }
 
 template <typename T>
