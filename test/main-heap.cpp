@@ -14,13 +14,12 @@
  * @description 	
  * =============================================================================
  */
-#include "info.h"
 
 #include <iostream>
 #include <vector>
 #include <functional>
 
-#include "priority_queue.hpp"
+#include "../include/priority_queue.hpp"
 
 using namespace std;
 
