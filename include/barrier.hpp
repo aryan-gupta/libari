@@ -2,6 +2,8 @@
 #include <mutex>
 #include <condition_variable>
 #include <cstddef>
+#include <unordered_set>
+#include <thread>
 
 
 #ifndef BARRIER_INC
@@ -17,13 +19,13 @@ class barrier {
 	// potentially uses less memory. 
 	
 	bool mComplete = false;
-	thread_local bool mIsPart = false;
+	std::unordered_set<std::thread::id> mIsPart;
 	
 	std::mutex mMtx;
 	std::condition_variable mCondVar;
 	
 public:
-	explicit barrier(ptrdiff_t num_threads) : mThreads{ num_threads }, mWaiting{ num_threads } {};
+	explicit barrier(ptrdiff_t num_threads) : mThreads( num_threads ), mWaiting{ mThreads } {};
 	barrier(const barrier&) = delete;
 	
 	barrier& operator=(const barrier&) = delete;
@@ -38,11 +40,12 @@ public:
 		
 		if (!mComplete)	{ // if we are not past the completion phase,
 			//then mark this thread as part of the barrier
-			mIsPart = true; 
+			mIsPart.emplace(std::this_thread::get_id()); 
 		} 
 		
-		if (mComplete and !mIsPart) { // Standard does not state what happens if
-			// if a non-participationg member calls this function.
+		if (mComplete and mIsPart.find(std::this_thread::get_id()) == mIsPart.end()) { 
+			// Standard does not state what happens if if a non-participationg
+			// member calls this function.
 			return; 
 		} 
 		
@@ -58,13 +61,13 @@ public:
 			mCondVar.notify_all();
 		} else {
 			bool cycle_local = mCycle;
-			mCondVar.wait(lk, [this]{ return mCycle == cycle_local; });	
+			mCondVar.wait(lk, [&]{ return mCycle == cycle_local; });	
 		}
 	}
 	
 	void arrive_and_drop() {
 		std::scoped_lock lk{ mMtx };
-		if (mIsPart) mIsPart = false;
+		if (auto it = mIsPart.find(std::this_thread::get_id()); it != mIsPart.end()) mIsPart.erase(it);
 		--mThreads;
 	}
 	
