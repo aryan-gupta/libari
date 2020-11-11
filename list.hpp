@@ -18,6 +18,12 @@
 #ifndef ARI_LIST_HPP
 #define ARI_LIST_HPP
 
+#include <cstddef>
+#include <memory>
+#include <limits>
+
+#include "Iterator.h"
+
 namespace ari {
 
 template <typename TType>
@@ -38,23 +44,29 @@ struct node_type {
 template <typename TType, typename TAlloc = std::allocator<TType>>
 class list {
 public:
-	using value_type      = TType;
-	using allocator_type  = TAlloc;
-	using size_type       = size_type;
-	using reference       = value_type&;	
-	using const_reference = const value_type&;
-	using move_reference  = value_type&&;
-	using pointer         = typename std::allocator_traits<allocator_type>::pointer;
-	using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
-	using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
+	using value_type           = TType;
+	using allocator_type       = TAlloc;
+	using size_type            = size_t;
+	using reference            = value_type&;	
+	using const_reference      = const value_type&;
+	using move_reference       = value_type&&;
+	using pointer              = typename std::allocator_traits<allocator_type>::pointer;
+	using const_pointer        = typename std::allocator_traits<allocator_type>::const_pointer;
+	using difference_type      = typename std::allocator_traits<allocator_type>::difference_type;
 	
 private:
 	using node_type            = node_type<value_type>;
-	using node_allocator_type  = allocator_type::template rebind<node_type>::other;
+	using node_allocator_type  = typename allocator_type::template rebind<node_type>::other;
 	using node_pointer         = typename std::allocator_traits<node_allocator_type>::pointer;
 	using const_node_pointer   = typename std::allocator_traits<node_allocator_type>::const_pointer;
 	
 public:	
+	using iterator             = ari::random_access_iterator<node_pointer>;
+	using const_iterator       = ari::random_access_iterator<const_node_pointer>;
+	using reverse_iterator     = ari::random_access_iterator<const_node_pointer>;
+	using const_reverse_iterator= ari::random_access_iterator<const_node_pointer>;
+	
+	
 	list();
 	explicit list(const allocator_type& alloc);
 	list(size_type count, const_reference val, const allocator_type& alloc = allocator_type{});
@@ -109,9 +121,9 @@ public:
 	iterator insert(const_iterator pos, std::initializer_list<value_type> ilst);
 	
 	// emplace
-	template <typename TArgs...> emplace(const_iterator pos, TArgs&&... args);
-	template <typename TArgs...> emplace_back(TArgs&&... args);
-	template <typename TArgs...> emplace_front(TArgs&&... args);
+	template <typename... TArgs> iterator emplace(const_iterator pos, TArgs&&... args);
+	template <typename... TArgs> iterator emplace_back(TArgs&&... args);
+	template <typename... TArgs> iterator emplace_front(TArgs&&... args);
 	
 	// erase
 	iterator erase(const_iterator pos);
@@ -128,7 +140,7 @@ public:
 	void pop_front();
 	
 	void resize(size_type count);
-	void resize(size_type count, const_reference val = val{});
+	void resize(size_type count, const_reference val = {});
 	
 	void swap(list& other);
 	
@@ -145,15 +157,15 @@ public:
 	void splice(const_iterator pos, list&& other, const_iterator first, const_iterator last);
 	
 	void remove(const_reference val);
-	template <typename TUPred> void remove_if(TUPred pred);
+	template <typename TPred> void remove_if(TPred pred);
 	
 	void reverse();
 	
 	void unique();
-	template <TBPred> void unique(TBPred binp);
+	template <typename TPred> void unique(TPred binp);
 
 	void sort();
-	template <TBPred> void sort(TBPred binp)
+	template <typename TPred> void sort(TPred binp);
 	
 private:
 	node_pointer insert_base(node_pointer pos, const_reference val, size_type count = 1);
@@ -204,7 +216,7 @@ list<TType, TAlloc>::list(size_type count, const allocator_type& alloc)
 
 template <typename TType, typename TAlloc> 
 template <typename TIter>
-list<TType, TAlloc>::list(TIter begin, TIter end, const allocator_type& alloc);
+list<TType, TAlloc>::list(TIter begin, TIter end, const allocator_type& alloc)
 : mAlloc{alloc}, mHead{}, mTail{}, mSize{} { mTail = insert_base(mHead, begin, end); }
 
 
@@ -234,7 +246,7 @@ list<TType, TAlloc>::list(list&& other, const allocator_type& alloc)
 
 template <typename TType, typename TAlloc> 
 list<TType, TAlloc>::list(std::initializer_list<value_type> init)
-: mAlloc{alloc}, mHead{}, mTail{}, mSize{}
+: mAlloc{}, mHead{}, mTail{}, mSize{}
 	{ mTail = insert_base(mHead, init.begin(), init.end()); }
 	
 	
@@ -243,7 +255,7 @@ list<TType, TAlloc>::~list() { clear(); }
 
 
 template <typename TType, typename TAlloc> 
-list& list<TType, TAlloc>::operator=(const list& other) {
+auto list<TType, TAlloc>::operator=(const list& other) -> list& {
 	clear();
 	mTail = insert_base(mHead, other.mHead, other.mTail);	
 	return *this;
@@ -251,7 +263,7 @@ list& list<TType, TAlloc>::operator=(const list& other) {
 
 
 template <typename TType, typename TAlloc>
-list& list<TType, TAlloc>::operator=(list&& other) {
+auto list<TType, TAlloc>::operator=(list&& other) -> list& {
 	clear();
 	mTail = splice_base(mHead, other.mHead, other.mTail);
 	return *this;
@@ -259,7 +271,7 @@ list& list<TType, TAlloc>::operator=(list&& other) {
 
 
 template <typename TType, typename TAlloc>
-list& list<TType, TAlloc>::operator=(std::initializer_list<value_type> init) {
+auto list<TType, TAlloc>::operator=(std::initializer_list<value_type> init) -> list& {
 	clear();
 	mTail = insert_base(mHead, init.begin(), init.end());
 	return *this;
@@ -343,11 +355,12 @@ auto list<TType, TAlloc>::crend() const -> const_reverse_iterator
 
 	
 template <typename TType, typename TAlloc> 
-std::pair<node_pointer, node_pointer> list<TType, TAlloc>::data() { return {mHead, mTail}; }
+auto list<TType, TAlloc>::data() -> std::pair<node_pointer, node_pointer>
+	{ return {mHead, mTail}; }
 
 	
 template <typename TType, typename TAlloc> 
-std::pair<const_node_pointer, const_node_pointer> list<TType, TAlloc>::data() const
+auto list<TType, TAlloc>::data() const -> std::pair<const_node_pointer, const_node_pointer>
 	{ return {mHead, mTail}; }
 	
 	
@@ -368,24 +381,76 @@ template <typename TType, typename TAlloc> ///@todo make sure that ease_base set
 void list<TType, TAlloc>::clear() { erase_base(mHead, mTail); }
 
 
-// insert
 template <typename TType, typename TAlloc> 
-void list<TType, TAlloc>::insert(iterator it, const_reference val) {
+auto list<TType, TAlloc>::insert(const_iterator pos, const_reference val) -> iterator {
 	// the reason we can do const_cast is because even though we might
 	// do list<const T> the node is NOT a const only the data is. 
 	// however, if we do const_cast on ari::vector<const T>
 	// we will cause undefined behavior because we are removeing the 
 	// const on the actual data (which is const). 
-	insert_base(const_cast<node_pointer>(it.base()), val);
+	insert_base(const_cast<node_pointer>(pos.base()), val);
 }
 
-// emplace
 
 
-// erase
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::insert(const_iterator pos, value_type&& val) -> iterator {
+	
+}
 
 
-// push ends
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::insert(const_iterator pos, size_type count, const_reference val) -> iterator {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename TIter> 
+auto list<TType, TAlloc>::insert(const_iterator pos, TIter first, TIter last) -> iterator {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+auto list<TType, TAlloc>::insert(const_iterator pos, std::initializer_list<value_type> ilst) -> iterator {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+template <typename... TArgs>
+auto list<TType, TAlloc>::emplace(const_iterator pos, TArgs&&... args) -> iterator {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+template <typename... TArgs>
+auto list<TType, TAlloc>::emplace_back(TArgs&&... args) -> iterator {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+template <typename... TArgs>
+auto list<TType, TAlloc>::emplace_front(TArgs&&... args) -> iterator {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+auto list<TType, TAlloc>::erase(const_iterator pos) -> iterator {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+auto list<TType, TAlloc>::erase(const_iterator begin, const_iterator end) -> iterator {
+	
+}
+
+
 template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::push_back(const_reference val) { insert_base(mTail, val); }
 
@@ -418,6 +483,88 @@ void list<TType, TAlloc>::pop_front() {
 
 
 template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::resize(size_type count) {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::resize(size_type count, const_reference val) {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::swap(list& other) {
+	std::swap(mHead, other.mHead);
+	std::swap(mTail, other.mTail);
+}
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::merge(list& other) {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+void list<TType, TAlloc>::merge(list&& other) {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
+template <typename TPred>
+void list<TType, TAlloc>::merge(list& other, TPred cmp) {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename TPred>
+void list<TType, TAlloc>::merge(list&& other, TPred cmp) {
+	
+}
+
+
+// splice
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::splice(const_iterator pos, list& other) {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::splice(const_iterator pos, list&& other) {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::splice(const_iterator pos, list& other, const_iterator it) {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::splice(const_iterator pos, list&& other, const_iterator it) {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::splice(const_iterator pos, list& other, const_iterator first, const_iterator last) {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::splice(const_iterator pos, list&& other, const_iterator first, const_iterator last) {
+	
+}
+
+
+template <typename TType, typename TAlloc> 
 void list<TType, TAlloc>::remove(const TType& val) {
 	node_pointer c = mHead;
 	while (c != nullptr)
@@ -426,12 +573,47 @@ void list<TType, TAlloc>::remove(const TType& val) {
 }
 
 
-template <typename TType, typename TAlloc> 
-auto list<TType, TAlloc>::size() const -> size_type	{ return mSize; }
+template <typename TType, typename TAlloc>
+template <typename TPred>
+void list<TType, TAlloc>::remove_if(TPred pred) {
 	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::reverse() {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::unique() {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename TPred>
+void list<TType, TAlloc>::unique(TPred binp) {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+void list<TType, TAlloc>::sort() {
+	
+}
+
+
+template <typename TType, typename TAlloc>
+template <typename TPred>
+void list<TType, TAlloc>::sort(TPred binp) {
+	
+}
+
 
 template <typename TType, typename TAlloc> 
-auto list<TType, TAlloc>::erase_base(node_pointer pos) -> iterator {
+auto list<TType, TAlloc>::erase_base(node_pointer pos) -> node_pointer {
 	if (pos == mTail) {
 		mTail = mTail->prev;
 		mTail->next = nullptr;
@@ -446,7 +628,6 @@ auto list<TType, TAlloc>::erase_base(node_pointer pos) -> iterator {
 	mAlloc.deallocate(pos, 1);
 }
 
-template <>
 
 } // end namespace ari
 
